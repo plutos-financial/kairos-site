@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Deploy Kairos · Base Sepolia</title>
+  <script type="module" crossorigin src="./assets/deploy-DfU7QNjv.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/foundry-CIZYeqgR.js">
+  <link rel="stylesheet" crossorigin href="./assets/foundry-DvOhFeCn.css">
+  <link rel="stylesheet" crossorigin href="./assets/app-BDZeXJKA.css">
+</head>
+<body>
+  <div class="testnet-bar">Test network (Base Sepolia). Fake money only.</div>
+  <header class="top">
+    <div class="brand"><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg><span class="name">kairos</span><span class="by">Deploy from your browser</span></div>
+    <div class="top-right"><a href="./" class="btn btn-ghost" style="display:inline-flex;align-items:center;text-decoration:none">Back to app</a></div>
+  </header>
+  <main>
+    <section class="card">
+      <h2>Deploy the Kairos contracts to Base Sepolia</h2>
+      <p class="sub">No terminal needed. Your wallet signs about 10 transactions: 4 contracts, then 6 setup steps. It costs only free test ETH. The wallet you use becomes the owner and sees the demo controls.</p>
+      <ol class="sub" style="line-height:1.8">
+        <li>Install MetaMask or Coinbase Wallet in this browser and create a <b>new test wallet</b> (never one with real money).</li>
+        <li>Get free Base Sepolia ETH from a faucet (links in the README), about 0.01 ETH is plenty.</li>
+        <li>Click the button and approve each transaction.</li>
+      </ol>
+      <div class="row wrap" style="margin-top:16px">
+        <button id="go" class="btn btn-primary">Connect and deploy</button>
+        <button id="dl" class="btn" hidden>Download deployment.json</button>
+        <a id="open" class="btn" href="./" hidden style="display:inline-flex;align-items:center;text-decoration:none">Open the app</a>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Progress</h2>
+      <ol id="log" class="sub" style="line-height:1.9;font-family:var(--mono);font-size:14px"></ol>
+    </section>
+  </main>
+</body>
+</html>

@@ -1,0 +1,4 @@
+# This folder is a finished static website: nothing to build.
+[build]
+  command = "echo 'Kairos: static site, no build step'"
+  publish = "."
