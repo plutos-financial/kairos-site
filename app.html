@@ -6,12 +6,13 @@
   <title>Kairos · Your savings</title>
   <meta name="description" content="Kairos testnet demo: keep every dollar, win the interest." />
   <meta name="theme-color" content="#050506" />
-  <script type="module" crossorigin src="./assets/app-BTIf3sZQ.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/foundry-CIZYeqgR.js">
-  <link rel="modulepreload" crossorigin href="./assets/core-Dzdn0Wce.js">
-  <link rel="modulepreload" crossorigin href="./assets/winners-ui-CgONBNOa.js">
-  <link rel="stylesheet" crossorigin href="./assets/foundry-DvOhFeCn.css">
-  <link rel="stylesheet" crossorigin href="./assets/app-BDZeXJKA.css">
+  <script type="module" crossorigin src="./assets/app-C-vVBK6T.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/foundry-DcIs69ir.js">
+  <link rel="modulepreload" crossorigin href="./assets/core-BgXClIxf.js">
+  <link rel="modulepreload" crossorigin href="./assets/winners-ui-BNiQ5s-Q.js">
+  <link rel="modulepreload" crossorigin href="./assets/pretend-CzB3FNjB.js">
+  <link rel="stylesheet" crossorigin href="./assets/style-DvOhFeCn.css">
+  <link rel="stylesheet" crossorigin href="./assets/app-Cp650oh5.css">
 </head>
 <body class="app-body">
   <div class="testnet-bar">Test network. Fake money only, nothing here has real value.</div>
@@ -22,6 +23,7 @@
       <span class="name">kairos</span>
     </a>
     <div class="top-right">
+      <a href="./how-it-works.html" class="top-link hide-sm">How it works</a>
       <a href="./winners.html" class="top-link">Winners</a>
       <span id="who" class="pill" hidden></span>
       <button id="signout" class="btn btn-ghost btn-sm" hidden>Sign out</button>
@@ -80,6 +82,14 @@
             <div class="ts-cell"><p class="label">Winners each draw</p><p id="winnersN" class="tile-num">—</p></div>
           </div>
           <p class="tiny entries-note" id="entriesNote" hidden></p>
+
+          <div class="card preview-card">
+            <div>
+              <h2>Curious how a draw goes?</h2>
+              <p class="tiny">Run a pretend one with the real savers and today's prize pool. Nothing moves.</p>
+            </div>
+            <button id="pretendBtn" class="btn btn-light" type="button">Run a pretend draw</button>
+          </div>
 
           <div class="chart-card">
             <div class="chart-head">

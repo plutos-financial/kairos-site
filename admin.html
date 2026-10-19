@@ -3,28 +3,29 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Kairos · Owner controls</title>
+  <title>Kairos · Draws</title>
   <meta name="robots" content="noindex" />
   <meta name="theme-color" content="#050506" />
-  <script type="module" crossorigin src="./assets/admin-BKYcyGnt.js"></script>
-  <link rel="modulepreload" crossorigin href="./assets/foundry-CIZYeqgR.js">
-  <link rel="modulepreload" crossorigin href="./assets/core-Dzdn0Wce.js">
-  <link rel="modulepreload" crossorigin href="./assets/winners-ui-CgONBNOa.js">
-  <link rel="stylesheet" crossorigin href="./assets/foundry-DvOhFeCn.css">
-  <link rel="stylesheet" crossorigin href="./assets/app-BDZeXJKA.css">
+  <script type="module" crossorigin src="./assets/admin-a4pI5xBw.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/foundry-DcIs69ir.js">
+  <link rel="modulepreload" crossorigin href="./assets/core-BgXClIxf.js">
+  <link rel="modulepreload" crossorigin href="./assets/winners-ui-BNiQ5s-Q.js">
+  <link rel="modulepreload" crossorigin href="./assets/pretend-CzB3FNjB.js">
+  <link rel="stylesheet" crossorigin href="./assets/style-DvOhFeCn.css">
+  <link rel="stylesheet" crossorigin href="./assets/app-Cp650oh5.css">
 </head>
 <body class="admin-page">
-  <div class="testnet-bar">Owner controls. Test network only.</div>
+  <div class="testnet-bar">Test network. Fake money only.</div>
   <header class="top">
     <a class="brand" href="./" aria-label="Kairos home">
       <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
-      <span class="name">kairos</span><span class="by">Owner</span>
+      <span class="name">kairos</span>
     </a>
     <nav class="subnav" aria-label="Pages">
       <a href="./app.html">App</a>
       <a href="./winners.html">Winners</a>
-      <a href="./admin.html" aria-current="page">Owner</a>
-      <a href="./control.html">Control room</a>
+      <a href="./admin.html" aria-current="page">Draws</a>
+      <a href="./how-it-works.html">How it works</a>
     </nav>
     <div class="top-right"><span id="who" class="pill">Not signed in</span></div>
   </header>
@@ -35,7 +36,10 @@
       <p class="dc-round" id="roundLine">Round <span id="roundId">—</span>, <span id="roundState">loading</span></p>
       <h1 class="dc-title" id="drawTitle">Loading…</h1>
       <p class="dc-hint" id="drawHint">&nbsp;</p>
-      <button id="drawNow" class="btn btn-primary btn-xl">Pick winners now</button>
+      <div class="dc-actions">
+        <button id="drawNow" class="btn btn-primary btn-xl">Run a pretend draw</button>
+        <button id="pretendBtn" class="btn btn-ghost btn-lg" type="button" hidden>Run a pretend draw</button>
+      </div>
       <ol class="dc-steps" id="drawSteps" hidden>
         <li data-step="1">Close the round</li>
         <li data-step="2">Get a random number</li>
@@ -46,7 +50,7 @@
         <span><b id="savers">—</b> savers entered</span>
         <span>A draw every <b id="period">—</b></span>
       </div>
-      <p class="dc-explain">Winners are picked at random, with more savings meaning more chances. Prizes come from the interest, so nobody loses their deposit.</p>
+      <p class="dc-explain">Winners are picked at random, and every dollar saved is a chance. Prizes come out of the interest, so nobody's deposit goes anywhere.</p>
     </section>
 
     <!-- 2. who won -->
@@ -56,19 +60,15 @@
       <p class="tiny latest-meta" id="latestMeta"></p>
     </section>
 
-    <!-- 3. settings -->
+    <!-- 3. the team's controls (hidden for everyone else) -->
+    <div id="adminArea" hidden>
     <div id="notOwner" class="lock" hidden>
       <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-      <p><b>These settings are locked to your MetaMask wallet.</b> Unlock them once to use them from your email account. Picking winners works either way.</p>
-      <button id="handover" class="btn btn-light btn-sm">Unlock with MetaMask</button>
-    </div>
-    <div id="signedOut" class="lock" hidden>
-      <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-      <p>Sign in on the <a href="./app.html">app</a> with your email first, then come back. Or connect the owner's MetaMask wallet.</p>
-      <button id="useWallet" class="btn btn-sm">Connect MetaMask</button>
+      <p><b>One-time setup.</b> Connect the MetaMask wallet that created Kairos once, and this email account can skip countdowns and change settings. Until then you can still pick winners when a round ends.</p>
+      <button id="handover" class="btn btn-light btn-sm">Connect MetaMask</button>
     </div>
 
-    <section class="card settings">
+    <section class="card settings" id="settings">
       <div class="card-head"><h2>Demo settings</h2><span class="tiny" id="updated"></span></div>
 
       <div class="set-row">
@@ -140,6 +140,9 @@
         <p class="tiny"><a href="./control.html">Open the control room</a> to watch the Rebalancer and simulate draws.</p>
       </details>
     </section>
+    </div>
+
+    <p class="team-note" id="signedOut" hidden>Kairos team? <a href="./app.html">Sign in</a>, then come back here. <button id="useWallet" class="link-btn" type="button">Or connect MetaMask.</button></p>
   </main>
 
   <!-- full-screen winners reveal after a draw -->
