@@ -21,13 +21,13 @@ jobs:
         with:
           fetch-depth: 0
       - name: Unzip the newest site zip
+        shell: bash
         run: |
           zip=""; newest=-1
-          for f in *.zip; do
-            [ -e "$f" ] || continue
+          while IFS= read -r f; do
             t=$(git log -1 --format=%ct -- "$f"); t=${t:-0}
             if [ "$t" -ge "$newest" ]; then newest=$t; zip="$f"; fi
-          done
+          done < <(find . -name '*.zip' -not -path './.git/*')
           if [ -z "$zip" ]; then echo "No .zip file found. Upload kairos-site.zip first."; exit 1; fi
           echo "Publishing $zip"
           rm -rf _unzipped _site && mkdir _unzipped _site
