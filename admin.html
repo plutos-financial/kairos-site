@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Kairos · Owner controls</title>
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#050506" />
+  <script type="module" crossorigin src="./assets/admin-BKYcyGnt.js"></script>
+  <link rel="modulepreload" crossorigin href="./assets/foundry-CIZYeqgR.js">
+  <link rel="modulepreload" crossorigin href="./assets/core-Dzdn0Wce.js">
+  <link rel="modulepreload" crossorigin href="./assets/winners-ui-CgONBNOa.js">
+  <link rel="stylesheet" crossorigin href="./assets/foundry-DvOhFeCn.css">
+  <link rel="stylesheet" crossorigin href="./assets/app-BDZeXJKA.css">
+</head>
+<body class="admin-page">
+  <div class="testnet-bar">Owner controls. Test network only.</div>
+  <header class="top">
+    <a class="brand" href="./" aria-label="Kairos home">
+      <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
+      <span class="name">kairos</span><span class="by">Owner</span>
+    </a>
+    <nav class="subnav" aria-label="Pages">
+      <a href="./app.html">App</a>
+      <a href="./winners.html">Winners</a>
+      <a href="./admin.html" aria-current="page">Owner</a>
+      <a href="./control.html">Control room</a>
+    </nav>
+    <div class="top-right"><span id="who" class="pill">Not signed in</span></div>
+  </header>
+
+  <main class="owner-main">
+    <!-- 1. the draw -->
+    <section class="card draw-card">
+      <p class="dc-round" id="roundLine">Round <span id="roundId">—</span>, <span id="roundState">loading</span></p>
+      <h1 class="dc-title" id="drawTitle">Loading…</h1>
+      <p class="dc-hint" id="drawHint">&nbsp;</p>
+      <button id="drawNow" class="btn btn-primary btn-xl">Pick winners now</button>
+      <ol class="dc-steps" id="drawSteps" hidden>
+        <li data-step="1">Close the round</li>
+        <li data-step="2">Get a random number</li>
+        <li data-step="3">Pay the winners</li>
+      </ol>
+      <div class="dc-stats">
+        <span>Prize pool <b class="gold" id="pool">—</b></span>
+        <span><b id="savers">—</b> savers entered</span>
+        <span>A draw every <b id="period">—</b></span>
+      </div>
+      <p class="dc-explain">Winners are picked at random, with more savings meaning more chances. Prizes come from the interest, so nobody loses their deposit.</p>
+    </section>
+
+    <!-- 2. who won -->
+    <section class="card latest" id="latestCard" hidden>
+      <div class="card-head"><h2 id="latestTitle">Latest winners</h2><a class="see-all" href="./winners.html">Winners page</a></div>
+      <div id="latestPodium"></div>
+      <p class="tiny latest-meta" id="latestMeta"></p>
+    </section>
+
+    <!-- 3. settings -->
+    <div id="notOwner" class="lock" hidden>
+      <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <p><b>These settings are locked to your MetaMask wallet.</b> Unlock them once to use them from your email account. Picking winners works either way.</p>
+      <button id="handover" class="btn btn-light btn-sm">Unlock with MetaMask</button>
+    </div>
+    <div id="signedOut" class="lock" hidden>
+      <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <p>Sign in on the <a href="./app.html">app</a> with your email first, then come back. Or connect the owner's MetaMask wallet.</p>
+      <button id="useWallet" class="btn btn-sm">Connect MetaMask</button>
+    </div>
+
+    <section class="card settings">
+      <div class="card-head"><h2>Demo settings</h2><span class="tiny" id="updated"></span></div>
+
+      <div class="set-row">
+        <div class="set-label"><b>Make the prize bigger</b><span>Fast-forward time so more interest piles up</span></div>
+        <div class="row">
+          <button class="btn btn-sm" data-ff="2592000">+1 month</button>
+          <button class="btn btn-sm" data-ff="31536000">+1 year</button>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-label"><b>Time between draws</b><span>How long each round lasts</span></div>
+        <div class="seg">
+          <button data-period="60">1 min</button>
+          <button data-period="600">10 min</button>
+          <button data-period="86400">1 day</button>
+          <button data-period="2592000">30 days</button>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-label"><b>Number of prizes</b><span>More prizes means more winners</span></div>
+        <div class="seg">
+          <button data-splits="3">3</button>
+          <button data-splits="10">10</button>
+          <button data-splits="20">20</button>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-label"><b>Draw automatically</b><span id="autoStatus">Off. When on, winners are picked every time a round ends, as long as this page stays open.</span></div>
+        <label class="switch"><input type="checkbox" id="autopilot" aria-label="Auto-pilot" /><span></span></label>
+      </div>
+
+      <details class="advanced">
+        <summary>More controls</summary>
+        <div class="adv-grid">
+          <div>
+            <p class="adv-h">Interest speed</p>
+            <p class="tiny">Now <span id="speed">—</span>× real time</p>
+            <div class="row">
+              <select id="speedSel" aria-label="Interest speed">
+                <option value="1">Real time</option>
+                <option value="52560">1 year per 10 min</option>
+                <option value="525600">1 year per minute</option>
+              </select>
+              <button id="setSpeed" class="btn btn-ghost btn-sm">Set</button>
+            </div>
+          </div>
+          <div>
+            <p class="adv-h">Cash drawer</p>
+            <p class="tiny" id="fundRules">—</p>
+            <div class="row wrap">
+              <button id="tick" class="btn btn-sm">Rebalance</button>
+              <button id="weekend" class="btn btn-sm">Weekend mode</button>
+              <button id="instant" class="btn btn-sm">Weekday mode</button>
+            </div>
+          </div>
+          <div>
+            <p class="adv-h">Money</p>
+            <p class="tiny">Cash on hand <span id="cash">—</span>, total saved <span id="tvl">—</span>, fees earned <span id="fees">—</span></p>
+            <div class="row wrap">
+              <button id="payFees" class="btn btn-ghost btn-sm">Pay fees</button>
+              <button id="pause" class="btn btn-ghost btn-sm">Pause deposits</button>
+            </div>
+          </div>
+        </div>
+        <p class="tiny" id="ownerLine">Loading…</p>
+        <p class="tiny"><a href="./control.html">Open the control room</a> to watch the Rebalancer and simulate draws.</p>
+      </details>
+    </section>
+  </main>
+
+  <!-- full-screen winners reveal after a draw -->
+  <div id="reveal" class="reveal" role="dialog" aria-modal="true" aria-labelledby="revealTitle" hidden>
+    <canvas id="revealConfetti" aria-hidden="true"></canvas>
+    <div class="reveal-card">
+      <p class="w-kicker" id="revealKicker">Draw</p>
+      <h2 class="reveal-title" id="revealTitle">the winners.</h2>
+      <p class="w-sub" id="revealSub"></p>
+      <div id="revealPodium" class="rise"></div>
+      <div class="win-actions">
+        <button id="revealDone" class="btn btn-primary btn-lg">Done</button>
+        <a class="btn btn-outline btn-lg" href="./winners.html">Winners page</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
