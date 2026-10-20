@@ -1,0 +1,29 @@
+{
+  "name": "kairos-app",
+  "version": "1.0.0",
+  "description": "Kairos prize-linked savings: demo and beta web app",
+  "main": "index.js",
+  "scripts": {
+    "sync": "node sync.mjs",
+    "dev": "vite",
+    "build": "node build-all.mjs",
+    "build:demo": "node sync.mjs && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@coinbase/cdp-core": "^0.0.127",
+    "@fontsource-variable/caveat": "^5.3.0",
+    "@fontsource-variable/funnel-display": "^5.3.0",
+    "@fontsource-variable/funnel-sans": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
+    "qrcode-generator": "^1.4.4",
+    "viem": "^2.57.7"
+  },
+  "devDependencies": {
+    "vite": "^6.4.4"
+  },
+  "type": "module"
+}

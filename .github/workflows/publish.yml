@@ -1,4 +1,7 @@
 name: Publish the Kairos site
+# Every push to main builds both copies of the site from the code and publishes them:
+#   /        the demo
+#   /beta/   the beta
 on:
   push:
     branches: [main]
@@ -18,28 +21,24 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          fetch-depth: 0
-      - name: Unzip the newest site zip
-        shell: bash
-        run: |
-          zip=""; newest=-1
-          while IFS= read -r f; do
-            t=$(git log -1 --format=%ct -- "$f"); t=${t:-0}
-            if [ "$t" -ge "$newest" ]; then newest=$t; zip="$f"; fi
-          done < <(find . -name '*.zip' -not -path './.git/*')
-          if [ -z "$zip" ]; then echo "No .zip file found. Upload kairos-site.zip first."; exit 1; fi
-          echo "Publishing $zip"
-          rm -rf _unzipped _site && mkdir _unzipped _site
-          unzip -q "$zip" -d _unzipped
-          index=$(find _unzipped -name index.html -not -path '*__MACOSX*' | awk '{ print length($0) " " $0 }' | sort -n | head -1 | cut -d' ' -f2-)
-          if [ -z "$index" ]; then echo "That zip has no index.html in it."; exit 1; fi
-          cp -R "$(dirname "$index")"/. _site/
-          touch _site/.nojekyll
-          ls _site
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Install
+        working-directory: app
+        run: npm ci
+      - name: Build the demo and the beta
+        working-directory: app
+        run: node build-all.mjs
+      - name: Test the money server
+        working-directory: netlify
+        run: npm ci && npm test
+      - run: touch app/dist/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: app/dist
       - id: deployment
         uses: actions/deploy-pages@v4

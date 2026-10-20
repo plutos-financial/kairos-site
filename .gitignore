@@ -1,0 +1,11 @@
+node_modules/
+contracts/out/
+contracts/cache/
+contracts/lib/
+contracts/broadcast/
+keeper/.env
+.env
+*.local
+app/dist/
+contracts/deployments/31337*.json
+.netlify/

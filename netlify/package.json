@@ -1,0 +1,12 @@
+{
+  "name": "kairos-money-server",
+  "private": true,
+  "type": "module",
+  "description": "Kairos money server: creates Coinbase onramp (Apple Pay) orders for the beta. Runs on Netlify Functions.",
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@coinbase/cdp-sdk": "1.59.0"
+  }
+}

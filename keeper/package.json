@@ -1,0 +1,18 @@
+{
+  "name": "kairos-keeper",
+  "version": "1.0.0",
+  "description": "Kairos rebalancer / draw keeper",
+  "main": "index.js",
+  "scripts": {
+    "start": "node keeper.mjs",
+    "once": "node keeper.mjs --once"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "viem": "^2.57.7"
+  },
+  "type": "module"
+}

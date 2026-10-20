@@ -1,0 +1,90 @@
+/* "How it works" page: a long read, set like an article */
+.wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 24px; }
+.ex { display: block; max-width: none; padding: 0 0 40px; }
+.ex-head { padding: 72px 24px 24px; }
+.ex-head h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.8rem, 7vw, 5rem); line-height: 0.95; letter-spacing: -0.055em; margin: 0 0 22px; }
+.ex-lede { font-size: clamp(18px, 2vw, 22px); line-height: 1.5; color: var(--muted); margin: 0 0 30px; }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+.toc a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 999px; }
+.toc a:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.3); }
+
+.ex-sec { position: relative; padding-top: 64px; padding-bottom: 8px; scroll-margin-top: 64px; }
+.ex-sec + .ex-sec { border-top: 1px solid var(--line); margin-top: 48px; }
+.ex-sec .sec-n { margin: 0 0 4px; font-family: "Caveat Variable", "Bradley Hand", cursive; font-weight: 700; font-size: 46px; line-height: 0.9; color: var(--accent); }
+.ex-sec h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.9rem, 4vw, 2.7rem); letter-spacing: -0.045em; line-height: 1.02; margin: 0 0 18px; }
+.ex-sec > p, .qa p, .honest li, .odds-mini p, details p { font-size: 17.5px; line-height: 1.65; color: #cfccc6; margin: 0 0 16px; }
+.ex-sec b { color: var(--text); font-weight: 650; }
+.ex-sec a:not(.btn):not(.text-link) { color: var(--accent); }
+
+/* follow $100: a timeline */
+.flow { list-style: none; margin: 26px 0 0; padding: 0; counter-reset: f; }
+.flow li { position: relative; padding: 0 0 26px 44px; display: flex; flex-direction: column; gap: 3px; counter-increment: f; }
+.flow li::before {
+  content: counter(f); position: absolute; left: 0; top: 0; width: 26px; height: 26px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--bg-3); color: var(--text); font-size: 13px; font-weight: 700;
+}
+.flow li::after { content: ""; position: absolute; left: 12.5px; top: 30px; bottom: 4px; width: 1px; background: var(--line-2); }
+.flow li:last-child::after { display: none; }
+.flow li b { font-size: 18px; letter-spacing: -0.01em; }
+.flow li span { color: var(--muted); font-size: 16px; line-height: 1.55; }
+.flow li.end::before { content: "✓"; background: var(--gold); color: var(--gold-ink); }
+.flow li.end b { color: var(--gold); }
+
+/* the example month, as a receipt */
+.receipt {
+  margin: 26px 0 26px; background: #fffcf7; color: #1a1712; border-radius: 18px; padding: 24px 24px 18px;
+  font-variant-numeric: tabular-nums; box-shadow: 0 40px 80px -50px rgba(0, 0, 0, 0.9);
+  -webkit-mask: radial-gradient(circle 7px at 50% 100%, #0000 98%, #000) 50% 100% / 22px 100% repeat-x;
+          mask: radial-gradient(circle 7px at 50% 100%, #0000 98%, #000) 50% 100% / 22px 100% repeat-x;
+  padding-bottom: 30px;
+}
+.r-title { margin: 0 0 12px; font-family: "Caveat Variable", "Bradley Hand", cursive; font-weight: 700; font-size: 28px; line-height: 1; }
+.r-row { display: flex; justify-content: space-between; gap: 18px; padding: 11px 0; border-bottom: 1px dashed rgba(26, 23, 18, 0.22); font-size: 16px; }
+.r-row span { color: #45403a; }
+.r-row b { color: #1a1712 !important; white-space: nowrap; }
+.r-row.minus b { color: #9a3b2a !important; }
+.r-row.total { border-bottom: 0; padding-top: 14px; font-size: 18px; }
+.r-row.total span { color: #1a1712; font-weight: 650; }
+.r-row.total small { display: block; margin-top: 2px; font-size: 13.5px; font-weight: 400; color: #6b655c; }
+.r-row.total b { font-family: var(--display); font-size: 26px; letter-spacing: -0.03em; }
+.r-foot { margin: 8px 0 0; font-size: 13.5px; color: #6b655c; line-height: 1.5; }
+
+/* the draw */
+.qa { margin: 0 0 8px; }
+.qa h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; margin: 26px 0 8px; }
+.odds-mini { margin: 30px 0 22px; background: var(--bg-1); border: 1px solid var(--line); border-radius: 20px; padding: 22px 22px 12px; }
+.om-title { margin: 0 0 6px !important; color: var(--text) !important; font-weight: 650; font-size: 18px !important; }
+.odds-mini > p:not(.om-title) { font-size: 16px; color: var(--muted); }
+.om-row { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); font-size: 16px; color: var(--muted); }
+.om-row b { font-family: var(--display); font-size: 20px; color: var(--accent) !important; }
+.try { color: var(--muted) !important; }
+.try .text-link { margin: 0 4px 0 0; }
+
+/* honest part */
+.honest { list-style: none; margin: 0; padding: 0; }
+.honest li { padding-left: 22px; position: relative; }
+.honest li::before { content: ""; position: absolute; left: 0; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+
+/* questions */
+details { border-bottom: 1px solid var(--line); }
+details:first-of-type { border-top: 1px solid var(--line); }
+summary { cursor: pointer; list-style: none; padding: 20px 36px 20px 0; position: relative; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: "+"; position: absolute; right: 4px; top: 16px; font-size: 24px; font-weight: 400; color: var(--muted); }
+details[open] summary::after { content: "–"; }
+details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted) !important; }
+
+.ex-end { padding-top: 80px; padding-bottom: 40px; text-align: center; }
+.ex-end h2 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.045em; margin: 0 0 24px; }
+.ex-end .cta-row { justify-content: center; }
+
+@media (max-width: 640px) {
+  .wrap-narrow { padding: 0 18px; }
+  .ex-head { padding: 40px 18px 8px; }
+  .ex-sec { padding-top: 48px; }
+  .ex-sec + .ex-sec { margin-top: 36px; }
+  .ex-sec > p, .qa p, .honest li, details p { font-size: 16.5px; }
+  .receipt { padding: 20px 18px 28px; }
+  .r-row { font-size: 15px; }
+  .ex-end .cta-row .btn { flex: 1 1 100%; }
+}

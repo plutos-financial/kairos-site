@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Kairos · Winners</title>
+  <meta name="description" content="Who won the latest Kairos draws on the test network." />
+  <meta name="theme-color" content="#050506" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/app.css" />
+</head>
+<body class="winners-page">
+  <div class="testnet-bar">Test network. Prizes are test dollars.</div>
+  <header class="top">
+    <a class="brand" href="./" aria-label="Kairos home">
+      <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
+      <span class="name">kairos</span>
+    </a>
+    <nav class="subnav" aria-label="Pages">
+      <a href="./">Home</a>
+      <a href="./winners.html" aria-current="page">Winners</a>
+      <a href="./how-it-works.html">How it works</a>
+      <a href="./app.html">App</a>
+    </nav>
+    <div class="top-right"><a class="btn btn-primary btn-sm" href="./app.html">Get in the next draw</a></div>
+  </header>
+
+  <main>
+    <section class="w-hero">
+      <p class="w-kicker" id="wKicker">Loading the latest draw…</p>
+      <h1 class="w-title">the winners.</h1>
+      <p class="w-sub" id="wSub">&nbsp;</p>
+      <p id="wBanner" class="you-won w-banner" hidden></p>
+      <div id="wPodium" class="w-podium"></div>
+    </section>
+
+    <section class="w-next">
+      <div>
+        <p class="label">Next draw in</p>
+        <p class="w-count" id="wCount">—</p>
+      </div>
+      <div>
+        <p class="label">Prize pool so far</p>
+        <p class="w-pool" id="wPool">—</p>
+      </div>
+      <div class="w-next-actions">
+        <a class="btn btn-primary btn-lg" href="./app.html">Save to enter</a>
+        <button id="pretendBtn" class="btn btn-ghost btn-lg" type="button">Run a pretend draw</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Past draws</h2><span class="tiny">Tap a draw to see everyone who won</span></div>
+      <div id="wHistory" class="w-history"><p class="sub">Loading…</p></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <footer><p>Every winner keeps their deposit. Prizes come only from the interest the pool earns. Test network demo by Pluto's Financial.</p></footer>
+  <script type="module" src="/src/winners.js"></script>
+</body>
+</html>

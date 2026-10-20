@@ -1,0 +1,19 @@
+{
+  "edition": "demo",
+  "deployment": {
+    "chainId": 84532,
+    "usdc": "0xF569f496dbBCB3EE0AA3913dc103474370F378B2",
+    "tbill": "0xfe0FB2F3424C5F1f9CC7a242698f3aFC9aA10DC4",
+    "vault": "0xbD76bD264f3B741795a7a74a4FC0a96ed50ad275",
+    "randomSource": "0xDaa98A40D45FE2107AdF4B9D01542E96971a9ADc",
+    "owner": "0x4a4D04e57A4B4600487313945cD1B5d61983D7e8"
+  },
+  "settings": {
+    "cdpProjectId": "2d8d53d1-8429-4fdc-a86c-c146122efec9",
+    "waitlistUrl": "https://script.google.com/macros/s/AKfycbxfu1RXsPv55YOV3awpedsXqejzDi2PHXeP6wyTkta6W8XvDaknDgzaztO9dJxKaRFgJg/exec",
+    "drawAdmins": [
+      "462c9f48d96e6269de6a5e8c20116ac144fc7eaa9ff67b3b91dcd027eace9887"
+    ],
+    "moneyApi": ""
+  }
+}
