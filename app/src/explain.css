@@ -2,7 +2,7 @@
 .wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 .ex { display: block; max-width: none; padding: 0 0 40px; }
 .ex-head { padding: 72px 24px 24px; }
-.ex-head h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.8rem, 7vw, 5rem); line-height: 0.95; letter-spacing: -0.055em; margin: 0 0 22px; }
+.ex-head h1 { font-family: var(--display); font-weight: 650; font-size: clamp(2.8rem, 6.4vw, 4.6rem); line-height: 1; letter-spacing: -0.045em; margin: 0 0 22px; }
 .ex-lede { font-size: clamp(18px, 2vw, 22px); line-height: 1.5; color: var(--muted); margin: 0 0 30px; }
 .toc { display: flex; flex-wrap: wrap; gap: 8px; }
 .toc a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 999px; }
@@ -10,8 +10,8 @@
 
 .ex-sec { position: relative; padding-top: 64px; padding-bottom: 8px; scroll-margin-top: 64px; }
 .ex-sec + .ex-sec { border-top: 1px solid var(--line); margin-top: 48px; }
-.ex-sec .sec-n { margin: 0 0 4px; font-family: "Caveat Variable", "Bradley Hand", cursive; font-weight: 700; font-size: 46px; line-height: 0.9; color: var(--accent); }
-.ex-sec h2 { font-family: var(--display); font-weight: 700; font-size: clamp(1.9rem, 4vw, 2.7rem); letter-spacing: -0.045em; line-height: 1.02; margin: 0 0 18px; }
+.ex-sec .sec-n { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.ex-sec h2 { font-family: var(--display); font-weight: 650; font-size: clamp(1.9rem, 4vw, 2.7rem); letter-spacing: -0.045em; line-height: 1.02; margin: 0 0 18px; }
 .ex-sec > p, .qa p, .honest li, .odds-mini p, details p { font-size: 17.5px; line-height: 1.65; color: #cfccc6; margin: 0 0 16px; }
 .ex-sec b { color: var(--text); font-weight: 650; }
 .ex-sec a:not(.btn):not(.text-link) { color: var(--accent); }
@@ -38,7 +38,7 @@
           mask: radial-gradient(circle 7px at 50% 100%, #0000 98%, #000) 50% 100% / 22px 100% repeat-x;
   padding-bottom: 30px;
 }
-.r-title { margin: 0 0 12px; font-family: "Caveat Variable", "Bradley Hand", cursive; font-weight: 700; font-size: 28px; line-height: 1; }
+.r-title { margin: 0 0 10px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6b655c; }
 .r-row { display: flex; justify-content: space-between; gap: 18px; padding: 11px 0; border-bottom: 1px dashed rgba(26, 23, 18, 0.22); font-size: 16px; }
 .r-row span { color: #45403a; }
 .r-row b { color: #1a1712 !important; white-space: nowrap; }
@@ -75,7 +75,7 @@ details[open] summary::after { content: "–"; }
 details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted) !important; }
 
 .ex-end { padding-top: 80px; padding-bottom: 40px; text-align: center; }
-.ex-end h2 { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.045em; margin: 0 0 24px; }
+.ex-end h2 { font-family: var(--display); font-weight: 650; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.045em; margin: 0 0 24px; }
 .ex-end .cta-row { justify-content: center; }
 
 @media (max-width: 640px) {

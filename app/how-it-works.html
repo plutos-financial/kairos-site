@@ -4,10 +4,10 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>How Kairos works</title>
-  <meta name="description" content="How Kairos works: where your money goes, where the prizes come from, how the draw picks winners, and the honest trade-offs." />
+  <meta name="description" content="How Kairos works: where your money goes, where the prizes come from, how Chainlink picks the winners, and what to know before you save." />
   <meta name="theme-color" content="#050506" />
   <meta property="og:title" content="How Kairos works" />
-  <meta property="og:description" content="You save, your money earns interest, and once a month the interest is handed out as prizes. Nobody loses their deposit." />
+  <meta property="og:description" content="Your money earns interest, the interest is pooled, and once a month it's paid out as prizes. Your deposit is never used for prizes." />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/landing.css" />
   <link rel="stylesheet" href="/src/explain.css" />
@@ -20,157 +20,156 @@
         <span class="name">kairos</span>
       </a>
       <nav class="nav-links" aria-label="Main">
+        <a href="./#how">Overview</a>
         <a href="./how-it-works.html" aria-current="page">How it works</a>
         <a href="./winners.html">Winners</a>
-        <a href="./app.html">Demo</a>
       </nav>
-      <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
+      <div class="nav-cta">
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
+      </div>
     </div>
   </header>
 
   <main class="ex">
     <header class="ex-head wrap-narrow">
       <h1>How Kairos works</h1>
-      <p class="ex-lede">The short version: you save, your money earns interest, and once a month the interest is handed out as prizes. Nobody loses their deposit. Here's the longer version, with the trade-offs.</p>
+      <p class="ex-lede">Kairos is a savings account with a monthly prize draw. Your money earns interest, the interest from all savers is pooled, and once a month it's paid out as prizes. Your deposit is never used for prizes.</p>
       <nav class="toc" aria-label="On this page">
         <a href="#idea">The idea</a>
-        <a href="#money">Where the money goes</a>
+        <a href="#money">Where your money goes</a>
         <a href="#prizes">Where prizes come from</a>
-        <a href="#draw">The draw</a>
-        <a href="#honest">The honest part</a>
-        <a href="#faq">Questions</a>
+        <a href="#draw">How the draw works</a>
+        <a href="#in-out">Adding and withdrawing</a>
+        <a href="#know">Good to know</a>
+        <a href="#faq">FAQ</a>
       </nav>
     </header>
 
-    <!-- 1 -->
     <section class="ex-sec wrap-narrow" id="idea">
-      <p class="sec-n">1</p>
+      <p class="sec-n">01</p>
       <h2>The idea</h2>
-      <p>A normal savings account pays everyone a little bit of interest. Kairos pools that interest and pays it out as prizes instead. Each month a handful of savers win something, and everyone keeps every dollar they put in.</p>
-      <p>It isn't a new idea. Britain's government has run <b>Premium Bonds</b> since 1956, and more than 22 million people hold them today. In the U.S., a 2014 federal law lets banks and credit unions offer prize-linked savings in states that allow it, and more than 30 do. So far it's mostly stuck at small local credit unions. We want it to be something anyone can open from their phone in a couple of minutes.</p>
+      <p>A regular savings account pays everyone a small amount of interest. Kairos pools that interest and pays it out as prizes instead. Each month some savers win, and everyone keeps their full deposit.</p>
+      <p>The idea has a long track record. The UK government has offered <b>Premium Bonds</b> since 1956, and more than 22 million people hold them today. In the U.S., a 2014 federal law allows banks and credit unions to offer prize-linked savings in states that permit it, and more than 30 states do. Kairos is building a version anyone can open from their phone.</p>
     </section>
 
-    <!-- 2 -->
     <section class="ex-sec wrap-narrow" id="money">
-      <p class="sec-n">2</p>
-      <h2>Follow $100</h2>
-      <p>Here's what happens to a deposit, start to finish.</p>
+      <p class="sec-n">02</p>
+      <h2>Where your money goes</h2>
+      <p>What happens to a $100 deposit, from start to finish:</p>
       <ol class="flow">
-        <li><b>You deposit $100.</b><span>That's 100 entries in every draw for as long as it stays saved.</span></li>
-        <li><b>It's put into U.S. Treasury bills.</b><span>Short-term loans to the U.S. government, one of the safest places money can sit. Some cash is kept aside so withdrawals are instant.</span></li>
-        <li><b>The Treasury bills earn interest.</b><span>Every saver's interest goes into one shared pot.</span></li>
-        <li><b>The pot becomes the prize pool.</b><span>85% goes to prizes. Kairos keeps 15% to keep the lights on. There's no fee to deposit or withdraw.</span></li>
-        <li><b>Draw day.</b><span>Winners are picked at random and their prizes land in their savings.</span></li>
-        <li class="end"><b>Your $100 is still $100.</b><span>Win or not, nothing comes out of your deposit. You're automatically in next month's draw.</span></li>
+        <li><b>You add $100.</b><span>With Apple Pay or a debit card through Coinbase, or by sending USDC. That's 100 entries in every draw while it stays saved.</span></li>
+        <li><b>It's held in U.S. Treasury bills.</b><span>Short-term loans to the U.S. government. A portion stays in cash so withdrawals are instant.</span></li>
+        <li><b>The Treasury bills earn interest.</b><span>The interest from all savers goes into one shared pool.</span></li>
+        <li><b>The pool becomes the prizes.</b><span>85% of the interest is paid out as prizes and Kairos keeps 15% to run the service. There are no fees to deposit or withdraw.</span></li>
+        <li><b>Draw day.</b><span>Chainlink picks the winners at random, and their prizes are added to their savings.</span></li>
+        <li class="end"><b>Your $100 is still $100.</b><span>Win or not, your deposit stays the same, and you're entered in next month's draw automatically.</span></li>
       </ol>
     </section>
 
-    <!-- 3 -->
     <section class="ex-sec wrap-narrow" id="prizes">
-      <p class="sec-n">3</p>
-      <h2>Where the prizes come from</h2>
-      <p>Only from interest. Here's a made-up but realistic month, so you can see the size of things.</p>
+      <p class="sec-n">03</p>
+      <h2>Where prizes come from</h2>
+      <p>Prizes come only from interest. Here is an example month to show the scale.</p>
       <div class="receipt">
         <p class="r-title">Example month</p>
         <div class="r-row"><span>10,000 people save $500 each</span><b>$5,000,000</b></div>
         <div class="r-row"><span>Treasury bills paying 4% a year earn, per month</span><b>$16,667</b></div>
         <div class="r-row total"><span>Prize pool this month<small>85% of the interest</small></span><b>$14,167</b></div>
-        <p class="r-foot">Split into, say, a $8,500 top prize and a few smaller ones. 4% is only an example: Treasury rates go up and down.</p>
+        <p class="r-foot">For example, an $8,500 top prize plus several smaller prizes. 4% is an example rate; Treasury rates change over time.</p>
       </div>
-      <p>More savers means more entries in the hat, but it also means a bigger pool. Your fair share stays about the same, and there's room for more prizes and bigger ones.</p>
+      <p>More savers means more entries in each draw, but also a bigger prize pool. Your expected share stays about the same, and there's room for more and bigger prizes.</p>
     </section>
 
-    <!-- 4 -->
     <section class="ex-sec wrap-narrow" id="draw">
-      <p class="sec-n">4</p>
-      <h2>How the draw picks winners</h2>
+      <p class="sec-n">04</p>
+      <h2>How the draw works</h2>
       <div class="qa">
         <h3>Every dollar is an entry</h3>
-        <p>Entries also count how long your money was saved that month. $100 saved for the whole month counts the same as $200 saved for half of it. That way nobody can drop in a big deposit the night before a draw and leave the next morning.</p>
+        <p>Entries also count how long your money was saved during the month. $100 saved for the whole month counts the same as $200 saved for half of it, so a large deposit made the night before a draw doesn't get an unfair advantage.</p>
       </div>
       <div class="qa">
-        <h3>A random number picks the winners</h3>
-        <p>When the month ends, a random number picks winners one prize at a time. More entries means more chances. The same person can win more than one prize.</p>
-        <p class="demo-only">In this demo, the random number comes from the test network itself. The real version uses Chainlink VRF, a service that produces random numbers anyone can check weren't rigged, including us.</p>
-        <p class="beta-only">The random number comes from Chainlink VRF, a service that produces random numbers anyone can check weren't rigged, including us. The beta already uses it.</p>
+        <h3>Chainlink picks the winners</h3>
+        <p>When the month ends, Kairos requests a random number from Chainlink VRF. It arrives with a cryptographic proof that it wasn't tampered with, so nobody, including Kairos, can influence who wins. Winners are picked one prize at a time, and the same person can win more than once.</p>
       </div>
       <div class="qa">
         <h3>Prizes go straight into your savings</h3>
-        <p>There's nothing to claim and nothing to cash in. If you win $25, your balance goes up by $25.</p>
+        <p>There's nothing to claim. If you win $25, your balance goes up by $25.</p>
       </div>
       <div class="odds-mini">
-        <p class="om-title">Your odds, without the math</p>
-        <p>We don't show exact odds, because they shift every time someone deposits or withdraws. What matters is simple: double your savings, double your chances.</p>
+        <p class="om-title">Your odds</p>
+        <p>Exact odds change whenever someone deposits or withdraws. The rule of thumb: double your savings and you double your chances.</p>
         <div class="om-row"><span>$100 saved</span><b>1×</b></div>
         <div class="om-row"><span>$500 saved</span><b>5×</b></div>
         <div class="om-row"><span>$1,000 saved</span><b>10×</b></div>
       </div>
-      <p class="try">Want to see one? <a class="text-link" href="./admin.html">Run a pretend draw &rarr;</a> It uses the real demo savers and prize pool, and nothing actually moves.</p>
+      <p class="try">See it for yourself: <a class="text-link" href="./admin.html">run a pretend draw &rarr;</a> It uses the real savers and prize pool from the test app, and nothing moves.</p>
     </section>
 
-    <!-- 5 -->
-    <section class="ex-sec wrap-narrow" id="out">
-      <p class="sec-n">5</p>
-      <h2>Taking money out</h2>
-      <p>Your deposit is yours, and you can take it out whenever you like. Most withdrawals are instant, because Kairos keeps a slice of everyone's money as cash instead of putting every dollar into Treasury bills. If lots of people withdraw at once, a big withdrawal might wait until some Treasury bills are sold, which usually takes about a business day. In the demo that wait is a couple of minutes.</p>
+    <section class="ex-sec wrap-narrow" id="in-out">
+      <p class="sec-n">05</p>
+      <h2>Adding and withdrawing</h2>
+      <p>You add money with Apple Pay or a debit card through Coinbase, or by sending USDC to your Kairos wallet. When you save it, it turns into kUSD savings tokens, one for each dollar.</p>
+      <p>You can withdraw your savings at any time, and cash out to the bank account linked in your Coinbase account. Most withdrawals are instant because part of everyone's savings is kept in cash. If many people withdraw at once, a large withdrawal can take about a business day while Treasury bills are sold.</p>
+      <p>In the test app, Coinbase runs in test mode. Your card is never charged, and you receive test dollars instead.</p>
     </section>
 
-    <!-- 6 -->
-    <section class="ex-sec wrap-narrow" id="honest">
-      <p class="sec-n">6</p>
-      <h2>The honest part</h2>
+    <section class="ex-sec wrap-narrow" id="know">
+      <p class="sec-n">06</p>
+      <h2>Good to know</h2>
       <ul class="honest">
-        <li><b>Most months, most people won't win.</b> On average, savers get back 85% of what the Treasury bills earn, all of it as prizes. If you want a steady, predictable return, a high-yield savings account is the better pick. Kairos is for people who'd rather have a shot at a prize without putting their deposit at risk.</li>
-        <li><b>It isn't live yet.</b> Before Kairos takes a single real dollar, we need the legal setup right, independent security audits, and identity checks on new customers, the same as any financial company.</li>
-        <li><b>It isn't a bank.</b> Kairos isn't FDIC insured. The demo runs on Base Sepolia, a test network, with fake dollars that have no value.</li>
+        <li><b>Most months, most people don't win.</b> On average, savers receive 85% of the interest their savings earn, paid as prizes. In some months you may win nothing. If you want a steady, predictable return, a high-yield savings account is the better choice.</li>
+        <li><b>Kairos isn't open yet.</b> Before taking real deposits, we need the right legal setup, independent security audits and identity checks for new customers, like any financial company.</li>
+        <li><b>Kairos isn't a bank.</b> Deposits won't be FDIC insured. The current app runs on the Base Sepolia test network with test money that has no value.</li>
       </ul>
     </section>
 
-    <!-- 7 -->
     <section class="ex-sec wrap-narrow" id="faq">
-      <p class="sec-n">7</p>
-      <h2>Questions people ask us</h2>
+      <p class="sec-n">07</p>
+      <h2>FAQ</h2>
       <details>
-        <summary>Isn't this just gambling?</summary>
-        <p>You never risk your deposit, which is the big difference from a lottery ticket or a bet. Prize-linked savings is legal for banks and credit unions in the states that allow it, and it isn't treated as a lottery there because nobody pays to enter. We still have to work out exactly how Kairos fits those rules before launch.</p>
+        <summary>Is this gambling?</summary>
+        <p>You never risk your deposit, which is the main difference from a lottery ticket or a bet. Prize-linked savings is legal for banks and credit unions in the states that allow it, and it isn't treated as a lottery there because nobody pays to enter. We're working out exactly how Kairos fits these rules before launch.</p>
       </details>
       <details>
         <summary>What if I never win?</summary>
-        <p>Then you haven't lost anything, but you haven't earned anything on that money either. That's the trade-off, and it's why we're upfront about it.</p>
+        <p>Then you haven't lost anything, but you also haven't earned interest on that money. That's the trade-off.</p>
       </details>
       <details>
         <summary>How much do I need to start?</summary>
         <p>$1. Every dollar you save is an entry.</p>
       </details>
       <details>
-        <summary>Why is it built on a blockchain?</summary>
-        <p>So anyone can check the rules and the results. Every deposit, prize and random number is public, and nobody, including us, can quietly change who won. You don't need to know anything about crypto to use it: you sign in with your email and see dollars.</p>
+        <summary>Why does Kairos run on a blockchain?</summary>
+        <p>So anyone can check the rules and the results. Every deposit, prize and random number is public, and nobody can quietly change who won. You don't need to know anything about crypto to use it: you sign in with your email and see dollars.</p>
       </details>
       <details>
-        <summary>Who's behind it?</summary>
-        <p>Ramy Jaibaji (Biological Sciences, UC Irvine) and Callum Arnaudy (Economics, Dartmouth), building it as Pluto's Financial. Our contact details are on the <a href="./#founders">home page</a>, and we answer.</p>
+        <summary>Who's behind Kairos?</summary>
+        <p>Ramy Jaibaji (Biological Sciences, UC Irvine) and Callum Arnaudy (Economics, Dartmouth), building it as Pluto's Financial. Our contact details are on the <a href="./#team">home page</a>.</p>
       </details>
       <details>
-        <summary>How do I try the demo?</summary>
-        <p>Open the <a href="./app.html">demo</a>, sign in with your email, tap "Get $1,000" for free test dollars, and deposit some. You'll see your entries and the prize pool growing. Then run a pretend draw to see how a draw would go.</p>
+        <summary>How do I try the app?</summary>
+        <p>Open the <a href="./app.html">app</a>, sign in with your email, and press <b>Add money</b>. Coinbase runs in test mode, so no card is charged. Then save some test dollars and run a pretend draw to see how a draw works.</p>
       </details>
     </section>
 
     <section class="ex-end wrap-narrow">
-      <h2>Want in when it launches?</h2>
+      <h2>Ready when you are</h2>
       <div class="cta-row">
         <a href="./#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
-        <a href="./app.html" class="btn btn-ghost btn-lg">Try the demo</a>
+        <a href="./app.html" class="btn btn-ghost btn-lg">Try the app</a>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="wrap foot">
-      <p>Kairos is being built by Pluto's Financial. It isn't a bank, isn't FDIC insured, and isn't taking deposits yet. The demo runs on a test network with fake money.</p>
+      <div class="foot-brand">
+        <p>© 2026 Pluto's Financial. Kairos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+      </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./">Home</a>
-        <a href="./app.html">Demo</a>
+        <a href="./app.html">App</a>
         <a href="./winners.html">Winners</a>
       </nav>
     </div>

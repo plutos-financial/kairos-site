@@ -4,12 +4,14 @@ Pluto's Financial · prize-linked savings · **test money only**
 
 Kairos is a savings account with a prize draw: savers keep every dollar they put in, and the interest is handed out as prizes. This repo holds everything: the website, the smart contracts, and a small money server.
 
-There are two copies of the site, both on Base Sepolia (Base's free test network):
+The site is at **https://plutos-financial.github.io/kairos-site/** (Base Sepolia, Base's free test network). It has:
 
-| Copy | Address | What's different |
-|---|---|---|
-| **Demo** | https://plutos-financial.github.io/kairos-site/ | The original. Free test dollars, a simple on-chain random number for draws. |
-| **Beta** | https://plutos-financial.github.io/kairos-site/beta/ | Closer to the real product: **Chainlink VRF** draws, **Add money with Apple Pay** (Coinbase test mode), a Kairos wallet with **send, receive and cash out**, and USDC turning into **kUSD savings tokens**. Its own contracts. |
+- **Chainlink VRF draws**: winners are picked with a verifiable random number.
+- **Add money with Apple Pay** through Coinbase's onramp, in Coinbase's test mode (no card is charged; test dollars arrive instead).
+- **A Kairos wallet** with send, receive and cash out (cash out is simulated: Coinbase has no test mode for it).
+- **Savings as kUSD tokens**, one per dollar saved, non-transferable.
+
+Old `/beta/` links redirect to the main site. The original demo edition (simple random source, free test dollars, contracts in `deployments/84532.json`) is still in the code and can be built with `node sync.mjs && npx vite build`.
 
 Nothing here moves real money. Coinbase runs in sandbox mode (cards are never charged) and the dollars are test tokens.
 
@@ -17,16 +19,16 @@ Nothing here moves real money. Coinbase runs in sandbox mode (cards are never ch
 
 ## How publishing works
 
-Push to `main` and GitHub builds and publishes both copies by itself (`.github/workflows/publish.yml`, about a minute). You can watch it under the **Actions** tab. Pages reload themselves when a newer version is out, so nobody gets stuck on an old copy.
+Push to `main` and GitHub builds and publishes the site by itself (`.github/workflows/publish.yml`, about a minute). You can watch it under the **Actions** tab. Pages reload themselves when a newer version is out, so nobody gets stuck on an old copy.
 
 ## What's in the repo
 
 | Folder | What it is |
 |---|---|
-| `app/` | The website (Vite, plain JavaScript). One codebase builds both copies: `node build-all.mjs` makes `dist/` (demo) and `dist/beta/` (beta). |
+| `app/` | The website (Vite, plain JavaScript). `node build-all.mjs` builds what GitHub publishes. |
 | `contracts/` | Solidity contracts and tests (Foundry). `deployments/` holds the live addresses. |
 | `shared/` | Contract ABIs and bytecode, exported from `contracts/` for the app. |
-| `netlify/` | The money server: one function that creates Coinbase Apple Pay orders for the beta. Runs on Netlify because GitHub Pages can't run server code. |
+| `netlify/` | The money server: one function that creates Coinbase Apple Pay orders. Runs on Netlify (https://majestic-raindrop-515139.netlify.app) because GitHub Pages can't run server code. |
 | `keeper/` | Optional bot that rebalances and closes draws on a timer. |
 | `waitlist/` | The Google Apps Script that saves waitlist sign-ups to the Kairos Google Sheet. |
 
@@ -52,9 +54,8 @@ Needs Node 22 and, for contracts, Foundry.
 ```bash
 cd app
 npm install
-node sync.mjs && npx vite          # the demo at http://localhost:5173
-EDITION=beta node sync.mjs && VITE_EDITION=beta npx vite   # the beta
-node build-all.mjs                 # what GitHub runs: dist/ and dist/beta/
+EDITION=beta node sync.mjs && VITE_EDITION=beta npx vite   # the site at http://localhost:5173
+node build-all.mjs                 # what GitHub runs
 
 cd ../netlify && npm install && npm test     # money server tests (fake Coinbase)
 
@@ -67,16 +68,12 @@ Local test chain: run `anvil`, deploy with `forge script script/Deploy.s.sol` (d
 
 ---
 
-## Turning on the beta (one-time, Ramy)
+## Setup status
 
-1. **Set up the contracts.** Open https://plutos-financial.github.io/kairos-site/beta/deploy.html in the browser with MetaMask, use the Kairos test wallet with about 0.003 Base Sepolia ETH, click **Connect and set up the beta**, approve one transaction. Then click **Copy the details for Claude** and paste them to Claude (they become `contracts/deployments/84532-beta.json`).
-2. **Coinbase gas sponsor.** If the Paymaster in the Coinbase Developer Platform has a contract allowlist, add the beta's USDC, vault and T-bill addresses (or leave the allowlist empty).
-3. **Money server (for Apple Pay).**
-   - In the Coinbase Developer Platform: **API Keys → Create API key** (a secret key). Keep the secret in a password manager. Never paste it into chat or into the website.
-   - In Netlify: **Add new site → Import an existing project → GitHub → plutos-financial/kairos-site**. The settings come from `netlify.toml`.
-   - Netlify → Site configuration → Environment variables: `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` (mark as secret), `ALLOWED_ORIGINS` = `https://plutos-financial.github.io` (plus your own domain once it's set up).
-   - Tell Claude the Netlify address (like `https://kairos-money.netlify.app`) so it goes in `kairos-settings.json` as `moneyApi`. Until then, Add money adds test dollars directly.
-4. **Apple Pay domain.** In the Coinbase Developer Platform: **Payments → Onramp & Offramp**, register the site's domain and host the verification file Coinbase gives you. This needs the file at the domain's root, so it works once the custom domain points at this site.
+- Contracts: set up on Base Sepolia with `KairosBetaSetup` (`contracts/deployments/84532-beta.json`). To redo it, open `/deploy.html` with MetaMask (about 0.003 test ETH).
+- Money server: running on Netlify with `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` (secret) and `ALLOWED_ORIGINS`. Coinbase Onramp is in trial mode (25 orders, $5 max each).
+- Still to do: add your own domain to GitHub Pages, Coinbase (Embedded Wallets clients, Onramp domain allowlist) and `ALLOWED_ORIGINS`; apply for full Onramp access before launch.
+- Coinbase gas sponsor: if the Paymaster has a contract allowlist, it must include the USDC, vault and T-bill addresses in `84532-beta.json` (or be empty).
 
 ## Before real money (not built yet, on purpose)
 

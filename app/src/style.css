@@ -1,5 +1,4 @@
-@import "@fontsource-variable/funnel-display";
-@import "@fontsource-variable/funnel-sans";
+@import "@fontsource-variable/geist";
 
 [hidden] { display: none !important; }
 .beta-only { display: none !important; }
@@ -33,8 +32,8 @@
   --green: var(--accent);
   --cyan: var(--blue);
   --radius: 22px;
-  --display: "Funnel Display Variable", "Funnel Display", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --sans: "Funnel Sans Variable", "Funnel Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --display: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: var(--sans);
   color-scheme: dark;
 }

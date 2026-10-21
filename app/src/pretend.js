@@ -80,7 +80,7 @@ function overlay() {
       <canvas id="pConfetti" aria-hidden="true"></canvas>
       <div class="reveal-card">
         <p class="w-kicker pretend-kicker">Pretend draw</p>
-        <h2 class="reveal-title" id="pTitle">how it could go.</h2>
+        <h2 class="reveal-title" id="pTitle">How it could go</h2>
         <p class="w-sub" id="pSub"></p>
         <div id="pPodium" class="rise"></div>
         <p class="you-won" id="pMine" hidden></p>

@@ -3,16 +3,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Kairos · Keep every dollar. Win the interest.</title>
-  <meta name="description" content="Kairos by Pluto's Financial: save from $1, and the interest becomes monthly prizes. Your deposit stays yours. Join the waitlist." />
+  <title>Kairos · The savings account with a prize draw</title>
+  <meta name="description" content="Kairos is a savings account where the interest goes into a monthly prize draw. Keep your full deposit, withdraw anytime, and start with $1." />
   <meta name="theme-color" content="#050506" />
-  <meta property="og:title" content="Kairos · Keep every dollar. Win the interest." />
-  <meta property="og:description" content="Prize-linked savings from Pluto's Financial. Join the waitlist." />
+  <meta property="og:title" content="Kairos · Save money. Win prizes." />
+  <meta property="og:description" content="A savings account where the interest goes into a monthly prize draw. Your deposit stays yours." />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/landing.css" />
 </head>
 <body class="landing">
-  <div class="beta-bar beta-only">This is the Kairos beta: real Chainlink draws, Apple Pay in Coinbase's test mode, send and receive. <a href="../">Back to the original demo</a></div>
   <header class="nav" id="nav">
     <div class="nav-in">
       <a class="brand" href="./" aria-label="Kairos home">
@@ -20,30 +19,35 @@
         <span class="name">kairos</span>
       </a>
       <nav class="nav-links" aria-label="Main">
-        <a href="./how-it-works.html">How it works</a>
-        <a href="./winners.html">Winners</a>
-        <a href="./app.html">Demo</a>
+        <a href="#how">How it works</a>
+        <a href="#trust">Fairness</a>
+        <a href="#faq">FAQ</a>
+        <a href="./how-it-works.html">Learn more</a>
       </nav>
-      <a href="#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
+      <div class="nav-cta">
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
+      </div>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <h1>Keep every dollar.<br />Win the interest.</h1>
-        <p class="lede">A savings account with a prize draw. Your money earns interest, and each month the interest is handed out as prizes. You keep every dollar you put in.</p>
-        <div class="cta-row">
-          <a href="#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
-          <a href="./app.html" class="btn btn-ghost btn-lg">Try the demo</a>
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <h1>Save money.<br />Win prizes.</h1>
+          <p class="lede">Kairos is a savings account where the interest goes into a monthly prize draw. Your deposit stays yours, and you can withdraw it anytime.</p>
+          <div class="cta-row">
+            <a href="#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
+            <a href="./app.html" class="btn btn-ghost btn-lg">Try the app</a>
+          </div>
+          <ul class="proof">
+            <li>Start with $1</li>
+            <li>No fees to deposit or withdraw</li>
+            <li>Draws verified by Chainlink</li>
+          </ul>
         </div>
-        <p class="byline"><span class="faces" aria-hidden="true"><i>R</i><i>C</i></span>Made by Ramy and Callum, two students at UC Irvine and Dartmouth.</p>
-      </div>
-
-      <div class="hero-visual" aria-hidden="true">
-        <p class="scribble s-bal"><svg viewBox="0 0 70 40"><path d="M66 9C48 3 25 7 9 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M6 13 8 28 22 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>your money,<br />still all yours</span></p>
-        <p class="scribble s-pool"><svg viewBox="0 0 70 40"><path d="M66 9C48 3 25 7 9 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M6 13 8 28 22 26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span>the interest,<br />up for grabs</span></p>
-
+        <div class="hero-visual" aria-hidden="true">
         <div class="float notif">
           <span class="f-ball"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg></span>
           <div>
@@ -112,163 +116,253 @@
             <span class="home-ind"></span>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="counter" id="why">
-    <div class="wrap">
-      <p class="counter-pre">Since you opened this page, Americans have spent</p>
-      <p class="lotto-num" id="lotto" aria-live="off">$0</p>
-      <p class="counter-line">on lottery tickets. Almost none of it comes back. With Kairos, every dollar you put in stays yours.</p>
-      <p class="counter-src">Based on $109.4 billion in U.S. lottery sales in 2025.</p>
-    </div>
-  </section>
-
-  <section class="story" id="story">
-    <div class="wrap story-grid">
-      <p class="year" aria-hidden="true">1956</p>
-      <div>
-        <h2 class="h-md">Britain has done this for 70 years.</h2>
-        <p class="body">They're called Premium Bonds. Instead of interest, savers get entered into a monthly prize draw, and nobody can lose what they put in. Over 22 million people in the UK have them. Here you'd mostly find it at a handful of local credit unions. We're building a version for everyone else.</p>
-        <a class="text-link" href="./how-it-works.html">How Kairos works &rarr;</a>
-      </div>
-    </div>
-  </section>
-
-  <section class="ride" id="ride">
-    <div class="wrap ride-copy">
-      <h2 class="h-lg">Take it out anytime.</h2>
-      <p class="body">Need your money back? It's yours. Only the interest goes into prizes, never your deposit.</p>
-    </div>
-    <div class="scene" aria-hidden="true">
-      <div class="layer far" data-depth="0.2"><div class="strip" id="farStrip"></div></div>
-      <div class="layer mid" data-depth="0.35"><div class="strip" id="midStrip"></div></div>
-      <div class="layer poles" data-depth="0.6"><div class="strip" id="poleStrip"></div></div>
-      <div class="train-wrap" id="trainWrap"><div class="train" id="train"></div></div>
-      <div class="layer ground"><div class="strip" id="groundStrip"></div></div>
-      <div class="layer streaks"><div class="strip" id="streakStrip"></div></div>
-    </div>
-  </section>
-
-  <section class="how" id="how">
-    <div class="wrap how-grid">
-      <div class="how-head">
-        <h2 class="h-lg">How it works</h2>
-        <p class="body">Three steps, and the third one is just waiting.</p>
-        <a class="text-link" href="./how-it-works.html">The full explanation &rarr;</a>
-      </div>
-      <ol class="steps">
-        <li>
-          <span class="step-n">1</span>
-          <div><h3>Sign up with your email</h3><p>We send you a code. No crypto wallet, no app store, no account numbers.</p></div>
-          <div class="step-vis otp" aria-hidden="true"><span>4</span><span>8</span><span>1</span><span>9</span><span class="on">0</span><span class="caret"></span></div>
-        </li>
-        <li>
-          <span class="step-n">2</span>
-          <div><h3>Put in as little as $1</h3><p>Each dollar is one entry in every draw for as long as it stays saved.</p></div>
-          <div class="step-vis dep" aria-hidden="true"><b>$1</b><span>Deposit</span></div>
-        </li>
-        <li>
-          <span class="step-n">3</span>
-          <div><h3>Wait for the draw</h3><p>Once a month, the interest is split into prizes. Win and it lands in your savings. Don't, and you've lost nothing.</p></div>
-          <div class="step-vis pod" aria-hidden="true">
-            <div class="mp"><span class="av" style="background:linear-gradient(140deg,#7ee0c3,#2b6cb0)"></span><i style="height:26px"></i></div>
-            <div class="mp first"><span class="av" style="background:linear-gradient(140deg,#ffb36b,#c2185b)"></span><i style="height:42px"></i></div>
-            <div class="mp"><span class="av" style="background:linear-gradient(140deg,#c6a7ff,#5b3fd1)"></span><i style="height:18px"></i></div>
-          </div>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <section class="odds" id="odds">
-    <div class="wrap odds-grid">
-      <div>
-        <h2 class="h-lg">Double it, double your odds.</h2>
-        <p class="body odds-note">Simple as that. Someone with $1,000 saved has ten times the chances of someone with $100. Drag the slider.</p>
-      </div>
-      <div class="calc">
-        <p class="calc-amt num" id="calcAmt">$500</p>
-        <input type="range" id="calcRange" min="0" max="19" step="1" value="9" aria-label="Amount saved" />
-        <div class="calc-out">
-          <p><b class="num" id="calcEntries">500</b> entries every month</p>
-          <p><b class="num" id="calcBoost">5×</b> the odds of someone saving $100</p>
         </div>
-        <div class="ladder" id="ladder"></div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="founders" id="founders">
-    <div class="wrap">
-      <div class="note">
-        <h2 class="note-title">Hi, we're Ramy and Callum.</h2>
-        <p>Saving is the smart move, but almost nobody finds it exciting. A prize draw changes that without anyone risking a dollar. Britain has proved it works since 1956, and we want to bring it here.</p>
-        <p>We're early, and we'd love to hear what you think. Text or email either of us.</p>
+    <section class="rails" aria-label="What Kairos runs on">
+      <div class="wrap rails-grid">
+        <div><span>Interest from</span><b>U.S. Treasury bills</b></div>
+        <div><span>Random draws by</span><b>Chainlink VRF</b></div>
+        <div><span>Payments through</span><b>Coinbase</b></div>
+        <div><span>Runs on</span><b>Base</b></div>
+      </div>
+    </section>
+
+    <section class="section" id="how">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>How Kairos works</h2>
+          <p>No tickets to buy. Your savings are your entries.</p>
+        </div>
+        <div class="steps">
+          <article class="step">
+            <div class="step-vis" aria-hidden="true">
+              <div class="sv-pay"><span class="sv-amt">$50</span><span class="sv-btn">Add money</span><span class="sv-sub">Apple Pay · Debit card · USDC</span></div>
+            </div>
+            <p class="step-n">01</p>
+            <h3>Add money</h3>
+            <p>Start with as little as $1. Pay with Apple Pay or a debit card through Coinbase.</p>
+          </article>
+          <article class="step">
+            <div class="step-vis" aria-hidden="true">
+              <div class="sv-entries"><span class="sv-big">500</span><span class="sv-sub">entries in this month's draw</span></div>
+            </div>
+            <p class="step-n">02</p>
+            <h3>Get entries</h3>
+            <p>Every dollar you save is one entry in every monthly draw, for as long as it stays saved.</p>
+          </article>
+          <article class="step">
+            <div class="step-vis" aria-hidden="true">
+              <div class="sv-pod">
+                <div class="mp"><span class="av" style="background:linear-gradient(140deg,#7ee0c3,#2b6cb0)"></span><b>$250</b><i style="height:34px"></i></div>
+                <div class="mp first"><span class="av" style="background:linear-gradient(140deg,#ffb36b,#c2185b)"></span><b>$1,000</b><i style="height:56px"></i></div>
+                <div class="mp"><span class="av" style="background:linear-gradient(140deg,#c6a7ff,#5b3fd1)"></span><b>$100</b><i style="height:24px"></i></div>
+              </div>
+            </div>
+            <p class="step-n">03</p>
+            <h3>Win prizes</h3>
+            <p>The interest everyone's savings earn becomes the prizes. Winnings go straight into your savings.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="compare">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>How Kairos compares</h2>
+          <p>The upside of a lottery ticket, without spending the money.</p>
+        </div>
+        <div class="table-wrap">
+          <table class="compare">
+            <thead>
+              <tr><th scope="col"></th><th scope="col" class="k">Kairos</th><th scope="col">Savings account</th><th scope="col">Lottery ticket</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">You keep the money you put in</th><td class="k"><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="no" aria-label="No"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></span></td></tr>
+              <tr><th scope="row">A chance to win a big prize</th><td class="k"><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="no" aria-label="No"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></span></td><td><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td></tr>
+              <tr><th scope="row">Take your money out anytime</th><td class="k"><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="no" aria-label="No"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></span></td></tr>
+              <tr><th scope="row">Free to take part</th><td class="k"><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="yes" aria-label="Yes"><svg viewBox="0 0 20 20"><path d="M5 10.5 8.5 14 15 7"/></svg></span></td><td><span class="no" aria-label="No"><svg viewBox="0 0 20 20"><path d="M6 6l8 8M14 6l-8 8"/></svg></span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="trust">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>Fair, and you can check it</h2>
+          <p>Every part of Kairos can be checked by anyone.</p>
+        </div>
+        <div class="cards">
+          <article class="card-t">
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3"/><circle cx="15" cy="15" r="1.3"/><circle cx="15" cy="9" r="1.3"/><circle cx="9" cy="15" r="1.3"/></svg></span>
+            <h3>Winners picked by Chainlink</h3>
+            <p>Each draw uses a random number from Chainlink VRF, with a proof that anyone can check. Nobody at Kairos can choose who wins.</p>
+          </article>
+          <article class="card-t">
+            <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18M12 3l9 5H3z"/></svg></span>
+            <h3>Prizes paid from Treasury interest</h3>
+            <p>Savings are held in short-term U.S. Treasury bills. The interest they earn pays for the prizes, so deposits are never used.</p>
+          </article>
+          <article class="card-t">
+            <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10h18M7 14.5h3"/></svg></span>
+            <h3>Money in and out with Coinbase</h3>
+            <p>Add money with Apple Pay or a debit card, and cash out to your bank account, through Coinbase.</p>
+          </article>
+          <article class="card-t">
+            <span class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></span>
+            <h3>Every transaction is public</h3>
+            <p>Kairos runs on Base. Deposits, draws and prize payments are recorded publicly, so the numbers can always be checked.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="odds">
+      <div class="wrap odds-grid">
+        <div class="sec-head left">
+          <h2>More savings, more chances</h2>
+          <p>Your odds grow with what you save. Someone with $1,000 saved has ten times the chances of someone with $100.</p>
+        </div>
+        <div class="calc">
+          <p class="calc-label">If you save</p>
+          <p class="calc-amt num" id="calcAmt">$500</p>
+          <input type="range" id="calcRange" min="0" max="19" step="1" value="9" aria-label="Amount saved" />
+          <div class="calc-out">
+            <p><b class="num" id="calcEntries">500</b> entries every month</p>
+            <p><b class="num" id="calcBoost">5×</b> the odds of someone saving $100</p>
+          </div>
+          <div class="ladder" id="ladder"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section why" id="why">
+      <div class="wrap why-grid">
+        <div>
+          <p class="why-num">$109B</p>
+          <p class="why-cap">spent on U.S. lottery tickets in 2025</p>
+        </div>
+        <div class="why-copy">
+          <h2>Why we're building Kairos</h2>
+          <p>Lottery tickets are popular because a small amount could change your life. But the money spent on them is gone.</p>
+          <p>In the UK, more than 22 million people use Premium Bonds instead, a government savings product that pays out prizes and never touches the amount saved. Kairos brings that idea to the U.S.</p>
+          <a class="text-link" href="./how-it-works.html">Read how Kairos works &rarr;</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="wrap faq-grid">
+        <div class="sec-head left">
+          <h2>Questions</h2>
+          <p>More detail on the <a href="./how-it-works.html">How it works</a> page.</p>
+        </div>
+        <div class="faq">
+          <details>
+            <summary>Can I lose the money I put in?</summary>
+            <p>Prizes are paid only from interest, never from deposits, so the amount you save stays the same whether you win or not. Kairos is not a bank and won't be FDIC insured, and we'll set out every risk clearly before launch.</p>
+          </details>
+          <details>
+            <summary>How are winners picked?</summary>
+            <p>Each draw uses a random number from Chainlink VRF, which comes with a proof anyone can verify. Your chances depend on how much you've saved and how long it's been saved that month.</p>
+          </details>
+          <details>
+            <summary>How big are the prizes?</summary>
+            <p>The prize pool is the interest that everyone's savings earn in a month. Kairos keeps 15% of the interest and the rest is paid out as prizes. The more people save, the bigger the prizes.</p>
+          </details>
+          <details>
+            <summary>How do I add and withdraw money?</summary>
+            <p>You add money with Apple Pay or a debit card through Coinbase, and you can withdraw your savings at any time. Cash-outs go to the bank account linked in your Coinbase account.</p>
+          </details>
+          <details>
+            <summary>When can I sign up?</summary>
+            <p>Kairos isn't open yet. Join the waitlist and we'll let you know when it launches in your state. You can try the full app today on the Base test network, using test money.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="team">
+      <div class="wrap">
+        <div class="sec-head">
+          <h2>The team</h2>
+          <p>Kairos is built by Pluto's Financial.</p>
+        </div>
         <div class="people">
           <div class="person">
-            <h3>Ramy Jaibaji</h3>
-            <p>Co-founder. Biological Sciences, 2nd year, UC Irvine.</p>
-            <div class="p-contact" data-user="ramyjaibaji" data-domain="icloud.com" data-tel="619 313 0704"></div>
+            <span class="initial" aria-hidden="true">R</span>
+            <div>
+              <h3>Ramy Jaibaji</h3>
+              <p>Co-founder · Biological Sciences, UC Irvine</p>
+              <div class="p-contact" data-user="ramyjaibaji" data-domain="icloud.com" data-tel="619 313 0704"></div>
+            </div>
           </div>
           <div class="person">
-            <h3>Callum Arnaudy</h3>
-            <p>Co-founder. Economics, 1st year, Dartmouth College.</p>
-            <div class="p-contact" data-user="callumarnaudy" data-domain="gmail.com" data-tel="619 865 3712"></div>
+            <span class="initial c" aria-hidden="true">C</span>
+            <div>
+              <h3>Callum Arnaudy</h3>
+              <p>Co-founder · Economics, Dartmouth College</p>
+              <div class="p-contact" data-user="callumarnaudy" data-domain="gmail.com" data-tel="619 865 3712"></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="waitlist" id="waitlist">
-    <div class="wrap wl-grid">
-      <div class="wl-copy">
-        <h2 class="h-xl">Want in?</h2>
-        <p class="body">Leave your details and we'll tell you when Kairos opens in your state. We're not taking any money yet.</p>
+    <section class="waitlist" id="waitlist">
+      <div class="wrap wl-grid">
+        <div class="wl-copy">
+          <h2>Join the waitlist</h2>
+          <p>We'll email you when Kairos launches in your state. We're not taking deposits yet.</p>
+        </div>
+
+        <form name="waitlist" id="waitlistForm" class="wl-form" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
+          <input type="hidden" name="form-name" value="waitlist" />
+          <p hidden><label>Leave this empty <input name="bot-field" /></label></p>
+
+          <label class="field"><span>Name</span><input id="wlName" name="name" type="text" autocomplete="name" required placeholder="Jane Doe" /></label>
+          <label class="field"><span>Email</span><input id="wlEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></label>
+          <label class="field"><span>Phone</span><input id="wlPhone" name="phone" type="tel" autocomplete="tel" required placeholder="(555) 123-4567" /></label>
+          <label class="field"><span>How much would you start with? (optional)</span>
+            <select id="wlAmount" name="amount">
+              <option value="">Choose one</option>
+              <option>$1–$50</option>
+              <option>$50–$250</option>
+              <option>$250–$1,000</option>
+              <option>More than $1,000</option>
+            </select>
+          </label>
+          <label class="check"><input type="checkbox" name="texts" value="yes" /> Text me when it launches</label>
+
+          <button type="submit" class="btn btn-primary btn-lg btn-block" id="wlSubmit">Join the waitlist</button>
+          <p class="form-error" id="wlError" role="alert"></p>
+          <p class="fine">We only use this to contact you about Kairos, and we never sell it.</p>
+        </form>
+
+        <div class="wl-done" id="wlDone" hidden>
+          <h3>You're on the list, <span id="wlFirst"></span>.</h3>
+          <p>We'll be in touch before launch. In the meantime, you can try the app on the test network.</p>
+          <a href="./app.html" class="btn btn-light">Try the app</a>
+        </div>
       </div>
-
-      <form name="waitlist" id="waitlistForm" class="wl-form" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
-        <input type="hidden" name="form-name" value="waitlist" />
-        <p hidden><label>Leave this empty <input name="bot-field" /></label></p>
-
-        <label class="field"><span>Name</span><input id="wlName" name="name" type="text" autocomplete="name" required placeholder="Jane Doe" /></label>
-        <label class="field"><span>Email</span><input id="wlEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></label>
-        <label class="field"><span>Phone</span><input id="wlPhone" name="phone" type="tel" autocomplete="tel" required placeholder="(555) 123-4567" /></label>
-        <label class="field"><span>How much would you start with? (optional)</span>
-          <select id="wlAmount" name="amount">
-            <option value="">Choose one</option>
-            <option>$1–$50</option>
-            <option>$50–$250</option>
-            <option>$250–$1,000</option>
-            <option>More than $1,000</option>
-          </select>
-        </label>
-        <label class="check"><input type="checkbox" name="texts" value="yes" /> Text me when it launches</label>
-
-        <button type="submit" class="btn btn-dark btn-lg btn-block" id="wlSubmit">Put me on the list</button>
-        <p class="form-error" id="wlError" role="alert"></p>
-        <p class="fine">We'll only use this to tell you about Kairos. We'll never sell it.</p>
-      </form>
-
-      <div class="wl-done" id="wlDone" hidden>
-        <h3>You're on the list, <span id="wlFirst"></span>.</h3>
-        <p>Thanks for being early. We'll be in touch before launch. Want to play with the demo in the meantime?</p>
-        <a href="./app.html" class="btn btn-dark">Try the demo</a>
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="site-footer">
     <div class="wrap foot">
-      <p>Kairos is being built by Pluto's Financial. It isn't a bank, isn't FDIC insured, and isn't taking deposits yet. The demo runs on a test network with fake money.</p>
+      <div class="foot-brand">
+        <a class="brand" href="./" aria-label="Kairos home"><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball2" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball2)"/></svg><span class="name">kairos</span></a>
+        <p>© 2026 Pluto's Financial. Kairos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+      </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./how-it-works.html">How it works</a>
-        <a href="./app.html">Demo</a>
+        <a href="./app.html">App</a>
         <a href="./winners.html">Winners</a>
-        <a href="./beta/" class="demo-only">Beta</a>
-        <a href="../" class="beta-only">Original demo</a>
+        <a href="#waitlist">Waitlist</a>
       </nav>
     </div>
   </footer>
