@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Kairos · Draws</title>
+  <meta name="description" content="The next Kairos prize draw, the latest winners, and how Chainlink picks them. Test network." />
+  <meta name="theme-color" content="#050506" />
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/app.css" />
+</head>
+<body class="draws-page">
+  <div class="testnet-bar">Test network. Prizes are test dollars.</div>
+
+  <header class="appbar">
+    <div class="appbar-in">
+      <a class="brand" href="./" aria-label="Kairos home">
+        <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
+        <span class="name">kairos</span>
+      </a>
+      <nav class="apptabs" aria-label="App">
+        <a href="./app.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5c0-1.7-2-2.8-4.5-2.8S7.5 5.8 7.5 7.6s2 2.6 4.5 3.1 4.5 1.4 4.5 3.3-2 3-4.5 3-4.5-1.1-4.5-2.9"/></svg>Savings</a>
+        <a href="./draws.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7h17v3.2a1.8 1.8 0 0 0 0 3.6V17h-17v-3.2a1.8 1.8 0 0 0 0-3.6z"/><path d="M14.5 7.5v1.5M14.5 11.25v1.5M14.5 15v1.5"/></svg>Draws</a>
+        <a href="./how-it-works.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 16.6v.2"/></svg>How it works</a>
+      </nav>
+      <div class="acct">
+        <a class="btn btn-primary btn-sm" id="acctSignIn" href="./app.html">Sign in</a>
+        <details class="acct-menu" id="acctMenu" hidden>
+          <summary><span class="acct-dot" aria-hidden="true"></span><span id="who">Account</span></summary>
+          <div class="acct-pop">
+            <p class="tiny" id="acctEmail"></p>
+            <a id="acctAddr" class="acct-link">Account</a>
+            <a href="./control.html" class="acct-link" id="hoodLink" hidden>Under the hood</a>
+            <a href="./privacy.html" class="acct-link">Privacy</a>
+            <button id="signout" class="btn btn-ghost btn-sm btn-block" type="button">Sign out</button>
+          </div>
+        </details>
+      </div>
+    </div>
+  </header>
+
+  <main class="draws-main">
+    <!-- the next draw -->
+    <section class="card draw-card">
+      <p class="dc-round" id="roundLine">Round <span id="roundId">—</span> · <span id="roundState">loading</span></p>
+      <h1 class="dc-title" id="drawTitle">Loading…</h1>
+      <p class="dc-hint" id="drawHint">&nbsp;</p>
+      <div class="dc-actions">
+        <button id="drawNow" class="btn btn-primary btn-xl" type="button">See how a draw works</button>
+        <button id="pretendBtn" class="btn btn-ghost btn-lg" type="button" hidden>Run a pretend draw</button>
+      </div>
+      <ol class="dc-steps" id="drawSteps" hidden>
+        <li data-step="1">Close the round</li>
+        <li data-step="2">Chainlink picks a random number</li>
+        <li data-step="3">Pay the winners</li>
+      </ol>
+      <div class="dc-stats">
+        <span>Prize pool <b class="gold" id="pool">—</b></span>
+        <span><b id="savers">—</b> savers</span>
+        <span>A draw every <b id="period">—</b></span>
+      </div>
+    </section>
+
+    <!-- how the winners are picked, in three lines -->
+    <section class="how3" aria-label="How the winners are picked">
+      <div><span class="h3-n">1</span><b>Entries are lined up</b><p>When the round ends, every saver gets a stretch of one long line: savings &times; time saved.</p></div>
+      <div><span class="h3-n">2</span><b>Chainlink sends a random number</b><p>With a proof the blockchain checks. Nobody, including Kairos, can pick or change it.</p></div>
+      <div><span class="h3-n">3</span><b>The number picks the spots</b><p>One spot on the line per prize. Whoever's stretch it lands in wins, straight into their savings.</p></div>
+    </section>
+
+    <!-- the latest winners -->
+    <section class="card latest" id="latestCard" hidden>
+      <div class="card-head">
+        <div><h2 id="latestTitle">Latest winners</h2><p class="tiny latest-meta" id="latestMeta"></p></div>
+        <button id="latestReplay" class="btn btn-ghost btn-sm" type="button">See how they were picked</button>
+      </div>
+      <p id="latestBanner" class="you-won" hidden></p>
+      <div id="latestPodium"></div>
+    </section>
+
+    <!-- past draws -->
+    <section class="card" id="historyCard">
+      <div class="card-head"><h2>Past draws</h2><span class="tiny">Tap a draw to see everyone who won</span></div>
+      <div id="history" class="w-history"><p class="sub">Loading…</p></div>
+    </section>
+
+    <!-- the Kairos team's controls (hidden for everyone else) -->
+    <div id="adminArea" hidden>
+      <div id="notOwner" class="lock" hidden>
+        <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+        <p><b>One-time setup.</b> Connect the MetaMask wallet that created Kairos once, and this email account can skip countdowns and change settings. Until then you can still pick winners when a round ends.</p>
+        <button id="handover" class="btn btn-light btn-sm">Connect MetaMask</button>
+      </div>
+
+      <section class="card settings" id="settings">
+        <div class="card-head"><h2>Team controls</h2><span class="tiny" id="updated"></span></div>
+
+        <div class="set-row">
+          <div class="set-label"><b>Make the prize bigger</b><span>Fast-forward time so more interest piles up</span></div>
+          <div class="row">
+            <button class="btn btn-sm" data-ff="2592000">+1 month</button>
+            <button class="btn btn-sm" data-ff="31536000">+1 year</button>
+          </div>
+        </div>
+
+        <div class="set-row">
+          <div class="set-label"><b>Time between draws</b><span>How long each round lasts</span></div>
+          <div class="seg">
+            <button data-period="60">1 min</button>
+            <button data-period="600">10 min</button>
+            <button data-period="86400">1 day</button>
+            <button data-period="2592000">30 days</button>
+          </div>
+        </div>
+
+        <div class="set-row">
+          <div class="set-label"><b>Number of prizes</b><span>More prizes means more winners</span></div>
+          <div class="seg">
+            <button data-splits="3">3</button>
+            <button data-splits="10">10</button>
+            <button data-splits="20">20</button>
+          </div>
+        </div>
+
+        <div class="set-row">
+          <div class="set-label"><b>Smallest deposit</b><span>The least anyone can put in</span></div>
+          <div class="seg">
+            <button data-mindep="1000000">$1</button>
+            <button data-mindep="10000000">$10</button>
+          </div>
+        </div>
+
+        <div class="set-row">
+          <div class="set-label"><b>Draw automatically</b><span id="autoStatus">Off. When on, winners are picked every time a round ends, as long as this page stays open.</span></div>
+          <label class="switch"><input type="checkbox" id="autopilot" aria-label="Draw automatically" /><span></span></label>
+        </div>
+
+        <details class="advanced">
+          <summary>More controls</summary>
+          <div class="adv-grid">
+            <div>
+              <p class="adv-h">Interest speed</p>
+              <p class="tiny">Now <span id="speed">—</span>× real time</p>
+              <div class="row">
+                <select id="speedSel" aria-label="Interest speed">
+                  <option value="1">Real time</option>
+                  <option value="52560">1 year per 10 min</option>
+                  <option value="525600">1 year per minute</option>
+                </select>
+                <button id="setSpeed" class="btn btn-ghost btn-sm">Set</button>
+              </div>
+            </div>
+            <div>
+              <p class="adv-h">Cash drawer</p>
+              <p class="tiny" id="fundRules">—</p>
+              <div class="row wrap">
+                <button id="tick" class="btn btn-sm">Rebalance</button>
+                <button id="weekend" class="btn btn-sm">Weekend mode</button>
+                <button id="instant" class="btn btn-sm">Weekday mode</button>
+              </div>
+            </div>
+            <div>
+              <p class="adv-h">Money</p>
+              <p class="tiny">Cash on hand <span id="cash">—</span>, total saved <span id="tvl">—</span>, fees earned <span id="fees">—</span></p>
+              <div class="row wrap">
+                <button id="payFees" class="btn btn-ghost btn-sm">Pay fees</button>
+                <button id="pause" class="btn btn-ghost btn-sm">Pause deposits</button>
+              </div>
+            </div>
+          </div>
+          <p class="tiny" id="ownerLine">Loading…</p>
+          <p class="tiny"><a href="./control.html">Open the control room</a> to watch the Rebalancer and simulate draws.</p>
+        </details>
+      </section>
+    </div>
+
+    <p class="team-note" id="signedOut" hidden>Running the draws? <a href="./app.html">Sign in</a> or <button id="useWallet" class="link-btn" type="button">connect MetaMask</button>.</p>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <footer class="app-foot"><p>Every winner keeps their deposit. Prizes come only from the interest the savings earn. Test network, by Pluto's Financial. <a href="./privacy.html">Privacy</a></p></footer>
+  <script type="module" src="/src/draws.js"></script>
+</body>
+</html>

@@ -324,9 +324,9 @@
           <input type="hidden" name="form-name" value="waitlist" />
           <p hidden><label>Leave this empty <input name="bot-field" /></label></p>
 
-          <label class="field"><span>Name</span><input id="wlName" name="name" type="text" autocomplete="name" required placeholder="Jane Doe" /></label>
-          <label class="field"><span>Email</span><input id="wlEmail" name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></label>
-          <label class="field"><span>Phone</span><input id="wlPhone" name="phone" type="tel" autocomplete="tel" required placeholder="(555) 123-4567" /></label>
+          <label class="field"><span>Name</span><input id="wlName" name="name" type="text" autocomplete="name" maxlength="100" required placeholder="Jane Doe" /></label>
+          <label class="field"><span>Email</span><input id="wlEmail" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com" /></label>
+          <label class="field"><span>Phone</span><input id="wlPhone" name="phone" type="tel" autocomplete="tel" maxlength="24" required placeholder="(555) 123-4567" /></label>
           <label class="field"><span>How much would you start with? (optional)</span>
             <select id="wlAmount" name="amount">
               <option value="">Choose one</option>
@@ -340,7 +340,7 @@
 
           <button type="submit" class="btn btn-primary btn-lg btn-block" id="wlSubmit">Join the waitlist</button>
           <p class="form-error" id="wlError" role="alert"></p>
-          <p class="fine">We only use this to contact you about Kairos, and we never sell it.</p>
+          <p class="fine">We only use this to contact you about Kairos, and we never sell it. <a href="./privacy.html">Privacy</a></p>
         </form>
 
         <div class="wl-done" id="wlDone" hidden>
@@ -361,8 +361,9 @@
       <nav class="foot-links" aria-label="Footer">
         <a href="./how-it-works.html">How it works</a>
         <a href="./app.html">App</a>
-        <a href="./winners.html">Winners</a>
+        <a href="./draws.html">Draws</a>
         <a href="#waitlist">Waitlist</a>
+        <a href="./privacy.html">Privacy</a>
       </nav>
     </div>
   </footer>

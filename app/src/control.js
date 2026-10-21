@@ -1,6 +1,6 @@
 // Control room: live Rebalancer view, draw simulator, activity feed.
 import { keccak256, encodeAbiParameters, formatUnits, parseUnits } from "viem";
-import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, txLink, humanDuration, resumeEmailSession, connectDevKey } from "./core.js";
+import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey } from "./core.js";
 import { saverName } from "./winners-ui.js";
 
 const YEAR = 365n * 24n * 3600n;
@@ -160,7 +160,7 @@ async function loadFeed() {
       .map((e) => {
         const ago = Number(latest - e.blockNumber) * secs;
         const when = new Date((Number(latestBlock.timestamp) - ago) * 1000);
-        const link = state.explorer ? `<a href="${state.explorer}/tx/${e.transactionHash}" target="_blank" rel="noopener">Receipt</a>` : "";
+        const link = state.explorer ? `<a href="${state.explorer}/tx/${e.transactionHash}" target="_blank" rel="noopener noreferrer">Receipt</a>` : "";
         return `<div class="ev"><span class="ico">${ICON[e.eventName] || "•"}</span><div class="t">${describe(e)}</div><div class="when">${when.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} ${link}</div></div>`;
       })
       .join("");
@@ -275,7 +275,7 @@ async function runSimulation() {
       <p class="tiny">Odds boost compares each saver with whoever has the fewest entries. Entries count dollars and how long they've been saved this round. One person can win more than one prize.</p>`;
   } catch (e) {
     console.error(e);
-    toast(friendlyError(e), true);
+    toastError(e);
   } finally {
     btn.disabled = false;
     btn.textContent = "Run pretend draws";
@@ -337,7 +337,7 @@ async function main() {
       await refresh();
       loadFeed();
     } catch (x) {
-      toast(friendlyError(x), true);
+      toastError(x);
     } finally {
       btn.disabled = false;
       btn.textContent = label;

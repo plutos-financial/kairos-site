@@ -19,6 +19,9 @@ import built from "./site-config.json"; // addresses + settings baked in at buil
 import "./fresh.js"; // reloads a stale cached page after a site update
 
 export const $ = (id) => document.getElementById(id);
+/** Makes text safe to put inside HTML. */
+export const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+const LOCAL = (cfg) => cfg?.chainId === 31337;
 
 // Which copy of the site this is: "demo" (the original) or "beta" (Chainlink draws, Add money, send/receive).
 export const EDITION = built.edition === "beta" ? "beta" : "demo";
@@ -62,18 +65,18 @@ async function fetchJson(path) {
 }
 
 export async function loadDeployment() {
-  const params = new URLSearchParams(location.search);
-  if (!params.has("devkey")) {
-    try {
-      const saved = JSON.parse(localStorage.getItem(SAVED_DEPLOYMENT) || "null");
-      if (saved?.vault) return saved;
-    } catch {}
-  }
-  // The file next to the page wins (so you can repoint the site without rebuilding).
-  // If it's missing, use the copy baked into the code.
+  // The official contracts: the file next to the page (so the site can be repointed without a
+  // rebuild), or the copy baked into the code.
   const j = await fetchJson("./deployment.json");
   if (j?.vault) return j;
-  return built.deployment?.vault ? built.deployment : null;
+  if (built.deployment?.vault) return built.deployment;
+  // Only before the official contracts exist: the ones this browser just set up on deploy.html.
+  // (Never on top of the official ones, so nothing saved in a browser can quietly swap them.)
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVED_DEPLOYMENT) || "null");
+    if (saved?.vault && /^0x[0-9a-fA-F]{40}$/.test(saved.vault)) return saved;
+  } catch {}
+  return null;
 }
 
 export async function setup() {
@@ -129,6 +132,8 @@ export async function canRunDraws(owner) {
 }
 
 export const emailAvailable = () => Boolean(state.appCfg.cdpProjectId) && state.cfg?.chainId === 84532;
+/** Local testing only: ?mock signs in with Coinbase's mock wallet on a local chain. */
+export const mockSignIn = () => LOCAL(state.cfg) && new URLSearchParams(location.search).has("mock");
 
 // ------------------------------------------------------------------ email sign-in (Coinbase embedded wallet)
 
@@ -139,7 +144,7 @@ async function loadCdp() {
   if (cdpReady) return cdpReady;
   cdpReady = (async () => {
     cdp = await import("@coinbase/cdp-core");
-    const mock = new URLSearchParams(location.search).has("mock");
+    const mock = mockSignIn();
     await cdp.initialize({
       projectId: mock ? "mock-project" : state.appCfg.cdpProjectId,
       ethereum: { createOnLogin: "smart" },
@@ -158,7 +163,7 @@ async function smartAccountOf(user) {
 
 /** Restores an email session from a previous visit. Returns true if signed in. */
 export async function resumeEmailSession() {
-  if (!emailAvailable() && !new URLSearchParams(location.search).has("mock")) return false;
+  if (!emailAvailable() && !mockSignIn()) return false;
   try {
     await loadCdp();
     if (!(await cdp.isSignedIn())) return false;
@@ -170,6 +175,16 @@ export async function resumeEmailSession() {
   } catch (e) {
     console.warn("Email session not restored", e);
     return false;
+  }
+}
+
+/** The Coinbase sign-in token, so the Kairos money server can check who's asking. Null if not signed in by email. */
+export async function accessToken() {
+  if (state.mode !== "email" || !cdp) return null;
+  try {
+    return await cdp.getAccessToken();
+  } catch {
+    return null;
   }
 }
 
@@ -222,7 +237,7 @@ export async function connectBrowserWallet() {
 /** Local testing only: ?devkey=0x… on a local chain signs with a local key. */
 export function connectDevKey() {
   const k = new URLSearchParams(location.search).get("devkey");
-  if (!k || state.cfg?.chainId !== 31337) return false;
+  if (!k || !LOCAL(state.cfg) || !/^0x[0-9a-fA-F]{64}$/.test(k)) return false;
   const acct = privateKeyToAccount(k);
   state.walletClient = createWalletClient({
     chain: state.chain,
@@ -349,10 +364,13 @@ export function friendlyError(e) {
 }
 
 export function txLink(hash) {
-  return state.explorer && hash ? `<a href="${state.explorer}/tx/${hash}" target="_blank" rel="noopener">View receipt</a>` : "";
+  return state.explorer && /^0x[0-9a-fA-F]{64}$/.test(hash || "") ? `<a href="${state.explorer}/tx/${hash}" target="_blank" rel="noopener noreferrer">View receipt</a>` : "";
 }
 
 let toastTimer;
+/** An error as a toast, as plain text (error messages can contain anything). */
+export const toastError = (e, ms = 6000) => toast(esc(friendlyError(e)), true, ms);
+/** `html` is trusted markup written by Kairos; anything from outside goes through esc() first. */
 export function toast(html, err = false, ms = 6000) {
   const t = $("toast");
   if (!t) return;

@@ -1,16 +1,19 @@
-// The draws page.
-//   Everyone: the countdown, the latest winners, and pretend draws (nothing on-chain).
+// The Draws page.
+//   Everyone: the countdown, the latest winners, past draws, replays of how each draw was picked,
+//   watching a draw live while Chainlink answers, and pretend draws (nothing on-chain).
 //   The Kairos team (the on-chain owner, or an email on the drawAdmins list): real draws, settings,
 //   auto-pilot. Ending a round early and the settings also need on-chain owner rights, which the
 //   team's email account gets through the one-time MetaMask handover below.
 import { createWalletClient, custom, parseEventLogs } from "viem";
 import abis from "./abis.json";
 import {
-  $, PRIZE_PRESETS, state, fmt, short, sleep, setup, read, act, friendlyError, toast, txLink, humanDuration,
+  $, PRIZE_PRESETS, state, fmt, short, sleep, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration,
   resumeEmailSession, connectBrowserWallet, connectDevKey, canRunDraws, usesChainlink,
 } from "./core.js";
 import { openPretend } from "./pretend.js";
-import { loadDraws, latestWithWinners, podiumHTML, groupWinners, drawTotal, drawWhen } from "./winners-ui.js";
+import { replayDraw, watchDraw } from "./drawshow.js";
+import { showAccount, wireAccount } from "./appbar.js";
+import { loadDraws, latestWithWinners, podiumHTML, groupWinners, drawTotal, drawWhen, avatar, saverName, myWin } from "./winners-ui.js";
 
 let owner = "";
 let nextDraw = 0n;
@@ -26,6 +29,7 @@ let allowlistOn = false; // kept as-is when the smallest deposit changes
 
 async function main() {
   if (!(await setup())) return toast(`No contracts yet. <a href="./deploy.html">Set them up</a>.`, true, 0);
+  wireAccount();
   if (!connectDevKey()) await resumeEmailSession();
   wire();
   await refresh();
@@ -45,7 +49,7 @@ function wire() {
       await connectBrowserWallet();
       await refresh();
     } catch (e) {
-      toast(friendlyError(e), true);
+      toastError(e);
     }
   };
   $("handover").onclick = handover;
@@ -65,12 +69,13 @@ function wire() {
   $("payFees").onclick = (e) => go(e.currentTarget, [{ c: "vault", fn: "payFees" }], "Fees sent to the treasury.");
   $("pause").onclick = (e) => go(e.currentTarget, [{ c: "vault", fn: paused ? "unpause" : "pause" }], paused ? "Deposits resumed." : "Deposits paused. Withdrawals still work.");
   $("drawNow").onclick = () => drawNow();
-  if (usesChainlink()) {
-    $("drawSteps").querySelector('[data-step="2"]').textContent = "Chainlink picks a random number";
-    const sub = state.cfg.subscriptionId;
-    $("dcExplain").innerHTML += ` The random number comes from <a href="https://vrf.chain.link/base-sepolia/${sub || ""}" target="_blank" rel="noopener">Chainlink VRF</a>, so nobody, including us, can choose the winners.`;
-  }
+  if (!usesChainlink()) $("drawSteps").querySelector('[data-step="2"]').textContent = "Get a random number";
   $("pretendBtn").onclick = () => openPretend();
+  $("latestReplay").onclick = () => latestId && replayDraw(latestId);
+  $("history").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-replay]");
+    if (b) replayDraw(BigInt(b.dataset.replay));
+  });
   document.querySelectorAll("[data-splits]").forEach((b) => {
     const preset = PRIZE_PRESETS[b.dataset.splits];
     b.onclick = () => go(b, [{ c: "vault", fn: "setPrizeSplits", args: [preset] }], `Prize structure set: ${preset.length} prizes per round.`);
@@ -80,8 +85,6 @@ function wire() {
       go(b, [{ c: "vault", fn: "setDepositRules", args: [BigInt(b.dataset.mindep), allowlistOn] }], `The smallest deposit is now ${fmt(BigInt(b.dataset.mindep), 0)}.`);
   });
   $("autopilot").onchange = (e) => (e.target.checked ? startAutopilot() : stopAutopilot());
-  $("revealDone").onclick = closeReveal;
-  addEventListener("keydown", (e) => e.key === "Escape" && closeReveal());
 }
 
 async function go(btn, calls, msg) {
@@ -98,7 +101,7 @@ async function go(btn, calls, msg) {
     return hash;
   } catch (e) {
     console.error(e);
-    toast(friendlyError(e), true);
+    toastError(e);
   } finally {
     btn.disabled = false;
     btn.textContent = label;
@@ -129,7 +132,8 @@ function setStep(n) {
 }
 
 async function drawNow() {
-  if (!admin) return openPretend(); // everyone else gets a pretend draw
+  // Everyone else: watch a real draw while Chainlink answers, or run a pretend one.
+  if (!admin) return pendingId && usesChainlink() ? watchDraw(pendingId) : openPretend();
   if (busy) return;
   const btn = $("drawNow");
   busy = true;
@@ -178,7 +182,6 @@ async function drawNow() {
     if (!closed) throw new Error("The round didn't close. Wait a few seconds and try again.");
     const { drawId, prize, entrants } = closed.args;
     if (prize === 0n) {
-      showResult(drawId, [], [], null);
       return toast(
         entrants === 0n
           ? `Round ${drawId} closed, but nobody had any savings in it, so there was no one to pick. Deposit in the app first.`
@@ -192,7 +195,7 @@ async function drawNow() {
     ok = true;
   } catch (e) {
     console.error(e);
-    toast(friendlyError(e), true, 9000);
+    toastError(e, 9000);
   } finally {
     busy = false;
     btn.disabled = false;
@@ -212,25 +215,14 @@ async function findPending(cur) {
   return found;
 }
 
-/** Chainlink VRF: the random number arrives by itself, usually within a minute. Just wait for it. */
-async function waitForChainlink(drawId, status) {
-  setStep(2);
-  status("Chainlink is picking a random number…");
-  for (let i = 0; i < 180; i++) {
-    const [d, winners, amounts] = await read("vault", "getDraw", [drawId]);
-    if (d.awarded) {
-      setStep(4);
-      return showResult(drawId, winners, amounts, null);
-    }
-    if (i === 30) status("Still waiting on Chainlink. This can take a couple of minutes on the test network…");
-    await sleep(2000);
-  }
-  throw new Error("Chainlink hasn't answered yet. The winners will appear by themselves once it does. Check back in a few minutes.");
-}
-
 /** The random source needs one more block after the round closes, then anyone can finish it. */
 async function pickWinners(drawId, status) {
-  if (usesChainlink()) return waitForChainlink(drawId, status);
+  if (usesChainlink()) {
+    // Chainlink answers by itself, usually within a minute. Show it happening, live.
+    status("Chainlink is picking a random number…");
+    watchDraw(drawId);
+    return;
+  }
   status("Getting a random number…");
   const req = await read("rng", "requestBlock", [drawId]).catch(() => 0n);
   for (let i = 0; i < 30 && req > 0n; i++) {
@@ -247,7 +239,7 @@ async function pickWinners(drawId, status) {
       const ev = (await vaultEvents("DrawAwarded"))[0];
       if (ev) {
         setStep(4);
-        return showResult(drawId, ev.args.winners, ev.args.amounts, state.lastHashes.at(-1));
+        return replayDraw(drawId);
       }
       break;
     } catch (e) {
@@ -262,53 +254,8 @@ async function pickWinners(drawId, status) {
   }
   // Read the result straight from the vault (covers "someone else finished it").
   const [d, winners, amounts] = await read("vault", "getDraw", [drawId]);
-  if (d.awarded && winners.length) return showResult(drawId, winners, amounts, null);
+  if (d.awarded && winners.length) return replayDraw(drawId);
   throw lastErr || new Error("Couldn't pick winners yet. Press the button again in a few seconds.");
-}
-
-function showResult(drawId, winners, amounts, hash) {
-  if (!winners.length) return toast(`Round #${drawId} closed with no prize. Grow the prize pool, then draw again.`, true, 8000);
-  const x = { id: drawId, d: { closeTime: BigInt(Math.floor(Date.now() / 1000)) }, winners, amounts, entrants: 0n };
-  const people = groupWinners(winners, amounts).length;
-  $("revealKicker").textContent = `Draw #${drawId}`;
-  $("revealSub").innerHTML = `<b>${fmt(drawTotal(x))}</b> just went to ${people} saver${people === 1 ? "" : "s"}. Prizes are already in their savings. ${hash ? txLink(hash) : ""}`;
-  $("revealPodium").innerHTML = podiumHTML(x, state.address);
-  $("reveal").hidden = false;
-  $("revealDone").focus();
-  confetti($("revealConfetti"), () => !$("reveal").hidden, 1600);
-}
-
-function closeReveal() {
-  $("reveal").hidden = true;
-}
-
-function confetti(c, open, delay = 0) {
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-  setTimeout(() => {
-    const ctx = c.getContext("2d");
-    const dpr = window.devicePixelRatio || 1;
-    c.width = innerWidth * dpr;
-    c.height = innerHeight * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const colors = ["#f4c24f", "#ffd77a", "#fffcf7", "#f5c542", "#f4c24f"];
-    const bits = Array.from({ length: 180 }, () => ({
-      x: innerWidth / 2 + (Math.random() - 0.5) * 160, y: innerHeight * 0.42,
-      vx: (Math.random() - 0.5) * 16, vy: -Math.random() * 15 - 4,
-      r: 4 + Math.random() * 6, a: Math.random() * Math.PI, va: (Math.random() - 0.5) * 0.3,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    }));
-    const start = performance.now();
-    const frame = (t) => {
-      ctx.clearRect(0, 0, innerWidth, innerHeight);
-      for (const b of bits) {
-        b.vy += 0.32; b.vx *= 0.99; b.x += b.vx; b.y += b.vy; b.a += b.va;
-        ctx.save(); ctx.translate(b.x, b.y); ctx.rotate(b.a); ctx.fillStyle = b.color; ctx.fillRect(-b.r / 2, -b.r / 4, b.r, b.r / 2); ctx.restore();
-      }
-      if (t - start < 4500 && open()) requestAnimationFrame(frame);
-      else ctx.clearRect(0, 0, innerWidth, innerHeight);
-    };
-    requestAnimationFrame(frame);
-  }, delay);
 }
 
 // ------------------------------------------------------------------ auto-pilot
@@ -384,7 +331,7 @@ async function handover() {
     await refresh();
   } catch (e) {
     console.error(e);
-    toast(friendlyError(e), true);
+    toastError(e);
   } finally {
     btn.disabled = false;
   }
@@ -424,10 +371,11 @@ async function refresh() {
     period = per;
     currentId = cur;
     paused = isPaused;
-    const { draws } = await loadDraws(6);
+    const { draws } = await loadDraws(15);
     pendingId = 0n;
     draws.forEach((x) => x.d.prize > 0n && !x.d.awarded && (pendingId = x.id)); // oldest stuck round
     renderLatest(draws);
+    renderHistory(draws);
 
     $("roundId").textContent = String(cur);
     $("tvl").textContent = fmt(tvl);
@@ -446,8 +394,7 @@ async function refresh() {
 
     const me = state.address;
     admin = await canRunDraws(owner);
-    $("who").textContent = me ? state.email || short(me) : "Not signed in";
-    $("who").className = "pill" + (me ? " ok" : "");
+    showAccount({ admin });
     $("ownerLine").innerHTML = `Owner account: ${short(owner)}${isOwner() ? " (that's you)" : me ? `. You're signed in as ${short(me)}.` : ""}`;
     $("signedOut").hidden = Boolean(me);
     $("adminArea").hidden = !admin;
@@ -465,18 +412,55 @@ async function refresh() {
   }
 }
 
+let latestId = 0n;
 function renderLatest(draws) {
   const x = latestWithWinners(draws);
   const card = $("latestCard");
   if (!x) return (card.hidden = true);
   card.hidden = false;
+  latestId = x.id;
   const key = `${x.id}:${state.address || ""}`;
   if (card.dataset.key === key) return;
   card.dataset.key = key;
   const people = groupWinners(x.winners, x.amounts).length;
+  const mine = myWin(x, state.address);
   $("latestTitle").textContent = `Draw #${x.id} winners`;
+  $("latestBanner").hidden = mine === 0n;
+  $("latestBanner").textContent = mine > 0n ? `That's you! You won ${fmt(mine)}. It's already in your savings.` : "";
   $("latestPodium").innerHTML = podiumHTML(x, state.address);
-  $("latestMeta").textContent = `${fmt(drawTotal(x))} to ${people} saver${people === 1 ? "" : "s"} on ${drawWhen(x)}.`;
+  $("latestMeta").textContent = `${fmt(drawTotal(x))} to ${people} saver${people === 1 ? "" : "s"} on ${drawWhen(x)}, out of ${x.entrants} who entered.`;
+}
+
+let historyKey = "";
+function renderHistory(draws) {
+  const key = draws.map((x) => `${x.id}:${x.d.awarded}`).join(",") + (state.address || "");
+  if (key === historyKey) return;
+  historyKey = key;
+  const latest = latestWithWinners(draws);
+  const rest = draws.filter((x) => x !== latest);
+  $("historyCard").hidden = Boolean(latest) && !rest.length; // nothing older to show yet
+  if (!rest.length) return ($("history").innerHTML = `<p class="sub">No draws yet. The first one happens when the countdown ends.</p>`);
+  const me = state.address;
+  $("history").innerHTML = rest
+    .map((x) => {
+      if (!x.d.awarded) return row(x, `<span class="badge wait">Chainlink is picking…</span>`, "");
+      if (!x.winners.length) return row(x, `<span class="tiny">No prize this round</span>`, "");
+      const g = groupWinners(x.winners, x.amounts);
+      const top = g[0];
+      const summary = `${avatar(top.addr)}<span><b>${saverName(top.addr, me)}</b> won ${fmt(top.amount)}${g.length > 1 ? ` <span class="tiny">+ ${g.length - 1} more</span>` : ""}</span>`;
+      const list = g
+        .map((w, i) => `<div class="rest-row${me && w.addr.toLowerCase() === me.toLowerCase() ? " me" : ""}"><span class="rest-n">${i + 1}</span>${avatar(w.addr)}<span class="rest-name">${saverName(w.addr, me)}${w.count > 1 ? ` <span class="tiny">${w.count} prizes</span>` : ""}</span><b>${fmt(w.amount)}</b></div>`)
+        .join("");
+      return row(x, summary, `<div class="pod-rest">${list}</div><div class="h-foot"><span class="tiny">${drawWhen(x)}. ${x.entrants} saver${x.entrants === 1n ? "" : "s"} entered.</span><button class="btn btn-ghost btn-sm" type="button" data-replay="${x.id}">See how they were picked</button></div>`);
+    })
+    .join("");
+}
+
+function row(x, summary, detail) {
+  const head = `<span class="h-id">#${x.id}</span><span class="h-sum">${summary}</span><span class="h-amt">${x.winners.length ? fmt(drawTotal(x)) : ""}</span>`;
+  return detail
+    ? `<details class="h-row"><summary>${head}</summary>${detail}</details>`
+    : `<div class="h-row plain"><div class="h-line">${head}</div></div>`;
 }
 
 function syncSelect(id, value) {
@@ -506,12 +490,18 @@ function tick() {
   const btn = $("drawNow");
   let title, hint, label, enabled = true;
   if (!admin) {
-    $("roundState").textContent = pendingId || left <= 0 ? "finished" : "open";
-    title = left > 0 && !pendingId ? `Next draw in ${clock(left)}` : "This round is over";
-    hint = left > 0 && !pendingId
-      ? "The Kairos team runs the real draw when the countdown ends. Curious how it could go?"
-      : "The Kairos team will pick the winners shortly. Here's how it could go.";
-    label = "Run a pretend draw";
+    $("roundState").textContent = pendingId ? "picking winners" : left <= 0 ? "finished" : "open";
+    if (pendingId && usesChainlink()) {
+      title = "Chainlink is picking the winners";
+      hint = `Round ${pendingId} is closed and Chainlink's random number is on its way. Watch the winners get picked.`;
+      label = "Watch it live";
+    } else {
+      title = left > 0 && !pendingId ? `Next draw in ${clock(left)}` : "This round is over";
+      hint = left > 0 && !pendingId
+        ? "When the countdown ends, Chainlink picks the winners. See exactly how, with a pretend draw."
+        : "The winners will be picked shortly. Meanwhile, here's how a draw works.";
+      label = "See how a draw works";
+    }
   } else if (pendingId && usesChainlink()) {
     $("roundState").textContent = "waiting for Chainlink";
     title = "Chainlink is picking the winners";

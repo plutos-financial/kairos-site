@@ -32,7 +32,7 @@ function calculator() {
   render();
 }
 
-// ------------------------------------------------------------------ waitlist (Netlify Forms)
+// ------------------------------------------------------------------ waitlist (Google Sheet)
 
 // If kairos-settings.json has a "waitlistUrl", sign-ups go there (a Google Sheet). Otherwise Netlify Forms.
 let settingsPromise;
@@ -54,6 +54,8 @@ function waitlist() {
     if (name.length < 2) return err("Please enter your name.");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err("Please enter a valid email.");
     if (phone.replace(/\D/g, "").length < 10) return err("Please enter a phone number with area code.");
+    if (form["bot-field"]?.value) return; // filled in by a bot, not a person
+    if (form.dataset.sent) return; // one sign-up per visit is plenty
 
     const btn = $("wlSubmit");
     btn.disabled = true;
@@ -71,6 +73,7 @@ function waitlist() {
         const r = await fetch("/", { method: "POST", headers, body });
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
       }
+      form.dataset.sent = "1";
       $("wlFirst").textContent = name.split(" ")[0];
       form.hidden = true;
       $("wlDone").hidden = false;

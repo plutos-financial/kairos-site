@@ -9,9 +9,10 @@
 // burn address, like a real cash-out sends USDC to Coinbase.
 import { isAddress, parseUnits } from "viem";
 import qrcode from "qrcode-generator";
-import { $, state, fmt, short, act, read, friendlyError, toast, txLink } from "./core.js";
+import { $, state, fmt, short, act, read, friendlyError, esc, txLink, accessToken } from "./core.js";
 
 const BURN = "0x000000000000000000000000000000000000dEaD";
+const PAY_ORIGIN = "https://pay.coinbase.com"; // the only page Kairos will show inside "Add money"
 const TERMS = {
   guest: "https://www.coinbase.com/legal/guest-checkout/us",
   user: "https://www.coinbase.com/legal/user_agreement",
@@ -25,9 +26,8 @@ let symbol = "kUSD";
 export function initBetaWallet(c) {
   ctx = c;
   $("walletCard").hidden = false;
-  $("betaTag").hidden = false;
   const bar = document.querySelector(".testnet-bar");
-  if (bar) bar.textContent = "Beta on the test network. Coinbase is in test mode, so no card is ever charged.";
+  if (bar) bar.textContent = "Test network. Coinbase runs in test mode, so no card is ever charged.";
   $("walletCard").addEventListener("click", (e) => {
     const b = e.target.closest(".wa");
     if (b) open(b.dataset.act);
@@ -49,6 +49,9 @@ export function renderWallet(wallet, savings) {
 
 // ------------------------------------------------------------------ the sheet
 
+/** Opens Add money / Send / Receive / Cash out from elsewhere on the page. */
+export const openAction = (kind) => open(kind);
+
 function open(kind) {
   pending = null;
   ({ add: addForm, send: sendForm, receive: receiveView, cashout: cashForm })[kind]?.();
@@ -60,6 +63,7 @@ function close() {
   $("sheet").hidden = true;
   $("sheetBody").innerHTML = "";
   pending = null;
+  payFrame = null;
 }
 
 const body = (html) => ($("sheetBody").innerHTML = html);
@@ -105,17 +109,43 @@ async function busy(btn, text, fn) {
 
 function moneyApi() {
   const u = String(state.appCfg.moneyApi || "").trim().replace(/\/+$/, "");
-  return /^https?:\/\//.test(u) ? u : "";
+  return /^https:\/\//.test(u) || (state.cfg?.chainId === 31337 && /^http:\/\/localhost:\d+$/.test(u)) ? u : "";
+}
+
+/** Apple Pay goes through the Kairos money server, which needs the email sign-in to know who's paying. */
+const canPay = () => Boolean(moneyApi()) && state.mode === "email";
+
+/** Headers for the money server: who's asking, proved by their Coinbase sign-in. */
+async function authHeaders() {
+  const t = await accessToken();
+  if (!t) throw new Error("Sign in with your email to pay with Apple Pay.");
+  return { Authorization: `Bearer ${t}` };
+}
+
+/** Only ever frame Coinbase's own payment page. */
+function safePayLink(link, sandbox) {
+  let u;
+  try {
+    u = new URL(String(link || ""));
+  } catch {
+    return "";
+  }
+  const localTest = state.cfg?.chainId === 31337 && u.origin === location.origin; // the local stand-in checkout
+  if (u.origin !== PAY_ORIGIN && !localTest) return "";
+  if (sandbox) u.searchParams.set("useApplePaySandbox", "true");
+  return u.toString();
 }
 
 function addForm() {
-  const api = moneyApi();
+  const api = canPay();
   body(`
     <h2 id="sheetTitle">Add money</h2>
     <p class="sh-sub">${
       api
         ? "Pay with Apple Pay through Coinbase. This is Coinbase's test mode: your card is never charged, and we add test dollars instead."
-        : "The Coinbase connection isn't switched on for this site yet, so this adds test dollars straight away."
+        : moneyApi()
+          ? "Apple Pay needs the email sign-in. With a browser wallet, this adds test dollars straight away."
+          : "The Coinbase connection isn't switched on for this site yet, so this adds test dollars straight away."
     }</p>
     ${moneyInput("shAmt", "50")}
     <div class="sh-chips">${[20, 50, 100, 250].map((v) => `<button type="button" class="chip" data-v="${v}">$${v}</button>`).join("")}</div>
@@ -123,7 +153,7 @@ function addForm() {
       api
         ? `<label class="sh-label" for="shPhone">US mobile number</label>
            <input id="shPhone" type="tel" autocomplete="tel" placeholder="(555) 123-4567" />
-           <label class="sh-check"><input type="checkbox" id="shAgree" /> <span>I agree to Coinbase's <a href="${TERMS.guest}" target="_blank" rel="noopener">Guest Checkout Terms</a>, <a href="${TERMS.user}" target="_blank" rel="noopener">User Agreement</a> and <a href="${TERMS.privacy}" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>`
+           <label class="sh-check"><input type="checkbox" id="shAgree" /> <span>I agree to Coinbase's <a href="${TERMS.guest}" target="_blank" rel="noopener noreferrer">Guest Checkout Terms</a>, <a href="${TERMS.user}" target="_blank" rel="noopener noreferrer">User Agreement</a> and <a href="${TERMS.privacy}" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span></label>`
         : ""
     }
     <button id="shGo" class="btn btn-primary btn-lg btn-block" type="button">${api ? "Continue to Apple Pay" : "Add test dollars"}</button>
@@ -144,20 +174,19 @@ async function startCoinbase() {
     try {
       const r = await fetch(`${moneyApi()}/api/onramp-order`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...(await authHeaders()) },
         body: JSON.stringify({
           address: state.address,
           amount: (Number(amount) / 1e6).toFixed(2),
-          email: state.email || undefined,
           phone: "+1" + digits,
           agreedAt: new Date().toISOString(),
         }),
       });
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.paymentLink) throw new Error(j.error || `Coinbase didn't start the payment (error ${r.status}).`);
-      pending = { amount, orderId: j.orderId, done: false };
-      let link = j.paymentLink;
-      if (j.sandbox) link += (link.includes("?") ? "&" : "?") + "useApplePaySandbox=true";
+      const link = safePayLink(j.paymentLink, j.sandbox);
+      if (!link) throw new Error("That payment link didn't come from Coinbase, so Kairos won't open it.");
+      pending = { amount, orderId: String(j.orderId || ""), done: false };
       payView(link);
     } catch (e) {
       console.error(e);
@@ -166,23 +195,32 @@ async function startCoinbase() {
   });
 }
 
+let payFrame = null; // the Coinbase checkout frame, the only window whose messages count
+
 function payView(link) {
   body(`
     <h2 id="sheetTitle">Pay with Apple Pay</h2>
     <p class="sh-sub">Coinbase test mode: nothing is charged. In Safari you'll see Apple Pay. In other browsers, scan the code with your iPhone.</p>
-    <iframe class="sh-pay" src="${link.replace(/"/g, "&quot;")}" sandbox="allow-scripts allow-same-origin" referrerpolicy="no-referrer" allow="payment" title="Coinbase checkout"></iframe>
+    <div id="shPayBox"></div>
     <button id="shPaid" class="btn btn-ghost btn-block" type="button">I've finished paying</button>
     <p class="form-error" id="sheetErr" role="alert"></p>`);
+  const f = document.createElement("iframe");
+  f.className = "sh-pay";
+  f.title = "Coinbase checkout";
+  f.setAttribute("sandbox", "allow-scripts allow-same-origin"); // what Coinbase asks for, nothing more
+  f.setAttribute("referrerpolicy", "no-referrer");
+  f.setAttribute("allow", "payment");
+  f.src = link; // checked by safePayLink: always https://pay.coinbase.com
+  $("shPayBox").replaceWith(f);
+  payFrame = f;
   $("shPaid").onclick = checkOrder;
 }
 
 function onCoinbaseMessage(e) {
   if (!pending || pending.done) return;
-  let host = "";
-  try {
-    host = new URL(e.origin).hostname;
-  } catch {}
-  if (!/(^|\.)coinbase\.com$/.test(host)) return;
+  // Only Coinbase's checkout, in the frame Kairos opened, can say a payment went through.
+  const from = state.cfg?.chainId === 31337 ? [PAY_ORIGIN, location.origin] : [PAY_ORIGIN];
+  if (!from.includes(e.origin) || !payFrame || e.source !== payFrame.contentWindow) return;
   let d = e.data;
   if (typeof d === "string") {
     try {
@@ -193,20 +231,20 @@ function onCoinbaseMessage(e) {
   }
   const name = String(d?.eventName || d?.event || d?.name || d?.type || "");
   if (/commit_success|polling_success/.test(name)) finishAdd();
-  else if (/commit_error|polling_error|polling_failed|session_error|load_error/.test(name)) err(d?.data?.errorMessage || "Coinbase couldn't finish the payment. Try again.");
+  else if (/commit_error|polling_error|polling_failed|session_error|load_error/.test(name)) err(String(d?.data?.errorMessage || "Coinbase couldn't finish the payment. Try again.").slice(0, 200));
 }
 
 async function checkOrder() {
   if (!pending) return;
   await busy($("shPaid"), "Checking with Coinbase…", async () => {
     try {
-      const r = await fetch(`${moneyApi()}/api/onramp-order?id=${encodeURIComponent(pending.orderId || "")}`);
+      const r = await fetch(`${moneyApi()}/api/onramp-order?id=${encodeURIComponent(pending.orderId || "")}`, { headers: await authHeaders() });
       const j = await r.json().catch(() => ({}));
       // Sandbox orders always succeed, so only a clear failure stops it there.
       if (/COMPLETED|PROCESSING/.test(j.status || "") || (j.sandbox && !/FAILED/.test(j.status || ""))) return finishAdd();
       err("Coinbase hasn't confirmed the payment yet. Finish it above, then press this again.");
-    } catch {
-      err("Couldn't reach the Kairos server. Try again in a moment.");
+    } catch (e) {
+      err(/sign in/i.test(e?.message || "") ? e.message : "Couldn't reach the Kairos server. Try again in a moment.");
     }
   });
 }
@@ -235,7 +273,7 @@ async function topUp(amount) {
     $("shDone").onclick = close;
   } catch (e) {
     console.error(e);
-    body(`<h2 id="sheetTitle">Add money</h2><p class="form-error" id="sheetErr" role="alert">${friendlyError(e)}</p>`);
+    body(`<h2 id="sheetTitle">Add money</h2><p class="form-error" id="sheetErr" role="alert">${esc(friendlyError(e))}</p>`);
   }
 }
 

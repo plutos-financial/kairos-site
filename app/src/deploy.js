@@ -4,6 +4,8 @@ import { baseSepolia, foundry } from "viem/chains";
 import abis from "./abis.json";
 import bytecode from "./bytecode.json";
 import built from "./site-config.json";
+import "./fresh.js"; // stale-page reload and frame guard
+const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
 // The beta sets everything up in ONE transaction (KairosBetaSetup), including Chainlink VRF.
 const isBeta = built.edition === "beta";
@@ -50,7 +52,7 @@ async function deploy(wallet, addr, name, args = []) {
   const li = log(`Deploying ${name}… confirm in your wallet`);
   const hash = await wallet.deployContract({ abi: abis[name], bytecode: bytecode[name], args, account: addr });
   const r = await pub.waitForTransactionReceipt({ hash });
-  li.innerHTML = `✓ ${name}: <a href="${explorer}/address/${r.contractAddress}" target="_blank" rel="noopener">${r.contractAddress}</a>`;
+  li.innerHTML = `✓ ${name}: <a href="${explorer}/address/${r.contractAddress}" target="_blank" rel="noopener noreferrer">${r.contractAddress}</a>`;
   return r.contractAddress;
 }
 
@@ -90,7 +92,7 @@ async function setUpBeta() {
   const ready = parseEventLogs({ abi: abis.KairosBetaSetup, logs: r.logs, eventName: "Ready" })[0];
   if (!ready) throw new Error("Set up, but couldn't read the addresses. Send Claude the transaction link.");
   const a = ready.args;
-  li.innerHTML = `✓ Everything is set up: <a href="${explorer}/tx/${hash}" target="_blank" rel="noopener">see the transaction</a>`;
+  li.innerHTML = `✓ Everything is set up: <a href="${explorer}/tx/${hash}" target="_blank" rel="noopener noreferrer">see the transaction</a>`;
   return {
     chainId: chain.id,
     usdc: a.usdc,
@@ -128,7 +130,7 @@ $("go").onclick = async () => {
       $("open").hidden = false;
       log("<b>Done.</b> This browser now uses the new beta. Copy the details for Claude so everyone else gets it too.");
     } catch (e) {
-      log(`<span style="color:var(--red)">Stopped: ${e.shortMessage || e.message}</span>`);
+      log(`<span style="color:var(--red)">Stopped: ${esc(e.shortMessage || e.message)}</span>`);
       $("go").disabled = false;
     }
     return;
@@ -160,7 +162,7 @@ $("go").onclick = async () => {
     $("dl").hidden = false;
     $("open").hidden = false;
   } catch (e) {
-    log(`<span style="color:var(--red)">Stopped: ${e.shortMessage || e.message}</span>`);
+    log(`<span style="color:var(--red)">Stopped: ${esc(e.shortMessage || e.message)}</span>`);
     $("go").disabled = false;
   }
 };

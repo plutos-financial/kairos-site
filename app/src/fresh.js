@@ -2,6 +2,15 @@
 // old version. If version.json says a newer build is out, load it once (the ?v= makes it a fresh URL).
 export {};
 if (import.meta.env.VITE_EDITION === "beta") document.documentElement.dataset.edition = "beta";
+
+// Kairos never runs inside another site's frame, so nobody can lay a fake page over its buttons
+// (click-jacking). GitHub Pages can't send the header that normally does this, so it's done here.
+if (window.top !== window.self) {
+  document.documentElement.style.display = "none";
+  try {
+    window.top.location.replace(location.href);
+  } catch {}
+}
 (function loadNewestVersion() {
   try {
     const u = new URL(location.href);

@@ -7,6 +7,9 @@ export function saverName(addr, me) {
   return "Saver " + addr.slice(-4).toUpperCase();
 }
 
+/** A color for each saver, taken from their account, so the same saver always looks the same. */
+export const hueOf = (addr) => (parseInt(addr.slice(2, 10), 16) >>> 0) % 360;
+
 /** A small round avatar whose colors come from the account, so the same saver always looks the same. */
 export function avatar(addr, size = "") {
   const h = parseInt(addr.slice(2, 10), 16) >>> 0;

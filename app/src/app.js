@@ -1,25 +1,29 @@
-// Kairos saver app: email sign-in, one-tap deposit / withdraw, live prize pool, odds boosts and draws.
-// Savers never see exact odds. They see entries (1 per $1) and boosts ("deposit $X, 2x your odds").
+// Kairos savings page: email sign-in, the wallet, save / withdraw, and the next draw.
+// Savers never see exact odds. They see entries (1 per $1) and how much a deposit multiplies them.
 import { parseUnits, formatUnits, parseEventLogs, maxUint256 } from "viem";
 import abis from "./abis.json";
 import {
-  $, state, fmt, short, sleep, setup, read, act, friendlyError, toast, txLink,
-  emailAvailable, resumeEmailSession, startEmailSignIn, finishEmailSignIn,
-  connectBrowserWallet, connectDevKey, signOutAll, canRunDraws, isBeta,
+  $, state, fmt, sleep, setup, read, act, friendlyError, toast, toastError, txLink,
+  emailAvailable, mockSignIn, resumeEmailSession, startEmailSignIn, finishEmailSignIn,
+  connectBrowserWallet, connectDevKey, canRunDraws, isBeta,
 } from "./core.js";
-import { podiumHTML, saverName, groupWinners } from "./winners-ui.js";
+import { groupWinners } from "./winners-ui.js";
+import { showAccount, wireAccount } from "./appbar.js";
 import { openPretend } from "./pretend.js";
+import { replayDraw } from "./drawshow.js";
 
 const YEAR = 365 * 24 * 3600;
 let tab = "deposit";
 let flowId = null;
 let pendingEmail = "";
 let busy = false;
+let admin = false;
 
 // latest on-chain snapshot
 const s = {
   savings: 0n, wallet: 0n, minDeposit: 1_000_000n, nextDraw: 0n, periodStart: 0n, period: 0n, chainOffset: 0,
   pool: 0n, poolAt: 0, ratePerSec: 0, // ratePerSec in USDC base units (float)
+  loaded: false,
 };
 const drawCache = new Map(); // finished draws never change, so keep them
 
@@ -28,15 +32,10 @@ const drawCache = new Map(); // finished draws never change, so keep them
 async function main() {
   const ok = await setup();
   if (!ok) {
-    toast(
-      isBeta
-        ? `The beta isn't set up yet. <a href="./deploy.html">Set it up</a> with one MetaMask transaction.`
-        : `This site isn't connected to contracts yet. <a href="./deploy.html">Set them up</a>.`,
-      true,
-      0
-    );
+    toast(`Kairos isn't connected to its contracts yet. <a href="./deploy.html">Set them up</a> with one MetaMask transaction.`, true, 0);
     return;
   }
+  wireAccount();
   wireSignIn();
   wireDash();
 
@@ -50,16 +49,15 @@ async function main() {
 function showSignIn() {
   $("dash").hidden = true;
   $("signin").hidden = false;
-  $("who").hidden = true;
-  $("signout").hidden = true;
-  const emailOn = emailAvailable() || new URLSearchParams(location.search).has("mock");
+  showAccount();
+  const emailOn = emailAvailable() || mockSignIn();
   $("emailForm").hidden = !emailOn;
   $("emailOff").hidden = emailOn;
   document.querySelector(".or").hidden = !emailOn;
   if (!emailOn) $("useWallet").className = "btn btn-primary btn-lg btn-block";
 }
 
-let beta = null; // the beta wallet module, loaded only in the beta
+let beta = null; // the wallet module (Add money, send, receive, cash out)
 async function startBeta() {
   if (!isBeta || beta) return;
   beta = await import("./beta-wallet.js");
@@ -72,7 +70,7 @@ async function startBeta() {
       $("amount").value = formatUnits(amount, 6);
       updatePreview();
       $("amount").focus();
-      if (innerWidth < 1000) document.querySelector(".ticket").scrollIntoView({ behavior: "smooth", block: "center" });
+      if (innerWidth < 1000) $("ticket").scrollIntoView({ behavior: "smooth", block: "center" });
     },
   });
 }
@@ -82,13 +80,7 @@ async function showDash() {
   await startBeta();
   $("signin").hidden = true;
   $("dash").hidden = false;
-  $("who").hidden = false;
-  $("signout").hidden = false;
-  $("who").textContent = state.email || short(state.address);
-  $("who").className = "pill ok";
-  $("acct").innerHTML = state.explorer
-    ? `<a href="${state.explorer}/address/${state.address}" target="_blank" rel="noopener">Account ${short(state.address)}</a>`
-    : `Account ${short(state.address)}`;
+  showAccount();
   await refresh();
   showTeamControls();
   if (started) return;
@@ -97,15 +89,14 @@ async function showDash() {
   setInterval(tick, 1000);
 }
 
-// The Kairos team sees a shortcut to the real draw controls instead of the pretend draw.
+// The Kairos team gets a shortcut to the real draw controls.
 async function showTeamControls() {
   try {
-    if (!(await canRunDraws(await read("vault", "owner")))) return;
-    $("pvTitle").textContent = "You run the draws";
-    $("pvText").textContent = "Pick the winners, skip a countdown, or change how often draws happen.";
-    $("pretendBtn").hidden = true;
+    admin = await canRunDraws(await read("vault", "owner"));
+    showAccount({ admin });
+    if (!admin) return;
     $("drawLink").hidden = false;
-    $("drawsTop").hidden = false;
+    tick();
   } catch (e) {
     console.warn(e);
   }
@@ -120,7 +111,7 @@ function wireSignIn() {
     e.preventDefault();
     err("");
     const email = $("email").value.trim();
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err("Enter a valid email address.");
+    if (!/^[^@\s]{1,64}@[^@\s]+\.[^@\s]{2,}$/.test(email) || email.length > 254) return err("Enter a valid email address.");
     setBusy($("sendCode"), "Sending…");
     try {
       flowId = await startEmailSignIn(email);
@@ -146,7 +137,7 @@ function wireSignIn() {
     try {
       await finishEmailSignIn(flowId, otp, pendingEmail);
       await showDash();
-      toast("You're in. Grab some test dollars to start.");
+      toast(isBeta ? "You're in. Start with Add money." : "You're in. Grab some test dollars to start.");
     } catch (x) {
       console.error(x);
       err(/otp|code|invalid|expired/i.test(x?.message || "") ? "That code didn't work. Check it or request a new one." : signInProblem(x));
@@ -173,22 +164,27 @@ function wireSignIn() {
       err(friendlyError(x));
     }
   };
-
-  $("signout").onclick = async () => {
-    await signOutAll();
-    location.reload();
-  };
 }
 
 function signInProblem(x) {
-  const m = x?.message || "";
+  const m = String(x?.message || "");
   if (/domain|origin|cors|not allowed|forbidden|403/i.test(m))
     return "This website isn't on the allowed list in the Coinbase developer portal yet (Embedded Wallets → Domains).";
   if (/network|fetch/i.test(m)) return "Couldn't reach the sign-in service. Check your connection and try again.";
-  return m || "Something went wrong. Try again.";
+  if (/rate|too many|429/i.test(m)) return "Too many tries. Wait a minute and try again.";
+  return m && m.length < 160 ? m : "Something went wrong signing in. Try again.";
 }
 
-// ------------------------------------------------------------------ deposit / withdraw
+// ------------------------------------------------------------------ save / withdraw
+
+const needsMoney = () => isBeta && tab === "deposit" && s.loaded && s.wallet === 0n;
+
+function goLabel() {
+  if (needsMoney()) return "Add money first";
+  const v = Number($("amount").value);
+  const amt = v > 0 && isFinite(v) ? " $" + v.toLocaleString("en-US", { maximumFractionDigits: 2 }) : "";
+  return (tab === "deposit" ? "Save" : "Withdraw") + amt;
+}
 
 function setTab(name) {
   tab = name;
@@ -196,7 +192,6 @@ function setTab(name) {
     x.classList.toggle("active", x.dataset.tab === name);
     x.setAttribute("aria-selected", x.dataset.tab === name);
   });
-  $("go").textContent = name === "deposit" ? "Deposit" : "Withdraw";
   updateHint();
   updatePreview();
 }
@@ -211,26 +206,26 @@ function wireDash() {
     };
   });
   $("amount").addEventListener("input", updatePreview);
-  $("boosts").addEventListener("click", (e) => {
-    const b = e.target.closest(".boost-tile");
-    if (!b) return;
-    setTab("deposit");
-    $("amount").value = b.dataset.fill;
-    updatePreview();
-    $("amount").focus();
-    if (innerWidth < 1000) document.querySelector(".ticket").scrollIntoView({ behavior: "smooth", block: "center" });
-  });
   $("pretendBtn").onclick = () => openPretend();
   $("faucet").onclick = (e) => doFaucet(e.currentTarget);
   $("faucet2").onclick = (e) => doFaucet(e.currentTarget);
-  $("go").onclick = () => (tab === "deposit" ? doDeposit() : doWithdraw());
+  $("go").onclick = () => (needsMoney() ? beta?.openAction("add") : tab === "deposit" ? doDeposit() : doWithdraw());
+  $("starter").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-go]");
+    if (!b) return;
+    if (b.dataset.go === "add") return isBeta ? beta?.openAction("add") : doFaucet($("faucet"));
+    if (b.dataset.go === "save") {
+      setTab("deposit");
+      $("amount").focus();
+      if (innerWidth < 1000) $("ticket").scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    document.querySelector(".next-card").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
   $("winKeep").onclick = closeWinner;
-  $("winWithdraw").onclick = () => {
+  $("winHow").onclick = () => {
     closeWinner();
-    setTab("withdraw");
-    $("amount").value = formatUnits(s.savings, 6);
-    updatePreview();
-    $("amount").focus();
+    replayDraw(Number($("winDraw").textContent));
   };
   addEventListener("keydown", (e) => e.key === "Escape" && closeWinner());
 }
@@ -243,32 +238,32 @@ async function doFaucet(btn) {
     const mins = Math.ceil(Number(last + 3600n - now) / 60);
     return toast(`You already got test dollars this hour. Try again in about ${mins} minute${mins === 1 ? "" : "s"}.`, true);
   }
-  await run(btn, "Get $1,000", [{ c: "usdc", fn: "faucet" }], () => "Added $1,000 test dollars.");
+  await run(btn, [{ c: "usdc", fn: "faucet" }], () => "Added $1,000 test dollars.");
 }
 
 async function doDeposit() {
   const amt = amountInput();
   if (amt === null) return;
-  if (amt < s.minDeposit) return toast(`The minimum deposit is ${fmt(s.minDeposit, 0)}.`, true);
-  if (amt > s.wallet) return toast(isBeta ? `You have ${fmt(s.wallet)} in your Kairos wallet. Tap Add money first.` : `You have ${fmt(s.wallet)} in test dollars. Get more first.`, true);
+  if (amt < s.minDeposit) return toast(`The smallest amount you can save is ${fmt(s.minDeposit, 0)}.`, true);
+  if (amt > s.wallet) return toast(isBeta ? `You have ${fmt(s.wallet)} in your Kairos wallet. Add money first.` : `You have ${fmt(s.wallet)} in test dollars. Get more first.`, true);
   const calls = [];
   const allowance = await read("usdc", "allowance", [state.address, state.cfg.vault]);
   // Email accounts approve the exact amount inside the same one-tap action.
   // Browser wallets approve once, so later deposits need only one pop-up.
   if (allowance < amt) calls.push({ c: "usdc", fn: "approve", args: [state.cfg.vault, state.mode === "email" ? amt : maxUint256] });
   calls.push({ c: "vault", fn: "deposit", args: [amt] });
-  await run($("go"), "Deposit", calls, () => `Deposited ${fmt(amt, 0)}. That's ${dollars(amt).toLocaleString()} more ${dollars(amt) === 1 ? "entry" : "entries"}.`);
+  await run($("go"), calls, () => `Saved ${fmt(amt, 0)}. That's ${dollars(amt).toLocaleString()} more ${dollars(amt) === 1 ? "entry" : "entries"}.`);
 }
 
 async function doWithdraw() {
   const amt = amountInput();
   if (amt === null) return;
   if (amt > s.savings) return toast(`You have ${fmt(s.savings)} in savings.`, true);
-  await run($("go"), "Withdraw", [{ c: "vault", fn: "withdraw", args: [amt] }], async (hash) => {
+  await run($("go"), [{ c: "vault", fn: "withdraw", args: [amt] }], async (hash) => {
     try {
       const r = await state.pub.getTransactionReceipt({ hash });
       const q = parseEventLogs({ abi: abis.KairosVault, logs: r.logs, eventName: "WithdrawalQueued" })[0];
-      if (q) return `Your ${fmt(amt, 0)} is in line (#${q.args.position}). The cash drawer is low, so it arrives as soon as T-bills settle, about 2 minutes in this demo.`;
+      if (q) return `Your ${fmt(amt, 0)} is in line (#${q.args.position}). The cash drawer is low, so it arrives as soon as Treasury bills settle.`;
     } catch {}
     return isBeta ? `Withdrew ${fmt(amt, 0)} to your Kairos wallet.` : `Withdrew ${fmt(amt, 0)} back to your test dollars.`;
   });
@@ -276,7 +271,7 @@ async function doWithdraw() {
 
 function amountInput() {
   const raw = String($("amount").value || "").trim();
-  if (!raw || Number(raw) <= 0) {
+  if (!raw || !(Number(raw) > 0)) {
     toast("Enter an amount.", true);
     return null;
   }
@@ -288,66 +283,51 @@ function amountInput() {
   }
 }
 
-async function run(btn, label, calls, successMsg) {
+async function run(btn, calls, successMsg) {
   if (busy) return;
   busy = true;
-  setBusy(btn, label === "Deposit" || label === "Withdraw" ? "Working…" : "…");
+  const label = btn.textContent;
+  setBusy(btn, btn === $("go") ? "Working…" : "…");
   try {
     const hash = await act(calls, (m) => setBusy(btn, m));
     await refresh();
-    const msg = typeof successMsg === "function" ? await successMsg(hash) : successMsg;
+    const msg = await successMsg(hash);
     toast(`${msg} ${txLink(hash)}`, false, 8000);
   } catch (x) {
     console.error(x);
-    toast(friendlyError(x), true);
+    toastError(x);
   } finally {
     busy = false;
-    clearBusy(btn, btn === $("go") ? (tab === "deposit" ? "Deposit" : "Withdraw") : btn.dataset.label || label);
+    clearBusy(btn, btn === $("go") ? goLabel() : label);
   }
 }
 
 function setBusy(btn, text) {
-  if (!btn.dataset.label) btn.dataset.label = btn.textContent;
   btn.disabled = true;
-  btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> <span class="status">${text}</span>`;
+  btn.innerHTML = `<span class="spinner" aria-hidden="true"></span> <span class="status"></span>`;
+  btn.querySelector(".status").textContent = text;
 }
 function clearBusy(btn, text) {
   btn.disabled = false;
   btn.textContent = text;
 }
 
-// ------------------------------------------------------------------ odds as entries and boosts
+// ------------------------------------------------------------------ entries and odds
 
 const dollars = (x) => Math.floor(Number(formatUnits(x, 6)));
-const money = (n) => "$" + Math.ceil(n).toLocaleString("en-US");
 function times(x) {
   if (!isFinite(x)) return "—";
   const v = x >= 10 ? Math.round(x).toLocaleString("en-US") : String(Number(x.toFixed(1)));
   return v + "×";
 }
 
-function renderBoosts() {
-  const bal = Number(formatUnits(s.savings, 6));
-  let tiles;
-  if (bal < 1) {
-    tiles = [10, 100, 1000].map((n) => ({ big: n.toLocaleString("en-US"), label: "entries", cta: `Deposit ${money(n)}`, fill: n }));
-  } else {
-    tiles = [1.5, 2, 5].map((m) => {
-      const add = Math.max(1, Math.ceil(bal * (m - 1)));
-      return { big: times(m), label: "your odds", cta: `Add ${money(add)}`, fill: add };
-    });
-  }
-  const html = tiles
-    .map((t) => `<button type="button" class="boost-tile" data-fill="${t.fill}"><span class="bx">${t.big}</span><span class="bl">${t.label}</span><span class="ba">${t.cta}</span></button>`)
-    .join("");
-  if ($("boosts").innerHTML !== html) $("boosts").innerHTML = html;
-}
-
 function updatePreview() {
   const el = $("boostPreview");
   const v = Number($("amount").value);
   $("amount").style.width = Math.max(1.5, String($("amount").value || "").length + 0.4) + "ch";
+  if (!busy) $("go").textContent = goLabel();
   const bal = Number(formatUnits(s.savings, 6));
+  if (needsMoney()) return (el.textContent = "Your Kairos wallet is empty");
   if (!v || v <= 0) return (el.innerHTML = "&nbsp;");
   if (tab === "deposit") {
     el.textContent = bal >= 1 ? `${times((bal + v) / bal)} your odds` : `${Math.floor(v).toLocaleString("en-US")} entries in every draw`;
@@ -357,6 +337,29 @@ function updatePreview() {
   }
 }
 
+function updateHint() {
+  const b = document.createElement("b");
+  b.textContent = tab === "deposit" ? fmt(s.wallet) : fmt(s.savings);
+  $("hint").replaceChildren(
+    tab === "deposit" ? (isBeta ? "In your Kairos wallet: " : "Test dollars available: ") : "In savings: ",
+    b,
+    tab === "deposit" ? "" : ". Always yours to take out."
+  );
+}
+
+/** For new savers: 1 add money, 2 save it, 3 you're in. */
+function renderStarter() {
+  const st = $("starter");
+  st.hidden = s.savings > 0n;
+  if (st.hidden) return;
+  const step = s.wallet > 0n ? "save" : "add";
+  st.querySelectorAll("li").forEach((li) => {
+    const k = li.dataset.step;
+    li.className = k === step ? "now" : k === "add" && step === "save" ? "done" : "";
+  });
+  if (!isBeta) st.querySelector('[data-step="add"] b').textContent = "Get test dollars";
+}
+
 // ------------------------------------------------------------------ reading state
 
 async function refresh() {
@@ -364,7 +367,7 @@ async function refresh() {
   try {
     const block = await state.pub.getBlock();
     s.chainOffset = Number(block.timestamp) - Math.floor(Date.now() / 1000);
-    const [bal, wal, odds, drawer, reserve, interest, nd, ps, per, curId, splits, feeBps, apy, speed] = await Promise.all([
+    const [bal, wal, odds, drawer, reserve, interest, nd, ps, per, curId, splits, feeBps, apy, speed, minDep] = await Promise.all([
       read("vault", "balanceOf", [state.address]),
       read("usdc", "balanceOf", [state.address]),
       read("vault", "projectedOdds", [state.address]),
@@ -379,20 +382,19 @@ async function refresh() {
       read("vault", "feeBps"),
       read("tbill", "apyBps"),
       read("tbill", "speed"),
+      read("vault", "minDeposit").catch(() => s.minDeposit),
     ]);
-    s.minDeposit = await read("vault", "minDeposit").catch(() => s.minDeposit);
-    Object.assign(s, { savings: bal, wallet: wal, nextDraw: nd, periodStart: ps, period: per });
+    Object.assign(s, { savings: bal, wallet: wal, nextDraw: nd, periodStart: ps, period: per, minDeposit: minDep, loaded: true });
     const keep = Number(10000n - feeBps) / 10000;
     s.pool = reserve + (interest * (10000n - feeBps)) / 10000n;
     s.poolAt = Date.now();
-    s.ratePerSec = (Number(drawer[1]) * Number(apy) * Number(speed)) / (10000 * YEAR) * keep;
+    s.ratePerSec = ((Number(drawer[1]) * Number(apy) * Number(speed)) / (10000 * YEAR)) * keep;
 
     $("savings").textContent = fmt(bal);
     $("getDollars").hidden = isBeta || wal > 0n || bal > 0n;
     $("faucetMore").hidden = isBeta || !$("getDollars").hidden;
     beta?.renderWallet(wal, bal);
     $("winnersN").textContent = splits.length.toLocaleString();
-    $("splits").textContent = `${splits.length} winner${splits.length === 1 ? "" : "s"} split it`;
 
     // Entries: one per dollar. Time matters (balance x time), so someone who joins mid-round
     // only gets part of their entries in this draw. No exact odds are shown.
@@ -407,7 +409,7 @@ async function refresh() {
       note.textContent = `You joined partway through this round, so ${thisRound.toLocaleString("en-US")} of your entries count in this draw. All ${full.toLocaleString("en-US")} count in the next one.`;
     } else note.hidden = true;
 
-    renderBoosts();
+    renderStarter();
     updateHint();
     updatePreview();
     await renderDraws(curId);
@@ -427,64 +429,32 @@ async function getDrawCached(id) {
 async function renderDraws(curId) {
   const ids = [];
   for (let id = curId - 1n; id >= 1n && ids.length < 20; id--) ids.push(id);
-  if (!ids.length) {
-    $("draws").innerHTML = `<p class="sub">No draws yet. The first one happens when the countdown ends.</p>`;
-    $("latestCard").hidden = true;
-    setWon(0n);
-    return;
-  }
   const rows = await Promise.all(ids.map(getDrawCached));
   const me = state.address.toLowerCase();
   checkForWins(ids, rows, me);
-  renderLatest(ids, rows, me);
-
   let wonTotal = 0n;
-  const html = rows.map(([d, winners, amounts, entrants], i) => {
-    let mine = 0n;
-    winners.forEach((w, j) => w.toLowerCase() === me && (mine += amounts[j]));
-    wonTotal += mine;
-    if (i >= 6) return "";
-    const when = new Date(Number(d.closeTime) * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-    let body;
-    if (d.prize === 0n) body = `<div class="winners">No prize this round</div>`;
-    else if (!d.awarded || !winners.length) body = `<div class="winners"><span class="badge wait">Picking winners…</span></div>`;
-    else {
-      // group by winner so a saver who won 3 prizes shows once
-      const list = groupWinners(winners, amounts);
-      const shown = list.slice(0, 4).map((w) => (w.addr.toLowerCase() === me ? `<span class="me">You won ${fmt(w.amount)}</span>` : `<span>${saverName(w.addr)} won ${fmt(w.amount)}</span>`));
-      if (list.length > 4) shown.push(`<span>+${list.length - 4} more</span>`);
-      body = `<div class="winners">${shown.join("")}</div>`;
-    }
-    return `<div class="draw${mine > 0n ? " mine" : ""}">
-      <div class="d-ico">#${ids[i]}</div>
-      <div><div class="d-title">Draw #${ids[i]}<span class="tiny">${when}</span></div>${body}</div>
-      <div class="d-amt">${mine > 0n ? "+" + fmt(mine) : fmt(d.prize)}</div>
-    </div>`;
-  }).join("");
-  $("draws").innerHTML = html;
+  rows.forEach(([, winners, amounts]) => winners.forEach((w, j) => w.toLowerCase() === me && (wonTotal += amounts[j])));
   setWon(wonTotal);
+  renderLast(ids, rows, me);
 }
 
-// The newest draw with winners, as a podium near the top of the page.
-function renderLatest(ids, rows, me) {
+/** The newest draw with winners, as one line that opens the Draws page. */
+function renderLast(ids, rows, me) {
   const i = rows.findIndex(([d, winners]) => d.awarded && winners.length);
-  const card = $("latestCard");
-  if (i < 0) return (card.hidden = true);
-  const [d, winners, amounts, entrants] = rows[i];
-  const x = { id: ids[i], d, winners, amounts, entrants };
+  const el = $("lastDraw");
+  if (i < 0) return (el.hidden = true);
+  const [d, winners, amounts] = rows[i];
   let mine = 0n;
   winners.forEach((w, j) => w.toLowerCase() === me && (mine += amounts[j]));
   const total = amounts.reduce((a, b) => a + b, 0n);
-  const key = `${ids[i]}:${mine}`;
-  card.hidden = false;
-  if (card.dataset.key === key) return; // nothing new
-  card.dataset.key = key;
-  $("latestTitle").textContent = `Draw #${ids[i]} winners`;
-  $("latestBanner").hidden = mine === 0n;
-  $("latestBanner").textContent = mine > 0n ? `You won ${fmt(mine)} in this draw. It's already in your savings.` : "";
-  $("latestPodium").innerHTML = podiumHTML(x, state.address);
+  const people = groupWinners(winners, amounts).length;
   const when = new Date(Number(d.closeTime) * 1000).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
-  $("latestMeta").textContent = `${fmt(total)} given away on ${when}. ${entrants} saver${entrants === 1n ? "" : "s"} entered.`;
+  el.hidden = false;
+  el.classList.toggle("mine", mine > 0n);
+  $("ldId").textContent = `#${ids[i]}`;
+  $("ldTitle").textContent = mine > 0n ? `You won ${fmt(mine)} in draw #${ids[i]}` : `Draw #${ids[i]}: ${fmt(total)} to ${people} saver${people === 1 ? "" : "s"}`;
+  $("ldSub").textContent = `${when} · See the winners and how they were picked`;
+  $("ldAmt").textContent = mine > 0n ? `+${fmt(mine)}` : "";
 }
 
 function setWon(total) {
@@ -498,61 +468,38 @@ function setWon(total) {
   }
 }
 
-// ------------------------------------------------------------------ live pool, countdown, chart
+// ------------------------------------------------------------------ live pool and countdown
 
 function tick() {
   if (!s.periodStart) return;
   const nowSec = Date.now() / 1000 + s.chainOffset;
   const poolNow = Number(s.pool) + s.ratePerSec * ((Date.now() - s.poolAt) / 1000);
+  const start = Number(s.periodStart);
   const end = Number(s.nextDraw);
   $("pool").textContent = fmtFloat(poolNow);
 
   let left = Math.floor(end - nowSec);
-  if (!$("drawLink").hidden) $("drawLink").textContent = left <= 0 ? "Pick winners now" : "Open draw controls";
+  if (admin) $("drawLink").textContent = left <= 0 ? "Pick the winners now" : "Open the draw controls";
+  $("roundFill").style.width = `${Math.min(100, Math.max(0, ((nowSec - start) / Math.max(1, end - start)) * 100))}%`;
+  const clock = (t) => new Date((t - s.chainOffset) * 1000).toLocaleString([], { weekday: "short", hour: "numeric", minute: "2-digit" });
+  $("roundStart").textContent = `Round started ${clock(start)}`;
+  $("roundEnd").textContent = `Draw ${clock(end)}`;
   if (left <= 0) {
-    $("countdown").textContent = "Drawing soon";
-    $("poolProj").textContent = fmtFloat(poolNow);
+    $("countdown").textContent = "Any moment";
+    $("poolProj").textContent = "The round is over. Winners are picked next.";
   } else {
-    $("poolProj").textContent = "~" + fmtFloat(poolNow + s.ratePerSec * left);
+    $("poolProj").textContent = `About ${fmtFloat(poolNow + s.ratePerSec * left)} by the draw`;
     const d = Math.floor(left / 86400);
     left %= 86400;
     const h = Math.floor(left / 3600);
     left %= 3600;
     const m = Math.floor(left / 60);
     const pad = (x) => String(x).padStart(2, "0");
-    $("countdown").textContent = d ? `${d}d ${pad(h)}h` : `${h ? pad(h) + ":" : ""}${pad(m)}:${pad(left % 60)}`;
+    $("countdown").textContent = d ? `${d}d ${pad(h)}h ${pad(m)}m` : `${h ? h + ":" : ""}${pad(m)}:${pad(left % 60)}`;
   }
-  drawChart(Number(s.periodStart), nowSec, Math.max(end, nowSec), poolNow);
 }
 
 const fmtFloat = (base) => "$" + (Math.max(0, base) / 1e6).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-// The pool grows steadily with T-bill interest: solid line so far this round, dashed to the draw.
-function drawChart(t0, now, t1, poolNow) {
-  const W = 600, top = 14, bottom = 136, right = 592; // keep the end marker inside the chart
-  const span = Math.max(1, t1 - t0);
-  const poolEnd = poolNow + s.ratePerSec * Math.max(0, t1 - now);
-  const max = Math.max(poolEnd, 1) * 1.08;
-  const X = (t) => ((t - t0) / span) * right;
-  const Y = (v) => bottom - (Math.max(0, v) / max) * (bottom - top);
-  const poolAt = (t) => Math.max(0, poolNow - s.ratePerSec * (now - t));
-  const pts = [];
-  const n = 48;
-  for (let i = 0; i <= n; i++) {
-    const t = t0 + ((now - t0) * i) / n;
-    pts.push(`${X(t).toFixed(1)},${Y(poolAt(t)).toFixed(1)}`);
-  }
-  const head = [X(now), Y(poolNow)];
-  const future = now < t1 ? `<path d="M${head[0].toFixed(1)} ${head[1].toFixed(1)} L${right} ${Y(poolEnd).toFixed(1)}" stroke="#f4c24f" stroke-opacity="0.45" stroke-width="2" stroke-dasharray="3 6" fill="none" vector-effect="non-scaling-stroke"/>
-      <circle cx="${right}" cy="${Y(poolEnd).toFixed(1)}" r="4" fill="#050506" stroke="#f4c24f" stroke-opacity="0.6" stroke-width="2" vector-effect="non-scaling-stroke"/>` : "";
-  $("poolChart").innerHTML = `
-    <line x1="0" y1="${bottom}" x2="${W}" y2="${bottom}" stroke="#ffffff" stroke-opacity="0.08" stroke-dasharray="2 5" vector-effect="non-scaling-stroke"/>
-    <polyline points="${pts.join(" ")}" fill="none" stroke="#f4c24f" stroke-width="2.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-    ${future}
-    <circle cx="${head[0].toFixed(1)}" cy="${head[1].toFixed(1)}" r="9" fill="#f4c24f" opacity="0.18"><animate attributeName="r" values="6;12;6" dur="1.6s" repeatCount="indefinite"/></circle>
-    <circle cx="${head[0].toFixed(1)}" cy="${head[1].toFixed(1)}" r="4.5" fill="#f4c24f"/>`;
-  $("roundStart").textContent = "Round started " + new Date((t0 - s.chainOffset) * 1000).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
-}
 
 // ------------------------------------------------------------------ winner celebration
 
@@ -564,6 +511,7 @@ function checkForWins(ids, rows, me) {
   try {
     seen = JSON.parse(localStorage.getItem(seenKey()) || "[]");
   } catch {}
+  if (!Array.isArray(seen)) seen = [];
   // only celebrate the newest few draws, oldest first
   for (let i = Math.min(rows.length, 5) - 1; i >= 0; i--) {
     const [d, winners, amounts] = rows[i];
@@ -586,6 +534,7 @@ function checkForWins(ids, rows, me) {
 
 function celebrate(drawId, amount) {
   if (!$("winner").hidden) return;
+  if ($("ds") && !$("ds").hidden) return; // a draw is playing; it shows the win itself
   $("winDraw").textContent = drawId;
   $("winAmount").textContent = fmt(amount);
   $("winSavings").textContent = fmt(s.savings);
@@ -637,15 +586,6 @@ function confetti() {
     else ctx.clearRect(0, 0, innerWidth, innerHeight);
   }
   requestAnimationFrame(frame);
-}
-
-function updateHint() {
-  $("hint").innerHTML =
-    tab === "deposit"
-      ? isBeta
-        ? `From your Kairos wallet: <span>${fmt(s.wallet)}</span>`
-        : `Test dollars available: <span>${fmt(s.wallet)}</span>`
-      : `In savings: <span>${fmt(s.savings)}</span>. Always yours to take out.`;
 }
 
 main().catch((e) => {

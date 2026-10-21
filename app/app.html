@@ -3,26 +3,38 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Kairos · Your savings</title>
-  <meta name="description" content="Kairos testnet demo: keep every dollar, win the interest." />
+  <title>Kairos · Savings</title>
+  <meta name="description" content="Your Kairos savings: add money, save it, and get entries in every prize draw. Test network." />
   <meta name="theme-color" content="#050506" />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/app.css" />
 </head>
 <body class="app-body">
-  <div class="testnet-bar">Test network. Fake money only, nothing here has real value.</div>
+  <div class="testnet-bar">Test network. Coinbase runs in test mode, so no card is ever charged.</div>
 
-  <header class="top">
-    <a class="brand" href="./" aria-label="Kairos home">
-      <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
-      <span class="name">kairos</span><span class="by" id="betaTag" hidden>Beta</span>
-    </a>
-    <div class="top-right">
-      <a href="./how-it-works.html" class="top-link hide-sm">How it works</a>
-      <a href="./winners.html" class="top-link">Winners</a>
-      <a href="./admin.html" class="top-link" id="drawsTop" hidden>Draws</a>
-      <span id="who" class="pill" hidden></span>
-      <button id="signout" class="btn btn-ghost btn-sm" hidden>Sign out</button>
+  <header class="appbar">
+    <div class="appbar-in">
+      <a class="brand" href="./" aria-label="Kairos home">
+        <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
+        <span class="name">kairos</span>
+      </a>
+      <nav class="apptabs" aria-label="App">
+        <a href="./app.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5c0-1.7-2-2.8-4.5-2.8S7.5 5.8 7.5 7.6s2 2.6 4.5 3.1 4.5 1.4 4.5 3.3-2 3-4.5 3-4.5-1.1-4.5-2.9"/></svg>Savings</a>
+        <a href="./draws.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7h17v3.2a1.8 1.8 0 0 0 0 3.6V17h-17v-3.2a1.8 1.8 0 0 0 0-3.6z"/><path d="M14.5 7.5v1.5M14.5 11.25v1.5M14.5 15v1.5"/></svg>Draws</a>
+        <a href="./how-it-works.html"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.6 9.6a2.5 2.5 0 1 1 3.4 2.3c-.6.3-1 .8-1 1.5v.4M12 16.6v.2"/></svg>How it works</a>
+      </nav>
+      <div class="acct">
+        <details class="acct-menu" id="acctMenu" hidden>
+          <summary><span class="acct-dot" aria-hidden="true"></span><span id="who">Account</span></summary>
+          <div class="acct-pop">
+            <p class="tiny" id="acctEmail"></p>
+            <a id="acctAddr" class="acct-link">Account</a>
+            <a href="./control.html" class="acct-link" id="hoodLink" hidden>Under the hood</a>
+            <a href="./privacy.html" class="acct-link">Privacy</a>
+            <button id="signout" class="btn btn-ghost btn-sm btn-block" type="button">Sign out</button>
+          </div>
+        </details>
+      </div>
     </div>
   </header>
 
@@ -34,7 +46,7 @@
 
       <form id="emailForm" class="stack" novalidate>
         <label for="email" class="sr">Email</label>
-        <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" required />
+        <input id="email" type="email" autocomplete="email" inputmode="email" placeholder="you@example.com" maxlength="254" required />
         <button id="sendCode" class="btn btn-primary btn-lg btn-block" type="submit">Continue</button>
       </form>
 
@@ -50,123 +62,109 @@
       <div class="or"><span>or</span></div>
       <button id="useWallet" class="btn btn-ghost btn-block">Use a browser wallet (MetaMask)</button>
       <p id="emailOff" class="tiny" hidden>Email sign-in isn't switched on for this site yet, so a browser wallet is needed for now.</p>
+      <p class="tiny signin-note">Coinbase handles the sign-in and keeps your account's keys. Kairos never sees a password. <a href="./privacy.html">Privacy</a></p>
     </section>
 
     <!-- Signed in -->
-    <section id="dash" hidden>
-      <div class="dash">
-        <div class="dash-main">
-          <div class="bal-block">
-            <p class="label">Your savings</p>
-            <p id="savings" class="balance-num">$0.00</p>
-            <p id="wonLine" class="won-line">Every $1 you save is an entry in every draw.</p>
-            <p id="tokensLine" class="tokens-line" hidden></p>
-          </div>
+    <section id="dash" class="dash" hidden>
+      <div class="bal-block">
+        <p class="label">Your savings</p>
+        <p id="savings" class="balance-num">$0.00</p>
+        <p id="wonLine" class="won-line">Every $1 you save is an entry in every draw.</p>
+        <p id="tokensLine" class="tokens-line" hidden></p>
+      </div>
 
-          <section class="card latest" id="latestCard" hidden>
-            <div class="card-head">
-              <h2 id="latestTitle">Latest winners</h2>
-              <a class="see-all" href="./winners.html">All winners</a>
-            </div>
-            <p id="latestBanner" class="you-won" hidden></p>
-            <div id="latestPodium"></div>
-            <p class="tiny latest-meta" id="latestMeta"></p>
-          </section>
+      <!-- new savers: what to do next -->
+      <ol class="starter" id="starter" hidden>
+        <li data-step="add"><button type="button" data-go="add"><span class="st-n">1</span><span><b>Add money</b><small>Apple Pay or a card, through Coinbase</small></span></button></li>
+        <li data-step="save"><button type="button" data-go="save"><span class="st-n">2</span><span><b>Save it</b><small>Every $1 saved is one entry</small></span></button></li>
+        <li data-step="draw"><button type="button" data-go="draw"><span class="st-n">3</span><span><b>You're in the draw</b><small>Winners are picked when the countdown ends</small></span></button></li>
+      </ol>
 
-          <div class="ticket-strip">
-            <div class="ts-cell"><p class="label">Next draw</p><p id="countdown" class="tile-num">—</p></div>
-            <div class="ts-cell"><p class="label">Your entries</p><p id="entries" class="tile-num">—</p></div>
-            <div class="ts-cell"><p class="label">Winners each draw</p><p id="winnersN" class="tile-num">—</p></div>
-          </div>
-          <p class="tiny entries-note" id="entriesNote" hidden></p>
-
-          <div class="card preview-card">
+      <aside class="dash-side">
+        <!-- the Kairos wallet: money that isn't saved yet -->
+        <div class="card wallet" id="walletCard" hidden>
+          <div class="wallet-top">
             <div>
-              <h2 id="pvTitle">Curious how a draw goes?</h2>
-              <p class="tiny" id="pvText">Run a pretend one with the real savers and today's prize pool. Nothing moves.</p>
+              <p class="label">Kairos wallet</p>
+              <p class="wallet-bal" id="walletBal">$0.00</p>
             </div>
-            <button id="pretendBtn" class="btn btn-light" type="button">Run a pretend draw</button>
-            <a id="drawLink" class="btn btn-primary" href="./admin.html" hidden>Pick winners</a>
+            <span class="wallet-chip">USDC</span>
           </div>
-
-          <div class="chart-card">
-            <div class="chart-head">
-              <div>
-                <p class="label"><span class="live-dot" aria-hidden="true"></span>Next prize pool, live</p>
-                <p id="pool" class="pool-num">—</p>
-              </div>
-              <div class="chart-side">
-                <p class="label">At the draw</p>
-                <p id="poolProj" class="proj-num">—</p>
-              </div>
-            </div>
-            <svg id="poolChart" class="pool-chart" viewBox="0 0 600 150" preserveAspectRatio="none" aria-hidden="true"></svg>
-            <div class="chart-foot tiny"><span id="roundStart">Round start</span><span id="splits"></span><span>Draw</span></div>
+          <p class="tiny wallet-note">Money that isn't saved yet. Save it to enter the draws.</p>
+          <div class="wallet-actions">
+            <button class="wa" type="button" data-act="add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add money</button>
+            <button class="wa" type="button" data-act="send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M9 5h10v10"/></svg>Send</button>
+            <button class="wa" type="button" data-act="receive"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19M15 19H5V9"/></svg>Receive</button>
+            <button class="wa" type="button" data-act="cashout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18M12 3l9 5H3z"/></svg>Cash out</button>
           </div>
-
-          <div class="card boost">
-            <div class="card-head"><h2>Boost your odds</h2><span class="tiny">1 entry for every $1 saved</span></div>
-            <div id="boosts" class="boost-row"></div>
-            <p class="tiny">More entries, better odds. Tap a boost to fill in the deposit.</p>
-          </div>
-
-          <section class="card">
-            <div class="card-head"><h2>Past draws</h2><a class="see-all" href="./winners.html">All winners</a></div>
-            <div id="draws" class="draws"><p class="sub">No draws yet.</p></div>
-          </section>
         </div>
 
-        <aside class="dash-side">
-          <!-- beta: the Kairos wallet (USDC that isn't saved yet) -->
-          <div class="card wallet" id="walletCard" hidden>
-            <div class="wallet-top">
-              <div>
-                <p class="label">Kairos wallet</p>
-                <p class="wallet-bal" id="walletBal">$0.00</p>
-              </div>
-              <span class="wallet-chip">USDC</span>
+        <!-- save / withdraw -->
+        <div class="card ticket" id="ticket">
+          <div id="getDollars" class="get-dollars" hidden>
+            <div>
+              <p class="gd-title">Grab some test dollars</p>
+              <p class="tiny">Free and fake. $1,000 an hour.</p>
             </div>
-            <p class="tiny wallet-note">Money that isn't saved yet. Save it to enter the draws.</p>
-            <div class="wallet-actions">
-              <button class="wa" type="button" data-act="add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add money</button>
-              <button class="wa" type="button" data-act="send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M9 5h10v10"/></svg>Send</button>
-              <button class="wa" type="button" data-act="receive"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19M15 19H5V9"/></svg>Receive</button>
-              <button class="wa" type="button" data-act="cashout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18M12 3l9 5H3z"/></svg>Cash out</button>
-            </div>
+            <button id="faucet" class="btn btn-light btn-sm">Get $1,000</button>
           </div>
 
-          <div class="card ticket">
-            <div id="getDollars" class="get-dollars" hidden>
-              <div>
-                <p class="gd-title">Grab some test dollars</p>
-                <p class="tiny">Free and fake. $1,000 an hour.</p>
-              </div>
-              <button id="faucet" class="btn btn-light btn-sm">Get $1,000</button>
-            </div>
-
-            <div class="tabs" role="tablist">
-              <button class="tab active" role="tab" aria-selected="true" data-tab="deposit">Deposit</button>
-              <button class="tab" role="tab" aria-selected="false" data-tab="withdraw">Withdraw</button>
-            </div>
-
-            <div class="amount-wrap">
-              <span class="dollar">$</span>
-              <input id="amount" type="number" min="0" step="1" value="100" inputmode="decimal" aria-label="Amount" />
-            </div>
-            <p id="boostPreview" class="boost-preview">&nbsp;</p>
-            <div class="chips" id="chips">
-              <button class="chip" data-v="10">$10</button>
-              <button class="chip" data-v="50">$50</button>
-              <button class="chip" data-v="100">$100</button>
-              <button class="chip" data-v="max">Max</button>
-            </div>
-            <button id="go" class="btn btn-primary btn-lg btn-block">Deposit</button>
-            <p id="hint" class="tiny center">&nbsp;</p>
-            <p id="faucetMore" class="tiny center"><button id="faucet2" class="link-btn">Get more test dollars</button></p>
+          <div class="tabs" role="tablist">
+            <button class="tab active" role="tab" aria-selected="true" data-tab="deposit">Save</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="withdraw">Withdraw</button>
           </div>
-          <p class="side-links tiny"><a href="./control.html">Under the hood</a><span>·</span><span id="acct"></span></p>
-        </aside>
-      </div>
+
+          <div class="amount-wrap">
+            <span class="dollar">$</span>
+            <input id="amount" type="number" min="0" step="1" value="100" inputmode="decimal" aria-label="Amount" />
+          </div>
+          <p id="boostPreview" class="boost-preview">&nbsp;</p>
+          <div class="chips" id="chips">
+            <button class="chip" data-v="10">$10</button>
+            <button class="chip" data-v="50">$50</button>
+            <button class="chip" data-v="100">$100</button>
+            <button class="chip" data-v="max">Max</button>
+          </div>
+          <button id="go" class="btn btn-primary btn-lg btn-block">Save</button>
+          <p id="hint" class="tiny center">&nbsp;</p>
+          <p id="faucetMore" class="tiny center"><button id="faucet2" class="link-btn">Get more test dollars</button></p>
+        </div>
+      </aside>
+
+      <!-- the next draw, in one place -->
+      <section class="card next-card" aria-labelledby="nextTitle">
+        <div class="next-top">
+          <div>
+            <p class="label" id="nextTitle">Next draw in</p>
+            <p id="countdown" class="next-count">—</p>
+          </div>
+          <div class="next-pool">
+            <p class="label"><span class="live-dot" aria-hidden="true"></span>Prize pool</p>
+            <p id="pool" class="pool-num">—</p>
+            <p class="tiny" id="poolProj">&nbsp;</p>
+          </div>
+        </div>
+        <div class="round-bar" aria-hidden="true"><div class="round-fill" id="roundFill"></div></div>
+        <div class="round-foot tiny"><span id="roundStart">Round started</span><span id="roundEnd">Draw</span></div>
+        <div class="next-stats">
+          <div><p class="label">Your entries</p><p id="entries" class="stat-num">—</p></div>
+          <div><p class="label">Prizes each draw</p><p id="winnersN" class="stat-num">—</p></div>
+        </div>
+        <p class="tiny entries-note" id="entriesNote" hidden></p>
+        <div class="next-actions">
+          <button id="pretendBtn" class="btn btn-light" type="button">See how a draw works</button>
+          <a id="drawLink" class="btn btn-primary" href="./draws.html" hidden>Run the draw</a>
+          <a class="see-all" href="./draws.html">Past winners &rarr;</a>
+        </div>
+      </section>
+
+      <!-- the last draw, one line -->
+      <a class="card last-draw" id="lastDraw" href="./draws.html" hidden>
+        <span class="ld-ico" id="ldId">#1</span>
+        <span class="ld-text"><b id="ldTitle">Last draw</b><span class="tiny" id="ldSub"></span></span>
+        <span class="ld-amt" id="ldAmt"></span>
+      </a>
     </section>
   </main>
 
@@ -180,13 +178,13 @@
       <p class="win-total">Savings now <b id="winSavings">$0.00</b></p>
       <div class="win-actions">
         <button id="winKeep" class="btn btn-primary btn-lg">Keep it saving</button>
-        <button id="winWithdraw" class="btn btn-outline btn-lg">Withdraw</button>
+        <button id="winHow" class="btn btn-outline btn-lg">See how you won</button>
       </div>
-      <p class="tiny win-note">Test network demo. Prizes are test dollars.</p>
+      <p class="tiny win-note">Test network. Prizes are test dollars.</p>
     </div>
   </div>
 
-  <!-- beta: one sheet for Add money / Send / Receive / Cash out -->
+  <!-- one sheet for Add money / Send / Receive / Cash out -->
   <div id="sheet" class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" hidden>
     <div class="sheet-card">
       <button class="sheet-x" id="sheetX" type="button" aria-label="Close">&times;</button>
@@ -196,8 +194,8 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <footer>
-    <p>Kairos is a concept in development by Pluto's Financial. This demo runs on the Base Sepolia test network with fake money and accepts no real deposits. Not FDIC insured.</p>
+  <footer class="app-foot">
+    <p>Kairos is in development by Pluto's Financial. It runs on the Base Sepolia test network with test money and accepts no real deposits. Not a bank, not FDIC insured. <a href="./privacy.html">Privacy</a></p>
   </footer>
 
   <script type="module" src="/src/app.js"></script>
