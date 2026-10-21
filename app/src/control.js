@@ -121,7 +121,7 @@ function describe(e) {
     case "Withdrawn": return `${who(a.user)} took out ${fmt(a.amount)}${a.route === "drawer" ? " instantly" : ""}`;
     case "WithdrawalQueued": return `${who(a.user)} asked to take out ${fmt(a.amount)}. It's waiting for T-bills to turn into cash.`;
     case "QueuePaid": return `${who(a.user)} got their ${fmt(a.amount)}`;
-    case "Harvested": return `${fmt(a.interest)} of interest collected: ${fmt(a.toPrizes)} for prizes, ${fmt(a.toFees)} for Kairos`;
+    case "Harvested": return `${fmt(a.interest)} of interest collected: ${fmt(a.toPrizes)} for prizes, ${fmt(a.toFees)} for Plutos`;
     case "Rebalanced":
       if (a.action === "invest") return `Moved ${fmt(a.amount)} of cash into T-bills`;
       if (a.action === "redeem") return `Sold ${fmt(a.amount)} of T-bills to get more cash`;
@@ -134,7 +134,7 @@ function describe(e) {
       a.winners.forEach((w, i) => by.set(w, (by.get(w) || 0n) + a.amounts[i]));
       return `Round ${a.drawId} winners: ${[...by.entries()].map(([w, t]) => `${who(w)} won ${fmt(t)}`).join(", ")}`;
     }
-    case "FeesPaid": return `${fmt(a.amount)} in fees paid to Kairos`;
+    case "FeesPaid": return `${fmt(a.amount)} in fees paid to Plutos`;
     default: return e.eventName;
   }
 }

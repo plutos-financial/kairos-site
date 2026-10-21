@@ -273,7 +273,7 @@
 @media (max-width: 640px) { .hide-sm { display: none; } }
 .pretend #pMine { margin: 26px auto 0; max-width: 34rem; }
 
-/* ---------------------------------------------------------------- beta: Kairos wallet + action sheet */
+/* ---------------------------------------------------------------- beta: Plutos wallet + action sheet */
 .tokens-line { margin: 6px 0 0; color: var(--muted); font-size: 14.5px; }
 .wallet { border-radius: 26px; display: flex; flex-direction: column; gap: 10px; }
 .wallet-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }

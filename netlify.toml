@@ -1,4 +1,4 @@
-# Netlify runs only the small Kairos money server (Apple Pay orders through Coinbase).
+# Netlify runs only the small Plutos money server (Apple Pay orders through Coinbase).
 # The website itself is published by GitHub Pages (.github/workflows/publish.yml).
 [build]
   base = "netlify"

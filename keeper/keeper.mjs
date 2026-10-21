@@ -1,4 +1,4 @@
-// Kairos keeper bot: the "Rebalancer" that pokes the contracts on a schedule.
+// Plutos keeper bot: the "Rebalancer" that pokes the contracts on a schedule.
 // Every tick it: keeps the cash drawer in its band, closes the draw when the period ends,
 // and (for the demo randomness source) finishes pending draws.
 //
@@ -87,6 +87,6 @@ async function tick() {
 }
 
 const once = process.argv.includes("--once");
-console.log(`Kairos keeper on chain ${CHAIN_ID} as ${account.address}, vault ${deployment.vault}`);
+console.log(`Plutos keeper on chain ${CHAIN_ID} as ${account.address}, vault ${deployment.vault}`);
 await tick();
 if (!once) setInterval(() => tick().catch((e) => console.error(e)), TICK_SECONDS * 1000);

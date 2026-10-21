@@ -1,12 +1,12 @@
-// Kairos money server: creates a Coinbase onramp order (Apple Pay) for the Kairos app.
+// Plutos money server: creates a Coinbase onramp order (Apple Pay) for the Plutos app.
 //
 //   POST /api/onramp-order   { address, amount, phone, agreedAt }  -> { orderId, paymentLink, sandbox }
 //   GET  /api/onramp-order?id=<orderId>                            -> { status, sandbox }
 //
 // Both need the saver's Coinbase sign-in: the app sends "Authorization: Bearer <access token>" from
 // the Coinbase embedded wallet. The server asks Coinbase who that token belongs to, and only starts a
-// payment into one of that person's own accounts. So nobody can use this server (or Kairos's Coinbase
-// quota) without signing in to Kairos, and nobody can point a payment at someone else's address.
+// payment into one of that person's own accounts. So nobody can use this server (or the Plutos Coinbase
+// quota) without signing in to Plutos, and nobody can point a payment at someone else's address.
 //
 // Test mode only: every order is a Coinbase *sandbox* order ("sandbox-" partnerUserRef), so cards are
 // never charged and no money moves. Real payments also need phone verification by SMS and Coinbase's
@@ -88,7 +88,7 @@ function emailOf(user) {
  */
 export async function handler(req, context = {}, deps = {}) {
   const origin = (req.headers.get("origin") || "").replace(/\/+$/, "");
-  if (!origin || !allowedOrigins().includes(origin)) return reply(403, { error: "This website isn't allowed to use the Kairos money server." });
+  if (!origin || !allowedOrigins().includes(origin)) return reply(403, { error: "This website isn't allowed to use the Plutos money server." });
   const cors = {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
@@ -115,7 +115,7 @@ export async function handler(req, context = {}, deps = {}) {
   const token = (req.headers.get("authorization") || "").replace(/^Bearer\s+/i, "").trim();
   if (required) {
     if (!token || token.length > 8192 || !/^[A-Za-z0-9._~+/=-]+$/.test(token))
-      return reply(401, { error: "Sign in to Kairos with your email first.", code: "signin" }, cors);
+      return reply(401, { error: "Sign in to Plutos with your email first.", code: "signin" }, cors);
     try {
       const r = await doFetch(`https://${HOST}${VALIDATE}`, {
         method: "POST",
@@ -165,7 +165,7 @@ export async function handler(req, context = {}, deps = {}) {
   if (!b || typeof b !== "object" || Array.isArray(b)) return reply(400, { error: "Send JSON." }, cors);
   const address = String(b.address || "");
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) return reply(400, { error: "That isn't a valid wallet address." }, cors);
-  if (mine && !mine.has(lower(address))) return reply(403, { error: "Payments can only go to your own Kairos account." }, cors);
+  if (mine && !mine.has(lower(address))) return reply(403, { error: "Payments can only go to your own Plutos account." }, cors);
   const amountStr = String(b.amount ?? "");
   const amount = Number(amountStr);
   if (!/^\d+(\.\d{1,2})?$/.test(amountStr) || !(amount >= MIN && amount <= MAX))

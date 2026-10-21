@@ -1,4 +1,4 @@
-// Kairos savings page: email sign-in, the wallet, save / withdraw, and the next draw.
+// Plutos savings page: email sign-in, the wallet, save / withdraw, and the next draw.
 // Savers never see exact odds. They see entries (1 per $1) and how much a deposit multiplies them.
 import { parseUnits, formatUnits, parseEventLogs, maxUint256 } from "viem";
 import abis from "./abis.json";
@@ -32,7 +32,7 @@ const drawCache = new Map(); // finished draws never change, so keep them
 async function main() {
   const ok = await setup();
   if (!ok) {
-    toast(`Kairos isn't connected to its contracts yet. <a href="./deploy.html">Set them up</a> with one MetaMask transaction.`, true, 0);
+    toast(`Plutos isn't connected to its contracts yet. <a href="./deploy.html">Set them up</a> with one MetaMask transaction.`, true, 0);
     return;
   }
   wireAccount();
@@ -89,7 +89,7 @@ async function showDash() {
   setInterval(tick, 1000);
 }
 
-// The Kairos team gets a shortcut to the real draw controls.
+// The Plutos team gets a shortcut to the real draw controls.
 async function showTeamControls() {
   try {
     admin = await canRunDraws(await read("vault", "owner"));
@@ -245,7 +245,7 @@ async function doDeposit() {
   const amt = amountInput();
   if (amt === null) return;
   if (amt < s.minDeposit) return toast(`The smallest amount you can save is ${fmt(s.minDeposit, 0)}.`, true);
-  if (amt > s.wallet) return toast(isBeta ? `You have ${fmt(s.wallet)} in your Kairos wallet. Add money first.` : `You have ${fmt(s.wallet)} in test dollars. Get more first.`, true);
+  if (amt > s.wallet) return toast(isBeta ? `You have ${fmt(s.wallet)} in your Plutos wallet. Add money first.` : `You have ${fmt(s.wallet)} in test dollars. Get more first.`, true);
   const calls = [];
   const allowance = await read("usdc", "allowance", [state.address, state.cfg.vault]);
   // Email accounts approve the exact amount inside the same one-tap action.
@@ -265,7 +265,7 @@ async function doWithdraw() {
       const q = parseEventLogs({ abi: abis.KairosVault, logs: r.logs, eventName: "WithdrawalQueued" })[0];
       if (q) return `Your ${fmt(amt, 0)} is in line (#${q.args.position}). The cash drawer is low, so it arrives as soon as Treasury bills settle.`;
     } catch {}
-    return isBeta ? `Withdrew ${fmt(amt, 0)} to your Kairos wallet.` : `Withdrew ${fmt(amt, 0)} back to your test dollars.`;
+    return isBeta ? `Withdrew ${fmt(amt, 0)} to your Plutos wallet.` : `Withdrew ${fmt(amt, 0)} back to your test dollars.`;
   });
 }
 
@@ -327,7 +327,7 @@ function updatePreview() {
   $("amount").style.width = Math.max(1.5, String($("amount").value || "").length + 0.4) + "ch";
   if (!busy) $("go").textContent = goLabel();
   const bal = Number(formatUnits(s.savings, 6));
-  if (needsMoney()) return (el.textContent = "Your Kairos wallet is empty");
+  if (needsMoney()) return (el.textContent = "Your Plutos wallet is empty");
   if (!v || v <= 0) return (el.innerHTML = "&nbsp;");
   if (tab === "deposit") {
     el.textContent = bal >= 1 ? `${times((bal + v) / bal)} your odds` : `${Math.floor(v).toLocaleString("en-US")} entries in every draw`;
@@ -341,7 +341,7 @@ function updateHint() {
   const b = document.createElement("b");
   b.textContent = tab === "deposit" ? fmt(s.wallet) : fmt(s.savings);
   $("hint").replaceChildren(
-    tab === "deposit" ? (isBeta ? "In your Kairos wallet: " : "Test dollars available: ") : "In savings: ",
+    tab === "deposit" ? (isBeta ? "In your Plutos wallet: " : "Test dollars available: ") : "In savings: ",
     b,
     tab === "deposit" ? "" : ". Always yours to take out."
   );
@@ -590,5 +590,5 @@ function confetti() {
 
 main().catch((e) => {
   console.error(e);
-  toast("Something went wrong loading Kairos. Refresh the page.", true, 0);
+  toast("Something went wrong loading Plutos. Refresh the page.", true, 0);
 });

@@ -1,14 +1,14 @@
-# Kairos
+# Plutos
 
 Pluto's Financial · prize-linked savings · **test money only**
 
-Kairos is a savings account with a prize draw: savers keep every dollar they put in, and the interest is handed out as prizes. This repo holds everything: the website, the smart contracts, and a small money server.
+Plutos is a savings account with a prize draw: savers keep every dollar they put in, and the interest is handed out as prizes. This repo holds everything: the website, the smart contracts, and a small money server.
 
 The site is at **https://plutos-financial.github.io/kairos-site/** (Base Sepolia, Base's free test network). It has:
 
 - **Chainlink VRF draws**: winners are picked with a verifiable random number, and the Draws page animates every draw step by step (entries lined up, Chainlink's number, one spot on the line per prize), redoing the vault's math in the browser and checking it against the blockchain.
 - **Add money with Apple Pay** through Coinbase's onramp, in Coinbase's test mode (no card is charged; test dollars arrive instead).
-- **A Kairos wallet** with send, receive and cash out (cash out is simulated: Coinbase has no test mode for it).
+- **A Plutos wallet** with send, receive and cash out (cash out is simulated: Coinbase has no test mode for it).
 - **Savings as kUSD tokens**, one per dollar saved, non-transferable.
 
 Old `/beta/` links redirect to the main site. The original demo edition (simple random source, free test dollars, contracts in `deployments/84532.json`) is still in the code and can be built with `node sync.mjs && npx vite build`.
@@ -30,7 +30,7 @@ Push to `main` and GitHub builds and publishes the site by itself (`.github/work
 | `shared/` | Contract ABIs and bytecode, exported from `contracts/` for the app. |
 | `netlify/` | The money server: one function that creates Coinbase Apple Pay orders. Runs on Netlify (https://majestic-raindrop-515139.netlify.app) because GitHub Pages can't run server code. |
 | `keeper/` | Optional bot that rebalances and closes draws on a timer. |
-| `waitlist/` | The Google Apps Script that saves waitlist sign-ups to the Kairos Google Sheet. |
+| `waitlist/` | The Google Apps Script that saves waitlist sign-ups to the Plutos Google Sheet. |
 
 ### The contracts
 
@@ -38,12 +38,12 @@ Push to `main` and GitHub builds and publishes the site by itself (`.github/work
 |---|---|---|
 | `MockUSDC` | Test dollars: hourly faucet, plus `topUp(amount)` up to $10,000 a day for the beta's Add money | USDC |
 | `MockTBill` | Test T-bill fund: rising price, allowlist, settlement delay, optional instant route | BUIDL, BENJI, USTB |
-| `KairosVault` | Deposits (minted 1:1 as non-transferable kUSD), cash drawer, 85/15 interest split, time-weighted draws, withdrawal queue | The Kairos product |
+| `KairosVault` | Deposits (minted 1:1 as non-transferable kUSD), cash drawer, 85/15 interest split, time-weighted draws, withdrawal queue | The Plutos product |
 | `DemoRandomSource` | Simple two-step randomness (the demo) | |
 | `ChainlinkVRFSource` | Chainlink VRF v2.5 randomness (the beta) | Chainlink VRF |
 | `KairosBetaSetup` | Sets up the whole beta in one transaction: all of the above plus a funded Chainlink subscription | |
 
-Fees: there is **no deposit or withdrawal fee**. Kairos keeps 15% of the interest; 85% becomes prizes.
+Fees: there is **no deposit or withdrawal fee**. Plutos keeps 15% of the interest; 85% becomes prizes.
 
 ---
 
@@ -89,12 +89,12 @@ Local test chain: run `anvil`, deploy with `forge script script/Deploy.s.sol` (d
 
 ## Security
 
-- **Content Security Policy** on every page (`app/vite.config.js`): pages only run Kairos's own scripts and only talk to Base, Coinbase, the money server and the waitlist sheet. GitHub Pages can't send headers, so it's a `<meta>` tag; pages also refuse to run inside another site's frame (`app/src/fresh.js`).
-- **The money server needs a Kairos sign-in.** The app sends the saver's Coinbase access token; the server checks it with Coinbase (`/v2/end-users/auth/validate-token`) and only starts a payment into one of that saver's own accounts, using the email from the sign-in. At most 5 payments per saver per 10 minutes, 10 requests per IP per minute. Set `SIGN_IN_REQUIRED=false` in Netlify only to troubleshoot.
+- **Content Security Policy** on every page (`app/vite.config.js`): pages only run the site's own scripts and only talk to Base, Coinbase, the money server and the waitlist sheet. GitHub Pages can't send headers, so it's a `<meta>` tag; pages also refuse to run inside another site's frame (`app/src/fresh.js`).
+- **The money server needs a Plutos sign-in.** The app sends the saver's Coinbase access token; the server checks it with Coinbase (`/v2/end-users/auth/validate-token`) and only starts a payment into one of that saver's own accounts, using the email from the sign-in. At most 5 payments per saver per 10 minutes, 10 requests per IP per minute. Set `SIGN_IN_REQUIRED=false` in Netlify only to troubleshoot.
 - **Only Coinbase's checkout is ever framed** (`https://pay.coinbase.com`, checked on the server and in the page), and only that frame's messages count.
 - **The official contracts can't be swapped from a browser**: a deployment saved by `/deploy.html` is only used before official contracts exist.
 - Secrets live only in Netlify's environment variables. Error text is escaped before it's shown. `npm audit` is clean (two transitive packages are pinned with `overrides` in `app/package.json`).
-- The "Kairos team" check on the website (`drawAdmins`) only decides what the page shows. What protects the contracts is on-chain: only the owner can change settings, and nobody can close a round early except the owner.
+- The "Plutos team" check on the website (`drawAdmins`) only decides what the page shows. What protects the contracts is on-chain: only the owner can change settings, and nobody can close a round early except the owner.
 
 ## Before real money (not built yet, on purpose)
 

@@ -77,7 +77,7 @@ test("creates a sandbox Apple Pay order for the signed-in saver", async () => {
   assert.equal(sent.clientIp, "1.2.3.4");
 });
 
-test("needs a Kairos sign-in", async () => {
+test("needs a Plutos sign-in", async () => {
   const handler = await fresh();
   const calls = [];
   const none = await handler(post(goodBody(), { token: "" }), { ip: "7.0.0.1" }, deps(coinbase({ calls })));

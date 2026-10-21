@@ -1,7 +1,7 @@
 // The Draws page.
 //   Everyone: the countdown, the latest winners, past draws, replays of how each draw was picked,
 //   watching a draw live while Chainlink answers, and pretend draws (nothing on-chain).
-//   The Kairos team (the on-chain owner, or an email on the drawAdmins list): real draws, settings,
+//   The Plutos team (the on-chain owner, or an email on the drawAdmins list): real draws, settings,
 //   auto-pilot. Ending a round early and the settings also need on-chain owner rights, which the
 //   team's email account gets through the one-time MetaMask handover below.
 import { createWalletClient, custom, parseEventLogs } from "viem";
@@ -288,7 +288,7 @@ async function autoTick() {
 function startAutopilot() {
   if (!admin) {
     $("autopilot").checked = false;
-    return toast("Only the Kairos team can turn this on.", true);
+    return toast("Only the Plutos team can turn this on.", true);
   }
   if (state.mode === "wallet") toast("Heads up: with MetaMask, auto-pilot asks you to confirm every step. Hand over to your email account for hands-free auto-pilot.", false, 9000);
   $("autoStatus").textContent = "On. Starting…";
@@ -327,7 +327,7 @@ async function handover() {
       await state.pub.waitForTransactionReceipt({ hash });
     }
     await sleep(1500);
-    toast("Done. Your email account now controls Kairos, and these buttons work without pop-ups.", false, 9000);
+    toast("Done. Your email account now controls Plutos, and these buttons work without pop-ups.", false, 9000);
     await refresh();
   } catch (e) {
     console.error(e);
@@ -515,7 +515,7 @@ function tick() {
   } else if (left <= 0) {
     $("roundState").textContent = "finished";
     title = "Ready to pick winners";
-    hint = "This round is over. Press the button and Kairos picks the winners.";
+    hint = "This round is over. Press the button and Plutos picks the winners.";
     label = "Pick winners now";
   } else {
     $("roundState").textContent = "open";

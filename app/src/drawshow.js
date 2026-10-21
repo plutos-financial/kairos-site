@@ -124,7 +124,7 @@ function overlay() {
           <p class="ds-verify" id="dsVerify"></p>
           <details class="ds-math">
             <summary>The exact math</summary>
-            <p>For prize <i>k</i> (counting from 0), the vault computes <code>keccak256(randomNumber, k)</code>, divides it by the length of the line (everyone's savings &times; seconds saved) and keeps the remainder. That remainder is a spot on the line, and the saver whose stretch contains it wins prize <i>k</i>. The code is <code>KairosVault.fulfillRandomness</code>, and the random number, the line and the winners are all stored on the blockchain, so anyone can redo it.</p>
+            <p>For prize <i>k</i> (counting from 0), the vault computes <code>keccak256(randomNumber, k)</code>, divides it by the length of the line (everyone's savings &times; seconds saved) and keeps the remainder. That remainder is a spot on the line, and the saver whose stretch contains it wins prize <i>k</i>. It's the vault's <code>fulfillRandomness</code> function, and the random number, the line and the winners are all stored on the blockchain, so anyone can redo it.</p>
           </details>
         </div>
 
@@ -424,7 +424,7 @@ function verifyLine(ok, tx, hadLine) {
   const links = [];
   if (tx && state.explorer) links.push(`<a href="${state.explorer}/tx/${tx}" target="_blank" rel="noopener noreferrer">The random number on Basescan</a>`);
   const cl = chainlinkLink();
-  if (cl && usesChainlink()) links.push(`<a href="${cl}" target="_blank" rel="noopener noreferrer">Kairos on Chainlink</a>`);
+  if (cl && usesChainlink()) links.push(`<a href="${cl}" target="_blank" rel="noopener noreferrer">Plutos on Chainlink</a>`);
   const head = !hadLine
     ? "The spots above come straight from the blockchain's random number."
     : ok
@@ -488,7 +488,7 @@ async function playFromChain(drawId, id, live) {
     for (let i = 0; !d.awarded; i++) {
       const secs = Math.round((Date.now() - t0) / 1000);
       $("dsRngNote").textContent = chainlink
-        ? `Kairos asked Chainlink for a number nobody can predict or change. Waiting for the answer… ${secs}s. This usually takes under a minute.`
+        ? `Plutos asked Chainlink for a number nobody can predict or change. Waiting for the answer… ${secs}s. This usually takes under a minute.`
         : `Waiting for the random number… ${secs}s`;
       if (Date.now() - t0 > 6 * 60_000) {
         clearInterval(scrambleTimer);
@@ -503,8 +503,8 @@ async function playFromChain(drawId, id, live) {
   }
   const txPromise = awardTx(drawId);
   $("dsRngNote").textContent = chainlink
-    ? "It arrives with a cryptographic proof, and the blockchain checks the proof before accepting it. Nobody, including Kairos, can choose it."
-    : "On the test network this comes from the chain itself. The live Kairos uses Chainlink.";
+    ? "It arrives with a cryptographic proof, and the blockchain checks the proof before accepting it. Nobody, including Plutos, can choose it."
+    : "On the test network this comes from the chain itself. The live Plutos uses Chainlink.";
   await revealNumber(d.randomWord, id);
   await pause(900, id);
 

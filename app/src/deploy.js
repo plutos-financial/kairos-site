@@ -1,4 +1,4 @@
-// Deploys and configures the whole Kairos demo from the browser, using the connected wallet.
+// Deploys and configures the whole Plutos demo from the browser, using the connected wallet.
 import { createPublicClient, createWalletClient, custom, http, parseEther, parseEventLogs } from "viem";
 import { baseSepolia, foundry } from "viem/chains";
 import abis from "./abis.json";
@@ -64,9 +64,9 @@ async function call(wallet, addr, label, address, abi, functionName, args) {
 }
 
 if (isBeta) {
-  $("dTitle").textContent = "Set up the Kairos beta";
+  $("dTitle").textContent = "Set up the Plutos beta";
   $("dIntro").innerHTML = `One transaction sets up everything: test USDC, the T-bill fund, the vault, and a Chainlink VRF subscription for fair draws. It sends ${VRF_FUNDING} test ETH to Chainlink to pay for random numbers. The wallet you use becomes the owner.`;
-  $("dSteps").innerHTML = `<li>Use your Kairos test wallet in MetaMask (never one with real money).</li>
+  $("dSteps").innerHTML = `<li>Use your Plutos test wallet in MetaMask (never one with real money).</li>
     <li>Make sure it has about 0.003 Base Sepolia ETH (free from a faucet).</li>
     <li>Click the button and approve the one transaction.</li>`;
   $("go").textContent = "Connect and set up the beta";

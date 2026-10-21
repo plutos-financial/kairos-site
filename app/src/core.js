@@ -1,4 +1,4 @@
-// Shared Kairos plumbing: network, contracts, sign-in, and sending actions.
+// Shared Plutos plumbing: network, contracts, sign-in, and sending actions.
 //
 // Two ways to sign in:
 //   1. Email (Coinbase embedded wallet). The user gets a smart account, actions are
@@ -178,7 +178,7 @@ export async function resumeEmailSession() {
   }
 }
 
-/** The Coinbase sign-in token, so the Kairos money server can check who's asking. Null if not signed in by email. */
+/** The Coinbase sign-in token, so the Plutos money server can check who's asking. Null if not signed in by email. */
 export async function accessToken() {
   if (state.mode !== "email" || !cdp) return null;
   try {
@@ -341,13 +341,13 @@ async function simulate(x, tries = 1) {
 export function friendlyError(e) {
   const msg = e?.shortMessage || e?.message || String(e);
   if (/paymaster|sponsor|allowlist|policy/i.test(msg))
-    return "Coinbase's gas sponsor turned this down. In the Coinbase developer portal, open Paymaster and either leave the contract allowlist empty or add all four Kairos contracts.";
+    return "Coinbase's gas sponsor turned this down. In the Coinbase developer portal, open Paymaster and either leave the contract allowlist empty or add all four Plutos contracts.";
   if (e?.code === 4001 || /user rejected|user denied|rejected the request|cancel/i.test(msg)) return "You cancelled it.";
   const reverted = typeof e?.walk === "function" ? e.walk((x) => x?.name === "ContractFunctionRevertedError") : null;
   const name = reverted?.data?.errorName;
   const reason = reverted?.reason;
   const known = {
-    ERC20InsufficientAllowance: "Kairos isn't approved to use your test dollars yet. Try again.",
+    ERC20InsufficientAllowance: "Plutos isn't approved to use your test dollars yet. Try again.",
     ERC20InsufficientBalance: "You don't have enough test dollars.",
     EnforcedPause: "Deposits are paused right now.",
     OwnableUnauthorizedAccount: "Only the owner account can do that.",
@@ -370,7 +370,7 @@ export function txLink(hash) {
 let toastTimer;
 /** An error as a toast, as plain text (error messages can contain anything). */
 export const toastError = (e, ms = 6000) => toast(esc(friendlyError(e)), true, ms);
-/** `html` is trusted markup written by Kairos; anything from outside goes through esc() first. */
+/** `html` is trusted markup written by Plutos; anything from outside goes through esc() first. */
 export function toast(html, err = false, ms = 6000) {
   const t = $("toast");
   if (!t) return;

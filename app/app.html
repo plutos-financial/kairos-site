@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Kairos · Savings</title>
-  <meta name="description" content="Your Kairos savings: add money, save it, and get entries in every prize draw. Test network." />
+  <title>Plutos · Savings</title>
+  <meta name="description" content="Your Plutos savings: add money, save it, and get entries in every prize draw. Test network." />
   <meta name="theme-color" content="#050506" />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/app.css" />
@@ -14,9 +14,9 @@
 
   <header class="appbar">
     <div class="appbar-in">
-      <a class="brand" href="./" aria-label="Kairos home">
+      <a class="brand" href="./" aria-label="Plutos home">
         <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
-        <span class="name">kairos</span>
+        <span class="name">plutos</span>
       </a>
       <nav class="apptabs" aria-label="App">
         <a href="./app.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5c0-1.7-2-2.8-4.5-2.8S7.5 5.8 7.5 7.6s2 2.6 4.5 3.1 4.5 1.4 4.5 3.3-2 3-4.5 3-4.5-1.1-4.5-2.9"/></svg>Savings</a>
@@ -41,7 +41,7 @@
   <main class="app-main">
     <!-- Signed out -->
     <section id="signin" class="signin" hidden>
-      <h1 class="signin-title">Sign in to Kairos</h1>
+      <h1 class="signin-title">Sign in to Plutos</h1>
       <p class="sub">No app to install and no crypto wallet. We'll email you a 6-digit code.</p>
 
       <form id="emailForm" class="stack" novalidate>
@@ -62,7 +62,7 @@
       <div class="or"><span>or</span></div>
       <button id="useWallet" class="btn btn-ghost btn-block">Use a browser wallet (MetaMask)</button>
       <p id="emailOff" class="tiny" hidden>Email sign-in isn't switched on for this site yet, so a browser wallet is needed for now.</p>
-      <p class="tiny signin-note">Coinbase handles the sign-in and keeps your account's keys. Kairos never sees a password. <a href="./privacy.html">Privacy</a></p>
+      <p class="tiny signin-note">Coinbase handles the sign-in and keeps your account's keys. Plutos never sees a password. <a href="./privacy.html">Privacy</a></p>
     </section>
 
     <!-- Signed in -->
@@ -82,11 +82,11 @@
       </ol>
 
       <aside class="dash-side">
-        <!-- the Kairos wallet: money that isn't saved yet -->
+        <!-- the Plutos wallet: money that isn't saved yet -->
         <div class="card wallet" id="walletCard" hidden>
           <div class="wallet-top">
             <div>
-              <p class="label">Kairos wallet</p>
+              <p class="label">Plutos wallet</p>
               <p class="wallet-bal" id="walletBal">$0.00</p>
             </div>
             <span class="wallet-chip">USDC</span>
@@ -195,7 +195,7 @@
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
   <footer class="app-foot">
-    <p>Kairos is in development by Pluto's Financial. It runs on the Base Sepolia test network with test money and accepts no real deposits. Not a bank, not FDIC insured. <a href="./privacy.html">Privacy</a></p>
+    <p>Plutos is in development. It runs on the Base Sepolia test network with test money and accepts no real deposits. Not a bank, not FDIC insured. <a href="./privacy.html">Privacy</a></p>
   </footer>
 
   <script type="module" src="/src/app.js"></script>

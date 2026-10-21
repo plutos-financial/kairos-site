@@ -1,4 +1,4 @@
-// Beta only: the Kairos wallet. Add money (Coinbase Apple Pay, test mode), send, receive, cash out.
+// Beta only: the Plutos wallet. Add money (Coinbase Apple Pay, test mode), send, receive, cash out.
 //
 // "Add money" asks our small server (netlify/functions/onramp-order) to create a Coinbase onramp order
 // in sandbox mode, then shows Coinbase's payment page in a frame. Sandbox orders always succeed and
@@ -12,7 +12,7 @@ import qrcode from "qrcode-generator";
 import { $, state, fmt, short, act, read, friendlyError, esc, txLink, accessToken } from "./core.js";
 
 const BURN = "0x000000000000000000000000000000000000dEaD";
-const PAY_ORIGIN = "https://pay.coinbase.com"; // the only page Kairos will show inside "Add money"
+const PAY_ORIGIN = "https://pay.coinbase.com"; // the only page Plutos will show inside "Add money"
 const TERMS = {
   guest: "https://www.coinbase.com/legal/guest-checkout/us",
   user: "https://www.coinbase.com/legal/user_agreement",
@@ -21,7 +21,6 @@ const TERMS = {
 
 let ctx; // { wallet(), savings(), refresh(), fillDeposit(amount) }
 let pending = null; // { amount, orderId } while a Coinbase payment is open
-let symbol = "kUSD";
 
 export function initBetaWallet(c) {
   ctx = c;
@@ -36,7 +35,6 @@ export function initBetaWallet(c) {
   $("sheet").addEventListener("click", (e) => e.target === $("sheet") && close());
   addEventListener("keydown", (e) => e.key === "Escape" && !$("sheet").hidden && close());
   addEventListener("message", onCoinbaseMessage);
-  read("vault", "symbol").then((x) => (symbol = x)).catch(() => {});
 }
 
 export function renderWallet(wallet, savings) {
@@ -44,7 +42,7 @@ export function renderWallet(wallet, savings) {
   const line = $("tokensLine");
   const tokens = Number(savings) / 1e6;
   line.hidden = savings === 0n;
-  line.textContent = `${tokens.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${symbol} savings tokens · each one is worth $1`;
+  line.textContent = `${tokens.toLocaleString(undefined, { maximumFractionDigits: 2 })} Plutos savings tokens · each one is worth $1`;
 }
 
 // ------------------------------------------------------------------ the sheet
@@ -112,7 +110,7 @@ function moneyApi() {
   return /^https:\/\//.test(u) || (state.cfg?.chainId === 31337 && /^http:\/\/localhost:\d+$/.test(u)) ? u : "";
 }
 
-/** Apple Pay goes through the Kairos money server, which needs the email sign-in to know who's paying. */
+/** Apple Pay goes through the Plutos money server, which needs the email sign-in to know who's paying. */
 const canPay = () => Boolean(moneyApi()) && state.mode === "email";
 
 /** Headers for the money server: who's asking, proved by their Coinbase sign-in. */
@@ -185,12 +183,12 @@ async function startCoinbase() {
       const j = await r.json().catch(() => ({}));
       if (!r.ok || !j.paymentLink) throw new Error(j.error || `Coinbase didn't start the payment (error ${r.status}).`);
       const link = safePayLink(j.paymentLink, j.sandbox);
-      if (!link) throw new Error("That payment link didn't come from Coinbase, so Kairos won't open it.");
+      if (!link) throw new Error("That payment link didn't come from Coinbase, so Plutos won't open it.");
       pending = { amount, orderId: String(j.orderId || ""), done: false };
       payView(link);
     } catch (e) {
       console.error(e);
-      err(/fetch/i.test(e.message) ? "Couldn't reach the Kairos server. Try again in a moment." : e.message);
+      err(/fetch/i.test(e.message) ? "Couldn't reach the Plutos server. Try again in a moment." : e.message);
     }
   });
 }
@@ -218,7 +216,7 @@ function payView(link) {
 
 function onCoinbaseMessage(e) {
   if (!pending || pending.done) return;
-  // Only Coinbase's checkout, in the frame Kairos opened, can say a payment went through.
+  // Only Coinbase's checkout, in the frame Plutos opened, can say a payment went through.
   const from = state.cfg?.chainId === 31337 ? [PAY_ORIGIN, location.origin] : [PAY_ORIGIN];
   if (!from.includes(e.origin) || !payFrame || e.source !== payFrame.contentWindow) return;
   let d = e.data;
@@ -244,7 +242,7 @@ async function checkOrder() {
       if (/COMPLETED|PROCESSING/.test(j.status || "") || (j.sandbox && !/FAILED/.test(j.status || ""))) return finishAdd();
       err("Coinbase hasn't confirmed the payment yet. Finish it above, then press this again.");
     } catch (e) {
-      err(/sign in/i.test(e?.message || "") ? e.message : "Couldn't reach the Kairos server. Try again in a moment.");
+      err(/sign in/i.test(e?.message || "") ? e.message : "Couldn't reach the Plutos server. Try again in a moment.");
     }
   });
 }
@@ -252,7 +250,7 @@ async function checkOrder() {
 async function finishAdd() {
   if (!pending || pending.done) return;
   pending.done = true;
-  body(`<h2 id="sheetTitle">Payment received</h2><p class="sh-sub"><span class="spinner" aria-hidden="true"></span> Adding ${fmt(pending.amount)} to your Kairos wallet…</p>`);
+  body(`<h2 id="sheetTitle">Payment received</h2><p class="sh-sub"><span class="spinner" aria-hidden="true"></span> Adding ${fmt(pending.amount)} to your Plutos wallet…</p>`);
   await topUp(pending.amount);
 }
 
@@ -263,7 +261,7 @@ async function topUp(amount) {
     await ctx.refresh();
     body(`
       <h2 id="sheetTitle">Added ${fmt(amount)}</h2>
-      <p class="sh-sub">It's in your Kairos wallet. Save it to get entries in the next draw. ${txLink(hash)}</p>
+      <p class="sh-sub">It's in your Plutos wallet. Save it to get entries in the next draw. ${txLink(hash)}</p>
       <button id="shSave" class="btn btn-primary btn-lg btn-block" type="button">Save ${fmt(amount)}</button>
       <button id="shDone" class="btn btn-ghost btn-block" type="button">Done</button>`);
     $("shSave").onclick = () => {
@@ -282,7 +280,7 @@ async function topUp(amount) {
 function sendForm() {
   body(`
     <h2 id="sheetTitle">Send money</h2>
-    <p class="sh-sub">Send USDC from your Kairos wallet to any address on Base. In the beta it's test USDC.</p>
+    <p class="sh-sub">Send USDC from your Plutos wallet to any address on Base. In the beta it's test USDC.</p>
     <label class="sh-label" for="shTo">To</label>
     <input id="shTo" autocomplete="off" spellcheck="false" placeholder="0x…" />
     ${moneyInput("shAmt", "10", ctx.wallet())}
@@ -296,7 +294,7 @@ function sendForm() {
     if (to.toLowerCase() === state.address.toLowerCase()) return err("That's your own address.");
     const amount = amountFrom("shAmt");
     if (amount === null) return err("Enter an amount.");
-    if (amount > ctx.wallet()) return err(`You have ${fmt(ctx.wallet())} in your Kairos wallet.`);
+    if (amount > ctx.wallet()) return err(`You have ${fmt(ctx.wallet())} in your Plutos wallet.`);
     await busy($("shGo"), "Sending…", async (status) => {
       try {
         const hash = await act([{ c: "usdc", fn: "transfer", args: [to, amount] }], status);
@@ -352,7 +350,7 @@ function cashForm() {
     err("");
     const amount = amountFrom("shAmt", 1);
     if (amount === null) return err("Enter at least $1.");
-    if (amount > ctx.wallet()) return err(`You have ${fmt(ctx.wallet())} in your Kairos wallet. Withdraw from savings first if you need more.`);
+    if (amount > ctx.wallet()) return err(`You have ${fmt(ctx.wallet())} in your Plutos wallet. Withdraw from savings first if you need more.`);
     await busy($("shGo"), "Cashing out…", async (status) => {
       try {
         const hash = await act([{ c: "usdc", fn: "transfer", args: [BURN, amount] }], status);
@@ -360,7 +358,7 @@ function cashForm() {
         body(`
           <h2 id="sheetTitle">${fmt(amount)} is on its way</h2>
           <ol class="sh-steps">
-            <li class="done">Sent from your Kairos wallet ${txLink(hash)}</li>
+            <li class="done">Sent from your Plutos wallet ${txLink(hash)}</li>
             <li class="done">Bank transfer started <span class="tiny">(simulated in the beta)</span></li>
             <li>Arrives in your bank in 1 to 3 business days</li>
           </ol>

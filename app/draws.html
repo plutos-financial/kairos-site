@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Kairos · Draws</title>
-  <meta name="description" content="The next Kairos prize draw, the latest winners, and how Chainlink picks them. Test network." />
+  <title>Plutos · Draws</title>
+  <meta name="description" content="The next Plutos prize draw, the latest winners, and how Chainlink picks them. Test network." />
   <meta name="theme-color" content="#050506" />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/app.css" />
@@ -14,9 +14,9 @@
 
   <header class="appbar">
     <div class="appbar-in">
-      <a class="brand" href="./" aria-label="Kairos home">
+      <a class="brand" href="./" aria-label="Plutos home">
         <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
-        <span class="name">kairos</span>
+        <span class="name">plutos</span>
       </a>
       <nav class="apptabs" aria-label="App">
         <a href="./app.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M16.5 7.5c0-1.7-2-2.8-4.5-2.8S7.5 5.8 7.5 7.6s2 2.6 4.5 3.1 4.5 1.4 4.5 3.3-2 3-4.5 3-4.5-1.1-4.5-2.9"/></svg>Savings</a>
@@ -64,7 +64,7 @@
     <!-- how the winners are picked, in three lines -->
     <section class="how3" aria-label="How the winners are picked">
       <div><span class="h3-n">1</span><b>Entries are lined up</b><p>When the round ends, every saver gets a stretch of one long line: savings &times; time saved.</p></div>
-      <div><span class="h3-n">2</span><b>Chainlink sends a random number</b><p>With a proof the blockchain checks. Nobody, including Kairos, can pick or change it.</p></div>
+      <div><span class="h3-n">2</span><b>Chainlink sends a random number</b><p>With a proof the blockchain checks. Nobody, including Plutos, can pick or change it.</p></div>
       <div><span class="h3-n">3</span><b>The number picks the spots</b><p>One spot on the line per prize. Whoever's stretch it lands in wins, straight into their savings.</p></div>
     </section>
 
@@ -84,11 +84,11 @@
       <div id="history" class="w-history"><p class="sub">Loading…</p></div>
     </section>
 
-    <!-- the Kairos team's controls (hidden for everyone else) -->
+    <!-- the Plutos team's controls (hidden for everyone else) -->
     <div id="adminArea" hidden>
       <div id="notOwner" class="lock" hidden>
         <svg class="lock-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2.5" fill="currentColor"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
-        <p><b>One-time setup.</b> Connect the MetaMask wallet that created Kairos once, and this email account can skip countdowns and change settings. Until then you can still pick winners when a round ends.</p>
+        <p><b>One-time setup.</b> Connect the MetaMask wallet that created Plutos once, and this email account can skip countdowns and change settings. Until then you can still pick winners when a round ends.</p>
         <button id="handover" class="btn btn-light btn-sm">Connect MetaMask</button>
       </div>
 
@@ -178,7 +178,7 @@
   </main>
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <footer class="app-foot"><p>Every winner keeps their deposit. Prizes come only from the interest the savings earn. Test network, by Pluto's Financial. <a href="./privacy.html">Privacy</a></p></footer>
+  <footer class="app-foot"><p>Every winner keeps their deposit. Prizes come only from the interest the savings earn. Test network. <a href="./privacy.html">Privacy</a></p></footer>
   <script type="module" src="/src/draws.js"></script>
 </body>
 </html>

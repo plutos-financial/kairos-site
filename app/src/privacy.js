@@ -5,7 +5,7 @@ import "./fresh.js";
 document.querySelectorAll(".mail-to").forEach((el) => {
   const email = `${el.dataset.user}@${el.dataset.domain}`;
   const a = document.createElement("a");
-  a.href = `mailto:${email}?subject=${encodeURIComponent("Delete my Kairos data")}`;
+  a.href = `mailto:${email}?subject=${encodeURIComponent("Delete my Plutos data")}`;
   a.textContent = email;
   el.replaceChildren(a);
 });

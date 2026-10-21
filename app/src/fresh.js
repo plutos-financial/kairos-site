@@ -3,7 +3,7 @@
 export {};
 if (import.meta.env.VITE_EDITION === "beta") document.documentElement.dataset.edition = "beta";
 
-// Kairos never runs inside another site's frame, so nobody can lay a fake page over its buttons
+// Plutos never runs inside another site's frame, so nobody can lay a fake page over its buttons
 // (click-jacking). GitHub Pages can't send the header that normally does this, so it's done here.
 if (window.top !== window.self) {
   document.documentElement.style.display = "none";
