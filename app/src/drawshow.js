@@ -525,6 +525,15 @@ async function playFromChain(drawId, id, live) {
   });
 }
 
+/** Five made-up savers ($900, $500, $250, $120, $60 for the whole round), for when nobody is saving yet. */
+const EXAMPLE_LINE = (() => {
+  const users = ["0x5a3e00000000000000000000000000000000a11c", "0xc71900000000000000000000000000000000b0b5", "0x1f8d00000000000000000000000000000000ca20", "0x93b600000000000000000000000000000000da7e", "0x46e200000000000000000000000000000000e11a"];
+  const cum = [];
+  let total = 0n;
+  for (const d of [900n, 500n, 250n, 120n, 60n]) cum.push((total += d * 1_000_000n * 86_400n));
+  return { users, cum, total };
+})();
+
 /**
  * A pretend draw with the real savers and pool (pretend.js loads them). Same math, but the random
  * number comes from this browser and nothing is sent anywhere.
@@ -535,8 +544,9 @@ export async function playPretend(snap, again) {
   const me = state.address;
   const id = begin({ kicker: "Pretend draw", title: "How a draw works", sub: "" });
   $("ds").classList.add("is-pretend");
-  if (!s.users.length) return notice("Nobody is saving yet, so there's nobody to pick. Save a few test dollars and you'll be the first one on the line.");
-  // No interest yet? Still show how it works, with an example prize pool.
+  // Nobody saving yet, or no interest yet? Still show how it works, with example savers or an example pool.
+  const noSavers = !s.users.length;
+  if (noSavers) s = { ...s, ...EXAMPLE_LINE };
   const example = s.pool === 0n;
   if (example) s = { ...s, pool: 25_000_000n };
   try {
@@ -569,7 +579,7 @@ export async function playPretend(snap, again) {
       me,
       title: "How it could go",
       sub:
-        (example ? `The real prize pool hasn't built up any interest yet, so this uses an example <b>${fmt(s.pool)}</b>. ` : "") +
+        (noSavers ? `Nobody is saving yet, so this uses five example savers and an example <b>${fmt(s.pool)}</b> prize pool. ` : example ? `The real prize pool hasn't built up any interest yet, so this uses an example <b>${fmt(s.pool)}</b>. ` : "") +
         `If draw #${s.drawId} went like this, ${people === 1 ? `one saver would take home all <b>${fmt(s.pool)}</b>` : `${people} savers would split <b>${fmt(s.pool)}</b>`}. ` +
         (s.later ? `The real one happens ${s.later}.` : "The real one runs as soon as the round ends."),
       verify: `<span class="ok">Real savers and the real prize pool, picked with the same math as a real draw. Nothing was paid out.</span>`,
