@@ -12,7 +12,8 @@ const VRF = {
   coordinator: "0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE",
   keyHash: "0x9e1344a1247c8a1785d0a4681a27152bffdb43666ae5bf7d14d24a5efd44bf71",
 };
-const VRF_FUNDING = "0.01"; // test ETH sent to the Chainlink subscription; plenty for hundreds of draws
+const VRF_FUNDING = "0.002"; // test ETH sent to the Chainlink subscription; each draw costs a tiny fraction of this
+const GAS_ALLOWANCE = "0.0004"; // the setup transaction itself costs far less than this on Base Sepolia
 
 const $ = (id) => document.getElementById(id);
 // ?rpc=http://127.0.0.1:8545 deploys to a local test chain instead (for developers).
@@ -64,7 +65,7 @@ if (isBeta) {
   $("dTitle").textContent = "Set up the Kairos beta";
   $("dIntro").innerHTML = `One transaction sets up everything: test USDC, the T-bill fund, the vault, and a Chainlink VRF subscription for fair draws. It sends ${VRF_FUNDING} test ETH to Chainlink to pay for random numbers. The wallet you use becomes the owner.`;
   $("dSteps").innerHTML = `<li>Use your Kairos test wallet in MetaMask (never one with real money).</li>
-    <li>Make sure it has about 0.02 Base Sepolia ETH (free from a faucet).</li>
+    <li>Make sure it has about 0.003 Base Sepolia ETH (free from a faucet).</li>
     <li>Click the button and approve the one transaction.</li>`;
   $("go").textContent = "Connect and set up the beta";
 }
@@ -73,7 +74,8 @@ async function setUpBeta() {
   const { addr, wallet } = await connect();
   const bal = await pub.getBalance({ address: addr });
   log(`Connected ${addr} · ${(Number(bal) / 1e18).toFixed(4)} test ETH`);
-  if (bal < parseEther("0.012")) throw new Error(`This wallet needs about 0.02 Base Sepolia ETH. Get some from a faucet, then try again.`);
+  if (bal < parseEther(VRF_FUNDING) + parseEther(GAS_ALLOWANCE))
+    throw new Error(`This wallet needs about 0.003 Base Sepolia ETH. Get some from a faucet, then try again.`);
   const li = log("Setting up everything in one transaction… confirm in your wallet");
   const hash = await wallet.deployContract({
     abi: abis.KairosBetaSetup,

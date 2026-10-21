@@ -69,7 +69,7 @@ Local test chain: run `anvil`, deploy with `forge script script/Deploy.s.sol` (d
 
 ## Turning on the beta (one-time, Ramy)
 
-1. **Set up the contracts.** Open https://plutos-financial.github.io/kairos-site/beta/deploy.html in the browser with MetaMask, use the Kairos test wallet with about 0.02 Base Sepolia ETH, click **Connect and set up the beta**, approve one transaction. Then click **Copy the details for Claude** and paste them to Claude (they become `contracts/deployments/84532-beta.json`).
+1. **Set up the contracts.** Open https://plutos-financial.github.io/kairos-site/beta/deploy.html in the browser with MetaMask, use the Kairos test wallet with about 0.003 Base Sepolia ETH, click **Connect and set up the beta**, approve one transaction. Then click **Copy the details for Claude** and paste them to Claude (they become `contracts/deployments/84532-beta.json`).
 2. **Coinbase gas sponsor.** If the Paymaster in the Coinbase Developer Platform has a contract allowlist, add the beta's USDC, vault and T-bill addresses (or leave the allowlist empty).
 3. **Money server (for Apple Pay).**
    - In the Coinbase Developer Platform: **API Keys → Create API key** (a secret key). Keep the secret in a password manager. Never paste it into chat or into the website.
