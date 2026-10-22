@@ -116,11 +116,12 @@ function film() {
   ).observe(v);
 }
 
-// The homepage nav sits on the page at first, then turns solid (and tightens up) once you scroll.
+// The homepage nav floats over the film, and turns solid once the film has scrolled away.
 function navOverFilm() {
   const nav = document.querySelector(".nav-over");
-  if (!nav) return;
-  const update = () => nav.classList.toggle("solid", scrollY > 8);
+  const f = document.querySelector(".film");
+  if (!nav || !f) return;
+  const update = () => nav.classList.toggle("solid", f.getBoundingClientRect().bottom < nav.offsetHeight + 8);
   addEventListener("scroll", update, { passive: true });
   addEventListener("resize", update);
   update();
