@@ -1,4 +1,4 @@
-// Landing page: odds calculator, founders' contact links, waitlist (Google Sheet).
+// Landing page: odds calculator, waitlist (Google Sheet), brand film.
 import { $ } from "./core.js";
 import built from "./site-config.json";
 
@@ -87,19 +87,6 @@ function waitlist() {
   });
 }
 
-// ------------------------------------------------------------------ founders' contact links
-// Assembled in the browser so the addresses aren't sitting in the page source for spam bots.
-function contacts() {
-  const mail = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="m4 7 8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
-  const phone = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.6 3.5h3l1.5 4-2 1.3a11 11 0 0 0 6.1 6.1l1.3-2 4 1.5v3a2 2 0 0 1-2.2 2A16.5 16.5 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>`;
-  document.querySelectorAll(".p-contact").forEach((el) => {
-    const email = `${el.dataset.user}@${el.dataset.domain}`;
-    const digits = el.dataset.tel.replace(/\D/g, "");
-    const pretty = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-    el.innerHTML = `<a href="mailto:${email}">${mail}${email}</a><a href="tel:+1${digits}">${phone}${pretty}</a>`;
-  });
-}
-
 // ------------------------------------------------------------------ the brand film
 // Muted and looping, and it only plays while it's on screen (and never downloads before that).
 // Paused for people who ask for less motion or to save data; the corner button plays or pauses it.
@@ -145,7 +132,6 @@ function navOverFilm() {
   update();
 }
 
-contacts();
 calculator();
 waitlist();
 film();

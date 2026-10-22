@@ -47,7 +47,7 @@ Fees: there is **no deposit or withdrawal fee**. Plutos keeps 15% of the interes
 
 ---
 
-## Working on it (Callum, or anyone with push access)
+## Working on it (anyone with push access)
 
 Needs Node 22 and, for contracts, Foundry.
 

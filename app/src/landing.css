@@ -234,17 +234,6 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 .faq details[open] summary::after { content: "−"; }
 .faq details p { margin: -6px 0 22px; color: var(--muted); font-size: 16px; line-height: 1.6; max-width: 40rem; }
 
-/* team */
-.people { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.person { display: flex; gap: 18px; align-items: flex-start; background: var(--bg-1); border: 1px solid var(--line); border-radius: 24px; padding: 28px; }
-.initial { flex: 0 0 auto; width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font-weight: 650; font-size: 18px; background: var(--accent); color: var(--accent-ink); }
-.initial.c { background: var(--gold); color: var(--gold-ink); }
-.person h3 { margin: 2px 0 4px; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; }
-.person p { margin: 0 0 16px; color: var(--muted); font-size: 15px; }
-.p-contact { display: flex; flex-wrap: wrap; gap: 8px; }
-.p-contact a { display: inline-flex; align-items: center; gap: 8px; color: var(--text); text-decoration: none; font-size: 14px; font-weight: 500; padding: 8px 13px; border-radius: 999px; border: 1px solid var(--line-2); overflow-wrap: anywhere; }
-.p-contact a:hover { background: var(--bg-2); }
-.p-contact svg { width: 16px; height: 16px; flex: 0 0 auto; color: var(--muted); }
 
 /* waitlist */
 .waitlist { padding: 104px 0 96px; }
@@ -278,7 +267,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 @media (max-width: 960px) {
   .hero-grid, .odds-grid, .why-grid, .faq-grid, .wl-grid { grid-template-columns: 1fr; gap: 32px; }
   .steps { grid-template-columns: 1fr; }
-  .cards, .people { grid-template-columns: 1fr; }
+  .cards { grid-template-columns: 1fr; }
   .rails-grid { grid-template-columns: 1fr 1fr; }
   .rails-grid b { font-size: 18px; }
   .rails-grid > div:nth-child(3) { border-left: 0; }

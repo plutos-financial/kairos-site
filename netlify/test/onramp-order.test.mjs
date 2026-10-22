@@ -28,7 +28,7 @@ const get = (id, token = TOKEN) =>
 
 const endUser = {
   userId: "user-123",
-  authenticationMethods: [{ type: "email", email: "ramy@example.com" }],
+  authenticationMethods: [{ type: "email", email: "saver@example.com" }],
   evmAccounts: [OWNER_KEY],
   evmSmartAccounts: [ME],
 };
@@ -68,7 +68,7 @@ test("creates a sandbox Apple Pay order for the signed-in saver", async () => {
   assert.equal(calls[1].url, "https://api.cdp.coinbase.com/platform/v2/onramp/orders");
   assert.equal(calls[1].init.headers.Authorization, "Bearer jwt-for-POST-/platform/v2/onramp/orders");
   assert.equal(sent.partnerUserRef, "sandbox-user-123");
-  assert.equal(sent.email, "ramy@example.com", "the email comes from the sign-in");
+  assert.equal(sent.email, "saver@example.com", "the email comes from the sign-in");
   assert.equal(sent.destinationAddress, ME);
   assert.equal(sent.paymentMethod, "GUEST_CHECKOUT_APPLE_PAY");
   assert.equal(sent.purchaseCurrency, "USDC");
