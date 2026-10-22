@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="/src/app.css" />
 </head>
 <body class="app-body">
-  <div class="testnet-bar">Test network. Coinbase runs in test mode, so no card is ever charged.</div>
+  <div class="testnet-bar">Test network. Everything here is free test dollars, and no card is ever charged.</div>
 
   <header class="appbar">
     <div class="appbar-in">
@@ -77,31 +77,13 @@
 
       <!-- new savers: what to do next -->
       <ol class="starter" id="starter" hidden>
-        <li data-step="add"><button type="button" data-go="add"><span class="st-n">1</span><span><b>Add money</b><small>Apple Pay or a card, through Coinbase</small></span></button></li>
+        <li data-step="add"><button type="button" data-go="add"><span class="st-n">1</span><span><b>Add money</b><small>Free test dollars, saved straight away</small></span></button></li>
         <li data-step="save"><button type="button" data-go="save"><span class="st-n">2</span><span><b>Save it</b><small>Every $1 saved is one entry</small></span></button></li>
         <li data-step="draw"><button type="button" data-go="draw"><span class="st-n">3</span><span><b>You're in the draw</b><small>Winners are picked when the countdown ends</small></span></button></li>
       </ol>
 
       <aside class="dash-side">
-        <!-- the Plutos wallet: money that isn't saved yet -->
-        <div class="card wallet" id="walletCard" hidden>
-          <div class="wallet-top">
-            <div>
-              <p class="label">Plutos wallet</p>
-              <p class="wallet-bal" id="walletBal">$0.00</p>
-            </div>
-            <span class="wallet-chip">USDC</span>
-          </div>
-          <p class="tiny wallet-note">Money that isn't saved yet. Save it to enter the draws.</p>
-          <div class="wallet-actions">
-            <button class="wa" type="button" data-act="add"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add money</button>
-            <button class="wa" type="button" data-act="send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M9 5h10v10"/></svg>Send</button>
-            <button class="wa" type="button" data-act="receive"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19M15 19H5V9"/></svg>Receive</button>
-            <button class="wa" type="button" data-act="cashout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18M12 3l9 5H3z"/></svg>Cash out</button>
-          </div>
-        </div>
-
-        <!-- save / withdraw -->
+        <!-- add money / withdraw (in the beta, Add money adds test dollars and saves them in one step) -->
         <div class="card ticket" id="ticket">
           <div id="getDollars" class="get-dollars" hidden>
             <div>
@@ -130,6 +112,25 @@
           <button id="go" class="btn btn-primary btn-lg btn-block">Save</button>
           <p id="hint" class="tiny center">&nbsp;</p>
           <p id="faucetMore" class="tiny center"><button id="faucet2" class="link-btn">Get more test dollars</button></p>
+          <p id="payPreview" class="tiny center" hidden><button id="tryApplePay" class="link-btn" type="button">See the real checkout: Apple Pay through Coinbase</button></p>
+        </div>
+
+        <!-- the Plutos wallet: money that isn't saved yet (shown only when there is some) -->
+        <div class="card wallet" id="walletCard" hidden>
+          <div class="wallet-top">
+            <div>
+              <p class="label">Plutos wallet</p>
+              <p class="wallet-bal" id="walletBal">$0.00</p>
+            </div>
+            <span class="wallet-chip">USDC</span>
+          </div>
+          <p class="tiny wallet-note">Money that isn't saved, so it isn't in the draws. Save it, or cash it out to your bank.</p>
+          <div class="wallet-actions">
+            <button class="wa wa-main" type="button" data-act="save"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg>Save it</button>
+            <button class="wa" type="button" data-act="send"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M9 5h10v10"/></svg>Send</button>
+            <button class="wa" type="button" data-act="receive"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 5 5 19M15 19H5V9"/></svg>Receive</button>
+            <button class="wa" type="button" data-act="cashout"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10h16M6 10v8M10 10v8M14 10v8M18 10v8M3 20h18M12 3l9 5H3z"/></svg>Cash out</button>
+          </div>
         </div>
       </aside>
 

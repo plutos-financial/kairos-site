@@ -1,9 +1,12 @@
-// Beta only: the Plutos wallet. Add money (Coinbase Apple Pay, test mode), send, receive, cash out.
+// Beta only: the Plutos wallet (save it, send, receive, cash out) and the Apple Pay preview.
 //
-// "Add money" asks our small server (netlify/functions/onramp-order) to create a Coinbase onramp order
-// in sandbox mode, then shows Coinbase's payment page in a frame. Sandbox orders always succeed and
-// no card is charged, so once Coinbase says the payment went through we add the same amount of test
-// dollars (MockUSDC.topUp). Without the server, Add money just adds test dollars.
+// The savings page's "Add money" adds test dollars and saves them in one step (app.js). This file's
+// "Try Apple Pay" is a preview of the real checkout: it asks our small server
+// (netlify/functions/onramp-order) to create a Coinbase onramp order in sandbox mode, then shows
+// Coinbase's payment page in a frame. Sandbox orders always succeed and no card is charged, so once
+// Coinbase says the payment went through we add the same amount of test dollars (MockUSDC.topUp) to
+// the Plutos wallet, ready to save. Coinbase's guest checkout allows $500 a week, which is why it's
+// only a preview here.
 //
 // "Cash out" is simulated: Coinbase has no test mode for cash-outs. The test dollars are sent to a
 // burn address, like a real cash-out sends USDC to Coinbase.
@@ -19,17 +22,18 @@ const TERMS = {
   privacy: "https://www.coinbase.com/legal/privacy",
 };
 
-let ctx; // { wallet(), savings(), refresh(), fillDeposit(amount) }
+let ctx; // { wallet(), savings(), refresh(), saveWallet(button, amount) }
 let pending = null; // { amount, orderId } while a Coinbase payment is open
 
 export function initBetaWallet(c) {
   ctx = c;
-  $("walletCard").hidden = false;
   const bar = document.querySelector(".testnet-bar");
-  if (bar) bar.textContent = "Test network. Coinbase runs in test mode, so no card is ever charged.";
+  if (bar) bar.textContent = "Test network. Everything here is free test dollars, and no card is ever charged.";
   $("walletCard").addEventListener("click", (e) => {
     const b = e.target.closest(".wa");
-    if (b) open(b.dataset.act);
+    if (!b) return;
+    if (b.dataset.act === "save") ctx.saveWallet(b);
+    else open(b.dataset.act);
   });
   $("sheetX").onclick = close;
   $("sheet").addEventListener("click", (e) => e.target === $("sheet") && close());
@@ -38,6 +42,7 @@ export function initBetaWallet(c) {
 }
 
 export function renderWallet(wallet, savings) {
+  $("walletCard").hidden = wallet === 0n; // only when there's money that isn't saved
   $("walletBal").textContent = fmt(wallet);
   const line = $("tokensLine");
   const tokens = Number(savings) / 1e6;
@@ -136,35 +141,37 @@ function safePayLink(link, sandbox) {
 
 function addForm() {
   const api = canPay();
+  if (!api) {
+    body(`
+      <h2 id="sheetTitle">The Apple Pay checkout</h2>
+      <p class="sh-sub">${
+        moneyApi()
+          ? "The Apple Pay preview needs the email sign-in. You don't need it to try Plutos: Add money adds test dollars straight into your savings."
+          : "The Coinbase connection isn't switched on for this site yet. Add money adds test dollars straight into your savings."
+      }</p>
+      <button id="shDone" class="btn btn-primary btn-lg btn-block" type="button">Got it</button>`);
+    $("shDone").onclick = close;
+    return;
+  }
   body(`
-    <h2 id="sheetTitle">Add money</h2>
-    <p class="sh-sub">${
-      api
-        ? "Pay with Apple Pay through Coinbase. This is Coinbase's test mode: your card is never charged, and we add test dollars instead."
-        : moneyApi()
-          ? "Apple Pay needs the email sign-in. With a browser wallet, this adds test dollars straight away."
-          : "The Coinbase connection isn't switched on for this site yet, so this adds test dollars straight away."
-    }</p>
+    <h2 id="sheetTitle">Try Apple Pay</h2>
+    <p class="sh-sub">This is how adding money works at launch: Apple Pay or a debit card through Coinbase. It's Coinbase's test mode, so your card is never charged and we add test dollars instead. Coinbase allows up to $500 a week here; Add money on the savings page has no card limits.</p>
     ${moneyInput("shAmt", "50")}
     <div class="sh-chips">${[20, 50, 100, 250].map((v) => `<button type="button" class="chip" data-v="${v}">$${v}</button>`).join("")}</div>
-    ${
-      api
-        ? `<label class="sh-label" for="shPhone">US mobile number</label>
-           <input id="shPhone" type="tel" autocomplete="tel" placeholder="(555) 123-4567" />
-           <label class="sh-check"><input type="checkbox" id="shAgree" /> <span>I agree to Coinbase's <a href="${TERMS.guest}" target="_blank" rel="noopener noreferrer">Guest Checkout Terms</a>, <a href="${TERMS.user}" target="_blank" rel="noopener noreferrer">User Agreement</a> and <a href="${TERMS.privacy}" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span></label>`
-        : ""
-    }
-    <button id="shGo" class="btn btn-primary btn-lg btn-block" type="button">${api ? "Continue to Apple Pay" : "Add test dollars"}</button>
+    <label class="sh-label" for="shPhone">US mobile number</label>
+    <input id="shPhone" type="tel" autocomplete="tel" placeholder="(555) 123-4567" />
+    <label class="sh-check"><input type="checkbox" id="shAgree" /> <span>I agree to Coinbase's <a href="${TERMS.guest}" target="_blank" rel="noopener noreferrer">Guest Checkout Terms</a>, <a href="${TERMS.user}" target="_blank" rel="noopener noreferrer">User Agreement</a> and <a href="${TERMS.privacy}" target="_blank" rel="noopener noreferrer">Privacy Policy</a>.</span></label>
+    <button id="shGo" class="btn btn-primary btn-lg btn-block" type="button">Continue to Apple Pay</button>
     <p class="form-error" id="sheetErr" role="alert"></p>`);
   $("sheetBody").querySelectorAll(".sh-chips .chip").forEach((c) => (c.onclick = () => ($("shAmt").value = c.dataset.v)));
-  $("shGo").onclick = api ? startCoinbase : () => topUp(amountFrom("shAmt", 1));
+  $("shGo").onclick = startCoinbase;
 }
 
 async function startCoinbase() {
   err("");
   const amount = amountFrom("shAmt", 5);
   if (amount === null) return err("Enter at least $5. That's Coinbase's smallest card payment.");
-  if (amount > 500_000_000n) return err("Coinbase guest checkout allows up to $500 a week.");
+  if (amount > 500_000_000n) return err("Coinbase's checkout allows up to $500 a week. For more, close this and use Add money.");
   const digits = String($("shPhone").value || "").replace(/\D/g, "").replace(/^1(?=\d{10}$)/, "");
   if (digits.length !== 10) return err("Enter a US mobile number with area code.");
   if (!$("shAgree").checked) return err("Tick the box to agree to Coinbase's terms.");
@@ -266,7 +273,7 @@ async function topUp(amount) {
       <button id="shDone" class="btn btn-ghost btn-block" type="button">Done</button>`);
     $("shSave").onclick = () => {
       close();
-      ctx.fillDeposit(amount);
+      ctx.saveWallet(document.querySelector('#walletCard [data-act="save"]'), amount);
     };
     $("shDone").onclick = close;
   } catch (e) {

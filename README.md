@@ -7,7 +7,7 @@ Plutos is a savings account with a prize draw: savers keep every dollar they put
 The site is at **https://winplutos.tech** (Base Sepolia, Base's free test network). The old address, plutos-financial.github.io/kairos-site, forwards there. It has:
 
 - **Chainlink VRF draws**: winners are picked with a verifiable random number, and the Draws page animates every draw step by step (entries lined up, Chainlink's number, one spot on the line per prize), redoing the vault's math in the browser and checking it against the blockchain.
-- **Add money with Apple Pay** through Coinbase's onramp, in Coinbase's test mode (no card is charged; test dollars arrive instead).
+- **Add money in one tap**: free test dollars go straight into savings (up to $10,000 a day per account, the test-dollar contract's limit). **Apple Pay** through Coinbase's onramp is there too, as a preview of the real checkout, in Coinbase's test mode (no card is charged; Coinbase's guest checkout allows $500 a week).
 - **A Plutos wallet** with send, receive and cash out (cash out is simulated: Coinbase has no test mode for it).
 - **Savings as kUSD tokens**, one per dollar saved, non-transferable.
 

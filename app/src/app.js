@@ -65,14 +65,11 @@ async function startBeta() {
     wallet: () => s.wallet,
     savings: () => s.savings,
     refresh,
-    fillDeposit(amount) {
-      setTab("deposit");
-      $("amount").value = formatUnits(amount, 6);
-      updatePreview();
-      $("amount").focus();
-      if (innerWidth < 1000) $("ticket").scrollIntoView({ behavior: "smooth", block: "center" });
-    },
+    saveWallet,
   });
+  $("tryApplePay").onclick = () => beta.openAction("add");
+  document.querySelector('.tab[data-tab="deposit"]').textContent = "Add money";
+  setTab(tab);
 }
 
 let started = false;
@@ -177,13 +174,19 @@ function signInProblem(x) {
 
 // ------------------------------------------------------------------ save / withdraw
 
-const needsMoney = () => isBeta && tab === "deposit" && s.loaded && s.wallet === 0n;
+// In the beta, "Add money" adds free test dollars and saves them in one step (any amount up to the
+// test-dollar contract's $10,000 a day per account). Apple Pay through Coinbase is still there as a
+// preview of the real checkout, but it isn't needed to try Plutos.
+const TOP_UP_LIMIT = 10_000_000_000n; // MockUSDC.TOP_UP_DAILY_LIMIT, $10,000 a day per account
+const CHIPS = {
+  deposit: isBeta ? ["100", "500", "1000", "5000"] : ["10", "50", "100", "max"],
+  withdraw: ["10", "50", "100", "max"],
+};
 
 function goLabel() {
-  if (needsMoney()) return "Add money first";
   const v = Number($("amount").value);
   const amt = v > 0 && isFinite(v) ? " $" + v.toLocaleString("en-US", { maximumFractionDigits: 2 }) : "";
-  return (tab === "deposit" ? "Save" : "Withdraw") + amt;
+  return (tab === "deposit" ? (isBeta ? "Add" : "Save") : "Withdraw") + amt;
 }
 
 function setTab(name) {
@@ -192,6 +195,12 @@ function setTab(name) {
     x.classList.toggle("active", x.dataset.tab === name);
     x.setAttribute("aria-selected", x.dataset.tab === name);
   });
+  document.querySelectorAll("#chips .chip").forEach((c, i) => {
+    const v = CHIPS[name][i];
+    c.dataset.v = v;
+    c.textContent = v === "max" ? "Max" : "$" + Number(v).toLocaleString("en-US");
+  });
+  $("payPreview").hidden = !isBeta || name !== "deposit";
   updateHint();
   updatePreview();
 }
@@ -209,12 +218,12 @@ function wireDash() {
   $("pretendBtn").onclick = () => openPretend();
   $("faucet").onclick = (e) => doFaucet(e.currentTarget);
   $("faucet2").onclick = (e) => doFaucet(e.currentTarget);
-  $("go").onclick = () => (needsMoney() ? beta?.openAction("add") : tab === "deposit" ? doDeposit() : doWithdraw());
+  $("go").onclick = () => (tab === "deposit" ? (isBeta ? doAdd() : doDeposit()) : doWithdraw());
   $("starter").addEventListener("click", (e) => {
     const b = e.target.closest("[data-go]");
     if (!b) return;
-    if (b.dataset.go === "add") return isBeta ? beta?.openAction("add") : doFaucet($("faucet"));
-    if (b.dataset.go === "save") {
+    if (b.dataset.go === "add" && !isBeta) return doFaucet($("faucet"));
+    if (b.dataset.go === "save" || b.dataset.go === "add") {
       setTab("deposit");
       $("amount").focus();
       if (innerWidth < 1000) $("ticket").scrollIntoView({ behavior: "smooth", block: "center" });
@@ -241,18 +250,60 @@ async function doFaucet(btn) {
   await run(btn, [{ c: "usdc", fn: "faucet" }], () => "Added $1,000 test dollars.");
 }
 
-async function doDeposit() {
-  const amt = amountInput();
-  if (amt === null) return;
-  if (amt < s.minDeposit) return toast(`The smallest amount you can save is ${fmt(s.minDeposit, 0)}.`, true);
-  if (amt > s.wallet) return toast(isBeta ? `You have ${fmt(s.wallet)} in your Plutos wallet. Add money first.` : `You have ${fmt(s.wallet)} in test dollars. Get more first.`, true);
+const moreEntries = (amt) => `That's ${dollars(amt).toLocaleString()} more ${dollars(amt) === 1 ? "entry" : "entries"} in every draw.`;
+
+/** The approve (if needed) and deposit calls for saving `amt`. */
+async function saveCalls(amt) {
   const calls = [];
   const allowance = await read("usdc", "allowance", [state.address, state.cfg.vault]);
   // Email accounts approve the exact amount inside the same one-tap action.
   // Browser wallets approve once, so later deposits need only one pop-up.
   if (allowance < amt) calls.push({ c: "usdc", fn: "approve", args: [state.cfg.vault, state.mode === "email" ? amt : maxUint256] });
   calls.push({ c: "vault", fn: "deposit", args: [amt] });
-  await run($("go"), calls, () => `Saved ${fmt(amt, 0)}. That's ${dollars(amt).toLocaleString()} more ${dollars(amt) === 1 ? "entry" : "entries"}.`);
+  return calls;
+}
+
+async function doDeposit() {
+  const amt = amountInput();
+  if (amt === null) return;
+  if (amt < s.minDeposit) return toast(`The smallest amount you can save is ${fmt(s.minDeposit, 0)}.`, true);
+  if (amt > s.wallet) return toast(`You have ${fmt(s.wallet)} in test dollars. Get more first.`, true);
+  await run($("go"), await saveCalls(amt), () => `Saved ${fmt(amt, 0)}. ${moreEntries(amt)}`);
+}
+
+/** How many more test dollars this account can add today. */
+async function topUpLeft() {
+  const [day, used] = await Promise.all([read("usdc", "topUpDay", [state.address]), read("usdc", "toppedUp", [state.address])]);
+  const today = BigInt(Math.floor((Date.now() / 1000 + s.chainOffset) / 86400));
+  return day === today ? (used >= TOP_UP_LIMIT ? 0n : TOP_UP_LIMIT - used) : TOP_UP_LIMIT;
+}
+
+/** Beta: add test dollars and save them, in one step (one tap with the email sign-in). */
+async function doAdd() {
+  if (busy) return;
+  const amt = amountInput();
+  if (amt === null) return;
+  if (amt < s.minDeposit) return toast(`The smallest amount you can add is ${fmt(s.minDeposit, 0)}.`, true);
+  let left = TOP_UP_LIMIT;
+  try {
+    left = await topUpLeft();
+  } catch {}
+  if (amt > left)
+    return toast(
+      left > 0n
+        ? `You can add up to ${fmt(left, 0)} more today. Test dollars are limited to $10,000 a day per account.`
+        : "You've added today's $10,000 of test dollars. Come back tomorrow for more.",
+      true
+    );
+  const calls = [{ c: "usdc", fn: "topUp", args: [amt] }, ...(await saveCalls(amt))];
+  await run($("go"), calls, () => `Added ${fmt(amt, 0)} to your savings. ${moreEntries(amt)}`);
+}
+
+/** Beta: save what's sitting in the Plutos wallet (after a withdrawal, or the Apple Pay preview). */
+async function saveWallet(btn, amount = s.wallet) {
+  const amt = amount > s.wallet ? s.wallet : amount;
+  if (amt < s.minDeposit) return toast(`There's ${fmt(s.wallet)} in your Plutos wallet. The smallest amount you can save is ${fmt(s.minDeposit, 0)}.`, true);
+  await run(btn || $("go"), await saveCalls(amt), () => `Saved ${fmt(amt, 0)}. ${moreEntries(amt)}`);
 }
 
 async function doWithdraw() {
@@ -265,7 +316,7 @@ async function doWithdraw() {
       const q = parseEventLogs({ abi: abis.KairosVault, logs: r.logs, eventName: "WithdrawalQueued" })[0];
       if (q) return `Your ${fmt(amt, 0)} is in line (#${q.args.position}). The cash drawer is low, so it arrives as soon as Treasury bills settle.`;
     } catch {}
-    return isBeta ? `Withdrew ${fmt(amt, 0)} to your Plutos wallet.` : `Withdrew ${fmt(amt, 0)} back to your test dollars.`;
+    return isBeta ? `Withdrew ${fmt(amt, 0)} to your Plutos wallet. Cash it out from there, or save it again.` : `Withdrew ${fmt(amt, 0)} back to your test dollars.`;
   });
 }
 
@@ -327,7 +378,6 @@ function updatePreview() {
   $("amount").style.width = Math.max(1.5, String($("amount").value || "").length + 0.4) + "ch";
   if (!busy) $("go").textContent = goLabel();
   const bal = Number(formatUnits(s.savings, 6));
-  if (needsMoney()) return (el.textContent = "Your Plutos wallet is empty");
   if (!v || v <= 0) return (el.innerHTML = "&nbsp;");
   if (tab === "deposit") {
     el.textContent = bal >= 1 ? `${times((bal + v) / bal)} your odds` : `${Math.floor(v).toLocaleString("en-US")} entries in every draw`;
@@ -338,26 +388,38 @@ function updatePreview() {
 }
 
 function updateHint() {
+  if (isBeta && tab === "deposit") {
+    $("hint").textContent = "Free test dollars, saved straight away. Up to $10,000 a day.";
+    return;
+  }
   const b = document.createElement("b");
   b.textContent = tab === "deposit" ? fmt(s.wallet) : fmt(s.savings);
   $("hint").replaceChildren(
-    tab === "deposit" ? (isBeta ? "In your Plutos wallet: " : "Test dollars available: ") : "In savings: ",
+    tab === "deposit" ? "Test dollars available: " : "In savings: ",
     b,
     tab === "deposit" ? "" : ". Always yours to take out."
   );
 }
 
-/** For new savers: 1 add money, 2 save it, 3 you're in. */
+/** For new savers. Beta: 1 add money (it's saved straight away), 2 you're in. Demo: get test dollars, save, you're in. */
 function renderStarter() {
   const st = $("starter");
   st.hidden = s.savings > 0n;
   if (st.hidden) return;
+  if (isBeta) {
+    st.classList.add("two");
+    st.querySelector('[data-step="save"]').hidden = true;
+    st.querySelector('[data-step="draw"] .st-n').textContent = "2";
+    st.querySelectorAll("li").forEach((li) => (li.className = li.dataset.step === "add" ? "now" : ""));
+    return;
+  }
   const step = s.wallet > 0n ? "save" : "add";
   st.querySelectorAll("li").forEach((li) => {
     const k = li.dataset.step;
     li.className = k === step ? "now" : k === "add" && step === "save" ? "done" : "";
   });
-  if (!isBeta) st.querySelector('[data-step="add"] b').textContent = "Get test dollars";
+  st.querySelector('[data-step="add"] b').textContent = "Get test dollars";
+  st.querySelector('[data-step="add"] small').textContent = "Free and fake, $1,000 an hour";
 }
 
 // ------------------------------------------------------------------ reading state
