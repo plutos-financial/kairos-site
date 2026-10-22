@@ -4,9 +4,9 @@
 .ex-head { padding: 72px 24px 24px; }
 .ex-head h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.8rem, 6.4vw, 4.6rem); line-height: 1; letter-spacing: -0.015em; margin: 0 0 22px; }
 .ex-lede { font-size: clamp(18px, 2vw, 22px); line-height: 1.5; color: var(--muted); margin: 0 0 30px; }
-.toc { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--line); }
-.toc a { color: var(--muted); text-decoration: underline; text-decoration-color: rgba(242, 237, 228, 0.22); text-underline-offset: 6px; font-size: 14.5px; font-weight: 500; padding: 2px 0; }
-.toc a:hover { color: var(--text); text-decoration-color: var(--accent); }
+.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+.toc a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 999px; }
+.toc a:hover { color: var(--text); border-color: rgba(255, 255, 255, 0.3); }
 
 .ex-sec { position: relative; padding-top: 64px; padding-bottom: 8px; scroll-margin-top: 64px; }
 .ex-sec + .ex-sec { border-top: 1px solid var(--line); margin-top: 48px; }

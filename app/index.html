@@ -26,8 +26,8 @@
         <a href="./how-it-works.html">Learn more</a>
       </nav>
       <div class="nav-cta">
-        <a href="./app.html" class="nav-text nav-app">Open app</a>
-        <a href="#waitlist" class="nav-text nav-gold">Join waitlist</a>
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
       </div>
     </div>
   </header>
@@ -40,23 +40,19 @@
         <source src="/src/media/plutos-film.webm" type="video/webm" />
       </video>
       <div class="film-shade" aria-hidden="true"></div>
-      <!-- hairline guides: down both sides and under the nav, with a cross where they meet -->
-      <div class="film-guides" aria-hidden="true">
-        <span class="g-v g-left"></span><span class="g-v g-right"></span><span class="g-h"></span>
-        <i class="g-x x-l"></i><i class="g-x x-c"></i><i class="g-x x-r"></i>
-      </div>
-      <div class="film-copy">
+      <div class="wrap film-copy">
         <h1 class="film-title" id="filmTitle">A savings account with a monthly prize draw.</h1>
         <p class="film-text">Plutos keeps your savings in U.S. Treasury bills and turns the interest into prizes, drawn at random every month. Your deposit stays yours, and you can withdraw it anytime.</p>
-        <div class="film-cta">
-          <a href="#waitlist" class="btn-tick">Join the waitlist</a>
-          <a href="#save" class="film-link">See how it works</a>
-        </div>
-        <div class="film-built">
-          <span>Built on</span>
-          <b>U.S. Treasury bills</b><b>Chainlink</b><b>Coinbase</b><b>Base</b>
+        <div class="cta-row">
+          <a href="#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
+          <a href="#save" class="btn btn-outline btn-lg">See how it works</a>
         </div>
       </div>
+      <a class="film-down" href="#save" aria-label="Scroll to the next section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></a>
+      <button class="film-toggle" id="filmToggle" type="button" aria-label="Pause the video" data-state="paused">
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+      </button>
     </section>
 
     <section class="hero" id="save">
@@ -75,6 +71,13 @@
           </ul>
         </div>
         <div class="hero-visual" aria-hidden="true">
+        <div class="float notif">
+          <span class="f-ball">P</span>
+          <div>
+            <p class="f-top"><b>Plutos</b><span>now</span></p>
+            <p class="f-msg">You won <b class="gold">$250.00</b> in Draw #12.</p>
+          </div>
+        </div>
 
         <div class="phone">
           <span class="btn-side b1"></span><span class="btn-side b2"></span><span class="btn-side b3"></span>
@@ -137,6 +140,15 @@
           </div>
         </div>
         </div>
+      </div>
+    </section>
+
+    <section class="rails" aria-label="What Plutos runs on">
+      <div class="wrap rails-grid">
+        <div><span>Interest from</span><b>U.S. Treasury bills</b></div>
+        <div><span>Random draws by</span><b>Chainlink VRF</b></div>
+        <div><span>Payments through</span><b>Coinbase</b></div>
+        <div><span>Runs on</span><b>Base</b></div>
       </div>
     </section>
 

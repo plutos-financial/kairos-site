@@ -102,18 +102,36 @@ function contacts() {
 
 // ------------------------------------------------------------------ the brand film
 // Muted and looping, and it only plays while it's on screen (and never downloads before that).
-// People whose device asks for less motion, or to save data, see a still frame instead.
+// Paused for people who ask for less motion or to save data; the corner button plays or pauses it.
 function film() {
   const v = $("film");
-  if (!v) return;
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData === true) return;
+  const btn = $("filmToggle");
+  if (!v || !btn) return;
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData === true;
+  let wanted = !calm; // what the visitor wants: playing or not
+  let inView = false;
+  const show = () => {
+    const playing = !v.paused;
+    btn.dataset.state = playing ? "playing" : "paused";
+    btn.setAttribute("aria-label", playing ? "Pause the video" : "Play the video");
+  };
+  const play = () => v.play().catch(() => {}).finally(show); // blocked (e.g. Low Power Mode) = the poster stays
   new IntersectionObserver(
     ([e]) => {
-      if (e.isIntersecting) v.play().catch(() => {}); // blocked (e.g. Low Power Mode) = the still frame stays
-      else v.pause();
+      inView = e.isIntersecting;
+      if (inView && wanted) play();
+      else if (!inView && !v.paused) v.pause();
     },
     { threshold: 0.2 }
-  ).observe(v);
+  ).observe(v.closest(".film"));
+  btn.onclick = () => {
+    wanted = v.paused;
+    if (wanted) play();
+    else v.pause();
+  };
+  v.addEventListener("play", show);
+  v.addEventListener("pause", show);
+  show();
 }
 
 // The homepage nav floats over the film, and turns solid once the film has scrolled away.

@@ -87,7 +87,7 @@ img, svg { max-width: 100%; }
 .pill {
   display: inline-flex; align-items: center; gap: 7px;
   font-size: 13px; font-weight: 500; color: var(--muted);
-  background: var(--bg-2); border: 1px solid var(--line); border-radius: 6px; padding: 7px 13px;
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: 999px; padding: 7px 13px;
   max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .pill.ok { color: var(--text); }
@@ -127,8 +127,8 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 /* buttons */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  font: 560 15px var(--sans); letter-spacing: 0.005em;
-  min-height: 46px; padding: 0 22px; border-radius: 6px;
+  font: 600 15px var(--sans); letter-spacing: -0.005em;
+  min-height: 46px; padding: 0 20px; border-radius: 999px;
   border: 1px solid var(--line-2); background: var(--bg-3); color: var(--text);
   cursor: pointer; white-space: nowrap; text-decoration: none;
   transition: transform 0.12s ease, background 0.15s, border-color 0.15s, opacity 0.15s;
@@ -174,7 +174,7 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 .band-legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 .sw { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: 0; }
 
-.badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); white-space: nowrap; }
+.badge { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); white-space: nowrap; }
 .badge.wait { background: var(--bg-3); color: var(--muted); }
 
 .toast {
