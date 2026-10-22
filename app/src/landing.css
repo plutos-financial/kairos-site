@@ -16,7 +16,7 @@
 .nav-cta { display: flex; gap: 8px; }
 
 /* ---------------------------------------------------------------- hero */
-.hero { padding: 72px 0 64px; overflow: hidden; }
+.hero { padding: 56px 0 64px; overflow: hidden; }
 .hero-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 40px; align-items: center; }
 .hero h1 { font-family: var(--display); font-weight: 650; font-size: clamp(3rem, 6.2vw, 5.6rem); line-height: 0.98; letter-spacing: -0.045em; margin: 0 0 24px; }
 .lede { color: var(--muted); font-size: clamp(18px, 1.6vw, 20px); line-height: 1.5; max-width: 31rem; margin: 0 0 32px; }
@@ -89,20 +89,21 @@
 .float p { margin: 0; }
 .notif { top: 60px; left: calc(50% - 132px); width: 264px; padding: 10px 13px 10px 10px; animation: drop 7s cubic-bezier(0.2, 0.8, 0.2, 1) infinite; }
 @keyframes drop { 0%, 8% { opacity: 0; transform: translateY(-14px) scale(0.97); } 14%, 80% { opacity: 1; transform: none; } 88%, 100% { opacity: 0; transform: translateY(-8px) scale(0.98); } }
-.f-ball svg { width: 34px; height: 34px; display: block; }
+.f-ball { width: 34px; height: 34px; border-radius: 9px; background: #15161a; display: grid; place-items: center; flex: 0 0 auto; }
+.f-ball svg { width: 22px; height: 22px; display: block; }
 .f-top { display: flex; justify-content: space-between; font-size: 13px; }
 .f-top span { color: var(--muted); font-size: 12px; }
 .f-msg { font-size: 13px; color: #dedbd5; margin-top: 1px !important; }
 
 
 /* ---------------------------------------------------------------- the brand film */
-.film { position: relative; isolation: isolate; height: min(78vh, 780px); min-height: 440px; overflow: hidden; background: #000; display: grid; place-items: center; }
+.film { position: relative; isolation: isolate; height: min(calc(100svh - 150px), 820px); min-height: 460px; overflow: hidden; background: #000; display: grid; place-items: center; }
 .film-video { position: absolute; inset: 0; z-index: -2; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.68) contrast(1.06); }
 /* darken the middle so the logo reads, and melt the top and bottom edges into the page */
 .film-shade {
   position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background:
-    linear-gradient(180deg, var(--bg) 0%, rgba(5, 5, 6, 0) 22%, rgba(5, 5, 6, 0) 72%, var(--bg) 100%),
+    linear-gradient(180deg, rgba(5, 5, 6, 0.55) 0%, rgba(5, 5, 6, 0) 16%, rgba(5, 5, 6, 0) 70%, var(--bg) 100%),
     radial-gradient(ellipse 58% 50% at 50% 52%, rgba(5, 5, 6, 0.62) 0%, rgba(5, 5, 6, 0.28) 65%, rgba(5, 5, 6, 0.4) 100%);
 }
 .film-brand { text-align: center; padding: 0 24px; }
@@ -123,7 +124,7 @@
 .film-toggle svg { width: 18px; height: 18px; fill: currentColor; }
 .film-toggle[data-state="playing"] .i-play, .film-toggle[data-state="paused"] .i-pause { display: none; }
 @media (max-width: 640px) {
-  .film { height: 64vh; min-height: 380px; }
+  .film { height: min(calc(100svh - 160px), 640px); min-height: 400px; }
   .film-toggle { right: 16px; bottom: 18px; width: 38px; height: 38px; }
 }
 

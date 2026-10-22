@@ -6,6 +6,8 @@
   <title>Plutos · The savings account with a prize draw</title>
   <meta name="description" content="Plutos is a savings account where the interest goes into a monthly prize draw. Keep your full deposit, withdraw anytime, and start with $1." />
   <meta name="theme-color" content="#050506" />
+  <link rel="icon" type="image/svg+xml" href="/src/media/plutos-icon.svg" />
+  <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
   <meta property="og:title" content="Plutos · Save money. Win prizes." />
   <meta property="og:description" content="A savings account where the interest goes into a monthly prize draw. Your deposit stays yours." />
   <link rel="stylesheet" href="/src/style.css" />
@@ -15,7 +17,7 @@
   <header class="nav" id="nav">
     <div class="nav-in">
       <a class="brand" href="./" aria-label="Plutos home">
-        <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg>
+        <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg>
         <span class="name">plutos</span>
       </a>
       <nav class="nav-links" aria-label="Main">
@@ -32,6 +34,23 @@
   </header>
 
   <main>
+    <!-- the brand film, first thing on the page: muted, looping, plays only while on screen (landing.js) -->
+    <section class="film" aria-label="Plutos">
+      <video class="film-video" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="/src/media/plutos-film.mp4" type="video/mp4" />
+        <source src="/src/media/plutos-film.webm" type="video/webm" />
+      </video>
+      <div class="film-shade" aria-hidden="true"></div>
+      <div class="film-brand">
+        <p class="film-logo"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg><span>plutos</span></p>
+        <p class="film-line">Keep every dollar. Win the interest.</p>
+      </div>
+      <button class="film-toggle" id="filmToggle" type="button" aria-label="Pause the video" data-state="paused">
+        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>
+        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+      </button>
+    </section>
+
     <section class="hero">
       <div class="wrap hero-grid">
         <div class="hero-copy">
@@ -49,7 +68,7 @@
         </div>
         <div class="hero-visual" aria-hidden="true">
         <div class="float notif">
-          <span class="f-ball"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg></span>
+          <span class="f-ball"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg></span>
           <div>
             <p class="f-top"><b>Plutos</b><span>now</span></p>
             <p class="f-msg">You won <b class="gold">$250.00</b> in Draw #12.</p>
@@ -71,7 +90,7 @@
 
             <div class="app">
               <div class="a-head">
-                <span class="a-brand"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="13" fill="url(#kball)"/></svg><b>plutos</b></span>
+                <span class="a-brand"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg><b>plutos</b></span>
                 <span class="a-icons">
                   <svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z M10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
                   <span class="a-av">A</span>
@@ -118,23 +137,6 @@
         </div>
         </div>
       </div>
-    </section>
-
-    <!-- the brand film: muted, looping, plays only while on screen (landing.js) -->
-    <section class="film" aria-label="Plutos">
-      <video class="film-video" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
-        <source src="/src/media/plutos-film.mp4" type="video/mp4" />
-        <source src="/src/media/plutos-film.webm" type="video/webm" />
-      </video>
-      <div class="film-shade" aria-hidden="true"></div>
-      <div class="film-brand">
-        <p class="film-logo"><svg viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball3" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball3)"/></svg><span>plutos</span></p>
-        <p class="film-line">Keep every dollar. Win the interest.</p>
-      </div>
-      <button class="film-toggle" id="filmToggle" type="button" aria-label="Pause the video" data-state="paused">
-        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>
-        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
-      </button>
     </section>
 
     <section class="rails" aria-label="What Plutos runs on">
@@ -372,7 +374,7 @@
   <footer class="site-footer">
     <div class="wrap foot">
       <div class="foot-brand">
-        <a class="brand" href="./" aria-label="Plutos home"><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><defs><radialGradient id="kball2" cx="34%" cy="30%" r="78%"><stop offset="0" stop-color="#fff0b8"/><stop offset=".42" stop-color="#f5c542"/><stop offset="1" stop-color="#b9820f"/></radialGradient></defs><circle cx="14" cy="14" r="13" fill="url(#kball2)"/></svg><span class="name">plutos</span></a>
+        <a class="brand" href="./" aria-label="Plutos home"><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg><span class="name">plutos</span></a>
         <p>© 2026 Pluto's Financial. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
