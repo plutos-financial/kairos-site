@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Plutos · The savings account with a prize draw</title>
   <meta name="description" content="Plutos is a savings account where the interest goes into a monthly prize draw. Keep your full deposit, withdraw anytime, and start with $1." />
-  <meta name="theme-color" content="#050506" />
+  <meta name="theme-color" content="#0A0E1A" />
   <link rel="icon" type="image/svg+xml" href="/src/media/plutos-icon.svg" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
   <meta property="og:title" content="Plutos · Save money. Win prizes." />
@@ -14,11 +14,10 @@
   <link rel="stylesheet" href="/src/landing.css" />
 </head>
 <body class="landing">
-  <header class="nav" id="nav">
+  <header class="nav nav-over" id="nav">
     <div class="nav-in">
       <a class="brand" href="./" aria-label="Plutos home">
-        <svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg>
-        <span class="name">plutos</span>
+        <span class="name">Plutos</span>
       </a>
       <nav class="nav-links" aria-label="Main">
         <a href="#how">How it works</a>
@@ -35,30 +34,35 @@
 
   <main>
     <!-- the brand film, first thing on the page: muted, looping, plays only while on screen (landing.js) -->
-    <section class="film" aria-label="Plutos">
+    <section class="film" aria-labelledby="filmTitle">
       <video class="film-video" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
         <source src="/src/media/plutos-film.mp4" type="video/mp4" />
         <source src="/src/media/plutos-film.webm" type="video/webm" />
       </video>
       <div class="film-shade" aria-hidden="true"></div>
-      <div class="film-brand">
-        <p class="film-logo"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg><span>plutos</span></p>
-        <p class="film-line">Keep every dollar. Win the interest.</p>
+      <div class="wrap film-copy">
+        <h1 class="film-title" id="filmTitle">A savings account with a monthly prize draw.</h1>
+        <p class="film-text">Plutos keeps your savings in U.S. Treasury bills and turns the interest into prizes, drawn at random every month. Your deposit stays yours, and you can withdraw it anytime.</p>
+        <div class="cta-row">
+          <a href="#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
+          <a href="#save" class="btn btn-outline btn-lg">See how it works</a>
+        </div>
       </div>
+      <a class="film-down" href="#save" aria-label="Scroll to the next section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></a>
       <button class="film-toggle" id="filmToggle" type="button" aria-label="Pause the video" data-state="paused">
         <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>
         <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
       </button>
     </section>
 
-    <section class="hero">
+    <section class="hero" id="save">
       <div class="wrap hero-grid">
         <div class="hero-copy">
-          <h1>Save money.<br />Win prizes.</h1>
-          <p class="lede">Plutos is a savings account where the interest goes into a monthly prize draw. Your deposit stays yours, and you can withdraw it anytime.</p>
+          <h2 class="hero-title">Save money.<br />Win prizes.</h2>
+          <p class="lede">Every dollar you save is an entry in every draw. Winners are picked at random each month, and prizes go straight into their savings. Nobody loses a cent of their deposit.</p>
           <div class="cta-row">
-            <a href="#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
-            <a href="./app.html" class="btn btn-ghost btn-lg">Try the app</a>
+            <a href="./app.html" class="btn btn-primary btn-lg">Try the app</a>
+            <a href="./how-it-works.html" class="btn btn-ghost btn-lg">Read the details</a>
           </div>
           <ul class="proof">
             <li>Start with $1</li>
@@ -68,7 +72,7 @@
         </div>
         <div class="hero-visual" aria-hidden="true">
         <div class="float notif">
-          <span class="f-ball"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg></span>
+          <span class="f-ball">P</span>
           <div>
             <p class="f-top"><b>Plutos</b><span>now</span></p>
             <p class="f-msg">You won <b class="gold">$250.00</b> in Draw #12.</p>
@@ -90,7 +94,7 @@
 
             <div class="app">
               <div class="a-head">
-                <span class="a-brand"><svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg><b>plutos</b></span>
+                <span class="a-brand"><b>Plutos</b></span>
                 <span class="a-icons">
                   <svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z M10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
                   <span class="a-av">A</span>
@@ -102,9 +106,9 @@
               <p class="a-won"><span class="chip-gold">+$250.00</span><span>won in prizes</span></p>
 
               <svg class="a-chart" viewBox="0 0 244 74" preserveAspectRatio="none">
-                <defs><linearGradient id="aFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2eb5e0" stop-opacity=".35"/><stop offset="1" stop-color="#2eb5e0" stop-opacity="0"/></linearGradient></defs>
+                <defs><linearGradient id="aFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E3CB94" stop-opacity=".35"/><stop offset="1" stop-color="#E3CB94" stop-opacity="0"/></linearGradient></defs>
                 <path d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14 V74 H0 Z" fill="url(#aFill)"/>
-                <path d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14" fill="none" stroke="#2eb5e0" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                <path d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14" fill="none" stroke="#E3CB94" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
               </svg>
               <div class="a-range"><span>1W</span><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
 
@@ -121,8 +125,8 @@
 
               <div class="a-wins">
                 <p>Latest winners</p>
-                <div class="aw"><span class="av" style="background:linear-gradient(140deg,#ffb36b,#c2185b)"></span><span>Saver 4F2A</span><b>+$1,000</b></div>
-                <div class="aw"><span class="av" style="background:linear-gradient(140deg,#7ee0c3,#2b6cb0)"></span><span>You</span><b>+$250</b></div>
+                <div class="aw"><span class="av" style="background:linear-gradient(140deg,#d9b38c,#8a4b5c)"></span><span>Saver 4F2A</span><b>+$1,000</b></div>
+                <div class="aw"><span class="av" style="background:linear-gradient(140deg,#a9c6bd,#3f5f7f)"></span><span>You</span><b>+$250</b></div>
               </div>
             </div>
 
@@ -174,9 +178,9 @@
           <article class="step">
             <div class="step-vis" aria-hidden="true">
               <div class="sv-pod">
-                <div class="mp"><span class="av" style="background:linear-gradient(140deg,#7ee0c3,#2b6cb0)"></span><b>$250</b><i style="height:34px"></i></div>
-                <div class="mp first"><span class="av" style="background:linear-gradient(140deg,#ffb36b,#c2185b)"></span><b>$1,000</b><i style="height:56px"></i></div>
-                <div class="mp"><span class="av" style="background:linear-gradient(140deg,#c6a7ff,#5b3fd1)"></span><b>$100</b><i style="height:24px"></i></div>
+                <div class="mp"><span class="av" style="background:linear-gradient(140deg,#a9c6bd,#3f5f7f)"></span><b>$250</b><i style="height:34px"></i></div>
+                <div class="mp first"><span class="av" style="background:linear-gradient(140deg,#d9b38c,#8a4b5c)"></span><b>$1,000</b><i style="height:56px"></i></div>
+                <div class="mp"><span class="av" style="background:linear-gradient(140deg,#b9b3d6,#4a4f7a)"></span><b>$100</b><i style="height:24px"></i></div>
               </div>
             </div>
             <p class="step-n">03</p>
@@ -374,7 +378,8 @@
   <footer class="site-footer">
     <div class="wrap foot">
       <div class="foot-brand">
-        <a class="brand" href="./" aria-label="Plutos home"><svg class="mark" viewBox="0 0 28 28" aria-hidden="true"><circle cx="12" cy="15.5" r="10" fill="#F4C24F"/><circle cx="23.5" cy="5" r="3.5" fill="#F4C24F"/></svg><span class="name">plutos</span></a>
+        <a class="brand" href="./" aria-label="Plutos home">
+        <span class="name">Plutos</span></a>
         <p>© 2026 Pluto's Financial. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">

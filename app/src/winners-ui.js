@@ -15,7 +15,7 @@ export function avatar(addr, size = "") {
   const h = parseInt(addr.slice(2, 10), 16) >>> 0;
   const a = h % 360;
   const b = (a + 50 + ((h >>> 9) % 90)) % 360;
-  return `<span class="av ${size}" aria-hidden="true" style="background:linear-gradient(140deg,hsl(${a} 72% 64%),hsl(${b} 68% 42%))"></span>`;
+  return `<span class="av ${size}" aria-hidden="true" style="background:linear-gradient(140deg,hsl(${a} 36% 62%),hsl(${b} 32% 38%))"></span>`;
 }
 
 /** Adds up every prize per winner (one saver can win several prizes), biggest first. */

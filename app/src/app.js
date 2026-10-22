@@ -555,7 +555,7 @@ function confetti() {
   c.width = innerWidth * dpr;
   c.height = innerHeight * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const colors = ["#f4c24f", "#ffd77a", "#fffcf7", "#f5c542", "#f4c24f"];
+  const colors = ["#CDAE6D", "#E3CB94", "#F2EDE4", "#f5c542", "#CDAE6D"];
   const bits = Array.from({ length: 170 }, () => ({
     x: innerWidth / 2 + (Math.random() - 0.5) * 140,
     y: innerHeight * 0.38,

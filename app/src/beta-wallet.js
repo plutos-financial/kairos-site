@@ -322,7 +322,7 @@ function receiveView() {
   body(`
     <h2 id="sheetTitle">Receive money</h2>
     <p class="sh-sub">Anyone can send USDC on Base to this address. In the beta, only send test USDC.</p>
-    <div class="sh-qr"><svg viewBox="-2 -2 ${n + 4} ${n + 4}" role="img" aria-label="QR code of your address"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><path d="${d}" fill="#050506"/></svg></div>
+    <div class="sh-qr"><svg viewBox="-2 -2 ${n + 4} ${n + 4}" role="img" aria-label="QR code of your address"><rect x="-2" y="-2" width="${n + 4}" height="${n + 4}" fill="#fff"/><path d="${d}" fill="#0A0E1A"/></svg></div>
     <p class="sh-addr" id="shAddr">${state.address}</p>
     <button id="shCopy" class="btn btn-primary btn-lg btn-block" type="button">Copy address</button>`);
   $("shCopy").onclick = async () => {

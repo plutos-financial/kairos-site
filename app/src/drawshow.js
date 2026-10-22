@@ -601,7 +601,7 @@ function confetti(count) {
   c.width = innerWidth * dpr;
   c.height = innerHeight * dpr;
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  const colors = ["#f4c24f", "#ffd77a", "#fffcf7", "#2eb5e0"];
+  const colors = ["#CDAE6D", "#E3CB94", "#F2EDE4", "#E3CB94"];
   const bits = Array.from({ length: count }, () => ({
     x: innerWidth / 2 + (Math.random() - 0.5) * 160, y: innerHeight * 0.38,
     vx: (Math.random() - 0.5) * 15, vy: -Math.random() * 14 - 4,

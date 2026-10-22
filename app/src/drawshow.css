@@ -2,17 +2,17 @@
 html.ds-open { overflow: hidden; }
 .ds {
   position: fixed; inset: 0; z-index: 58; overflow-y: auto; overscroll-behavior: contain;
-  background: radial-gradient(900px 520px at 50% -10%, rgba(244, 194, 79, 0.11), transparent 70%), #030304;
+  background: radial-gradient(900px 520px at 50% -10%, rgba(205, 174, 109, 0.11), transparent 70%), #030304;
   padding: 30px 16px 44px;
 }
-.ds.is-pretend { background: radial-gradient(900px 520px at 50% -10%, rgba(46, 181, 224, 0.13), transparent 70%), #030304; }
+.ds.is-pretend { background: radial-gradient(900px 520px at 50% -10%, rgba(227, 203, 148, 0.13), transparent 70%), #030304; }
 .ds canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
 .ds-card { position: relative; width: min(760px, 100%); margin: 0 auto; }
 .ds-x { position: absolute; top: -4px; right: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--text); font-size: 22px; line-height: 1; cursor: pointer; }
 .ds-x:hover { background: var(--bg-3); }
 .ds-kicker { margin: 0; color: var(--gold); font-weight: 600; font-size: 14px; }
 .ds.is-pretend .ds-kicker { color: var(--accent); }
-.ds-title { font-family: var(--display); font-weight: 700; font-size: clamp(2rem, 6vw, 3.1rem); letter-spacing: -0.045em; line-height: 1; margin: 8px 52px 12px 0; }
+.ds-title { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 6vw, 3.1rem); letter-spacing: -0.015em; line-height: 1; margin: 8px 52px 12px 0; }
 .ds-sub { color: var(--muted); margin: 0 0 18px; font-size: 16px; line-height: 1.5; max-width: 40rem; }
 .ds-sub:empty { display: none; }
 .ds-sub b { color: var(--gold); font-weight: 650; }
@@ -37,10 +37,10 @@ html.ds-open { overflow: hidden; }
 .ds-line { position: relative; height: 46px; border-radius: 12px; overflow: hidden; background: var(--bg-3); }
 .ds-seg {
   position: absolute; top: 0; bottom: 0; display: grid; place-items: center;
-  background: hsl(var(--h) 52% 46%); box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.6);
+  background: hsl(var(--h) 30% 44%); box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.6);
   transform-origin: left; animation: segIn 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) var(--d) both;
 }
-.ds-seg.alt { background: hsl(var(--h) 44% 37%); }
+.ds-seg.alt { background: hsl(var(--h) 26% 35%); }
 .ds-seg.plain { background: linear-gradient(90deg, #1f2025, #2c2d34); }
 .ds-seg.me { box-shadow: inset 0 0 0 2px #fff; z-index: 1; }
 .ds-seg span { font-size: 12px; font-weight: 700; color: #fff; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7); }
@@ -50,13 +50,13 @@ html.ds-open { overflow: hidden; }
 @keyframes segIn { from { transform: scaleX(0); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes segHit { 0% { filter: none; } 22% { filter: brightness(2) saturate(1.3); } 100% { filter: none; } }
 .ds-marks { position: absolute; left: 0; right: 0; bottom: -13px; height: 8px; }
-.ds-mark { position: absolute; top: 0; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(244, 194, 79, 0.7); animation: popIn 0.3s ease both; }
+.ds-mark { position: absolute; top: 0; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(205, 174, 109, 0.7); animation: popIn 0.3s ease both; }
 .ds-pin { position: absolute; top: -32px; bottom: -4px; width: 0; z-index: 2; pointer-events: none; }
-.ds-pin::before { content: ""; position: absolute; left: -1px; top: 22px; bottom: 0; width: 2px; background: var(--gold); box-shadow: 0 0 10px rgba(244, 194, 79, 0.9); }
+.ds-pin::before { content: ""; position: absolute; left: -1px; top: 22px; bottom: 0; width: 2px; background: var(--gold); box-shadow: 0 0 10px rgba(205, 174, 109, 0.9); }
 .ds-pin span { position: absolute; top: 0; left: 0; white-space: nowrap; background: var(--gold); color: var(--gold-ink); font: 700 12px/1 var(--sans); padding: 5px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
 .ds-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
 .ds-key { display: inline-flex; align-items: center; gap: 6px; }
-.ds-key i, .pk-who i { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 3px; background: hsl(var(--h) 52% 46%); }
+.ds-key i, .pk-who i { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 3px; background: hsl(var(--h) 30% 44%); }
 .ds-key.me { color: var(--text); font-weight: 600; }
 .ds-key.more { color: var(--dim); }
 
@@ -68,7 +68,7 @@ html.ds-open { overflow: hidden; }
 }
 .hx-p, .hx-off { color: var(--dim); }
 .hx-on { color: var(--gold); }
-.ds-hex.in { border-color: rgba(244, 194, 79, 0.4); box-shadow: 0 0 0 4px rgba(244, 194, 79, 0.06); }
+.ds-hex.in { border-color: rgba(205, 174, 109, 0.4); box-shadow: 0 0 0 4px rgba(205, 174, 109, 0.06); }
 /* once the picks start, the number step shrinks so the line and the picks fit on screen together */
 .ds-block.compact { padding-top: 12px; padding-bottom: 12px; }
 .ds-block.compact .ds-bh p { display: none; }
