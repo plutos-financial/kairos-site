@@ -8,7 +8,7 @@ html.ds-open { overflow: hidden; }
 .ds.is-pretend { background: radial-gradient(900px 520px at 50% -10%, rgba(227, 203, 148, 0.13), transparent 70%), #030304; }
 .ds canvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; }
 .ds-card { position: relative; width: min(760px, 100%); margin: 0 auto; }
-.ds-x { position: absolute; top: -4px; right: 0; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--text); font-size: 22px; line-height: 1; cursor: pointer; }
+.ds-x { position: absolute; top: -4px; right: 0; width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--line-2); background: var(--bg-2); color: var(--text); font-size: 22px; line-height: 1; cursor: pointer; }
 .ds-x:hover { background: var(--bg-3); }
 .ds-kicker { margin: 0; color: var(--gold); font-weight: 600; font-size: 14px; }
 .ds.is-pretend .ds-kicker { color: var(--accent); }
@@ -17,17 +17,17 @@ html.ds-open { overflow: hidden; }
 .ds-sub:empty { display: none; }
 .ds-sub b { color: var(--gold); font-weight: 650; }
 
-.ds-steps { list-style: none; padding: 0; margin: 0 0 20px; display: flex; gap: 6px; flex-wrap: wrap; }
-.ds-steps li { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--dim); background: var(--bg-1); border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px 6px 7px; }
-.ds-steps li::before { content: attr(data-s); display: grid; place-items: center; width: 21px; height: 21px; border-radius: 50%; background: var(--bg-3); color: var(--muted); font-size: 12px; }
-.ds-steps li.now { color: var(--text); border-color: var(--line-2); }
-.ds-steps li.now::before { background: var(--accent); color: var(--accent-ink); animation: blinkdot 1s ease-in-out infinite; }
+.ds-steps { list-style: none; padding: 0; margin: 0 0 20px; display: flex; gap: 6px 22px; flex-wrap: wrap; }
+.ds-steps li { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: var(--dim); padding: 4px 0; }
+.ds-steps li::before { content: attr(data-s); display: grid; place-items: center; width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--line-2); color: var(--muted); font-size: 11.5px; font-weight: 600; }
+.ds-steps li.now { color: var(--text); }
+.ds-steps li.now::before { border-color: var(--accent); color: var(--accent); animation: blinkdot 1s ease-in-out infinite; }
 .ds-steps li.done { color: var(--text); }
-.ds-steps li.done::before { content: "✓"; background: var(--accent); color: var(--accent-ink); }
+.ds-steps li.done::before { content: "✓"; background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 
 .ds-block { background: var(--bg-1); border: 1px solid var(--line); border-radius: 20px; padding: 18px 20px 20px; margin-bottom: 12px; animation: dsIn 0.45s ease both; }
 .ds-bh { display: flex; gap: 12px; align-items: flex-start; }
-.ds-n { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--bg-3); color: var(--text); font-weight: 650; font-size: 13px; margin-top: 1px; }
+.ds-n { flex: 0 0 auto; width: 26px; height: 26px; border-radius: 5px; display: grid; place-items: center; background: var(--bg-3); color: var(--text); font-weight: 650; font-size: 13px; margin-top: 1px; }
 .ds-bh b { font-size: 16px; font-weight: 650; letter-spacing: -0.01em; }
 .ds-bh p { margin: 3px 0 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
 .ds-hex, .ds-picks { margin-top: 14px; }
@@ -53,7 +53,7 @@ html.ds-open { overflow: hidden; }
 .ds-mark { position: absolute; top: 0; width: 7px; height: 7px; margin-left: -3.5px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px rgba(205, 174, 109, 0.7); animation: popIn 0.3s ease both; }
 .ds-pin { position: absolute; top: -32px; bottom: -4px; width: 0; z-index: 2; pointer-events: none; }
 .ds-pin::before { content: ""; position: absolute; left: -1px; top: 22px; bottom: 0; width: 2px; background: var(--gold); box-shadow: 0 0 10px rgba(205, 174, 109, 0.9); }
-.ds-pin span { position: absolute; top: 0; left: 0; white-space: nowrap; background: var(--gold); color: var(--gold-ink); font: 700 12px/1 var(--sans); padding: 5px 8px; border-radius: 999px; font-variant-numeric: tabular-nums; }
+.ds-pin span { position: absolute; top: 0; left: 0; white-space: nowrap; background: var(--gold); color: var(--gold-ink); font: 700 12px/1 var(--sans); padding: 5px 8px; border-radius: 4px; font-variant-numeric: tabular-nums; }
 .ds-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 13px; color: var(--muted); }
 .ds-key { display: inline-flex; align-items: center; gap: 6px; }
 .ds-key i, .pk-who i { flex: 0 0 auto; width: 10px; height: 10px; border-radius: 3px; background: hsl(var(--h) 30% 44%); }
@@ -107,8 +107,8 @@ html.ds-open { overflow: hidden; }
   .ds-block { padding: 15px 14px 16px; border-radius: 16px; }
   .ds-line { height: 40px; }
   .ds-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
-  .ds-steps li { justify-content: center; gap: 5px; font-size: 11.5px; padding: 5px 4px; white-space: nowrap; }
-  .ds-steps li::before { width: 17px; height: 17px; font-size: 10px; }
+  .ds-steps li { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 500; color: var(--dim); padding: 4px 0; }
+  .ds-steps li::before { content: attr(data-s); display: grid; place-items: center; width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--line-2); color: var(--muted); font-size: 11.5px; font-weight: 600; }
   .pk { grid-template-columns: auto auto minmax(0, 1fr); grid-template-areas: "n amt who" "math math math"; row-gap: 3px; }
   .pk-n { grid-area: n; }
   .pk-amt { grid-area: amt; }

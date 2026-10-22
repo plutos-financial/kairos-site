@@ -35,12 +35,14 @@
   <main>
     <!-- the brand film, first thing on the page: muted, looping, plays only while on screen (landing.js) -->
     <section class="film" aria-labelledby="filmTitle">
-      <video class="film-video" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
-        <source src="/src/media/plutos-film.mp4" type="video/mp4" />
-        <source src="/src/media/plutos-film.webm" type="video/webm" />
-      </video>
-      <div class="film-shade" aria-hidden="true"></div>
-      <div class="wrap film-copy">
+      <div class="film-frame">
+        <video class="film-video" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
+          <source src="/src/media/plutos-film.mp4" type="video/mp4" />
+          <source src="/src/media/plutos-film.webm" type="video/webm" />
+        </video>
+        <div class="film-shade" aria-hidden="true"></div>
+      </div>
+      <div class="film-copy">
         <h1 class="film-title" id="filmTitle">A savings account with a monthly prize draw.</h1>
         <p class="film-text">Plutos keeps your savings in U.S. Treasury bills and turns the interest into prizes, drawn at random every month. Your deposit stays yours, and you can withdraw it anytime.</p>
         <div class="cta-row">
@@ -49,10 +51,6 @@
         </div>
       </div>
       <a class="film-down" href="#save" aria-label="Scroll to the next section"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5l6 6 6-6"/></svg></a>
-      <button class="film-toggle" id="filmToggle" type="button" aria-label="Pause the video" data-state="paused">
-        <svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="5" width="3.6" height="14" rx="1"/><rect x="13.9" y="5" width="3.6" height="14" rx="1"/></svg>
-        <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.4-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
-      </button>
     </section>
 
     <section class="hero" id="save">
@@ -71,12 +69,6 @@
           </ul>
         </div>
         <div class="hero-visual" aria-hidden="true">
-        <div class="float notif">
-          <span class="f-ball">P</span>
-          <div>
-            <p class="f-top"><b>Plutos</b><span>now</span></p>
-            <p class="f-msg">You won <b class="gold">$250.00</b> in Draw #12.</p>
-          </div>
         </div>
 
         <div class="phone">
