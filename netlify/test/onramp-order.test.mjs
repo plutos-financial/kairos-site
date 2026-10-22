@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-const ORIGIN = "https://plutos-financial.github.io";
+const ORIGIN = "https://winplutos.tech";
 process.env.ALLOWED_ORIGINS = `${ORIGIN},http://localhost:8888`;
 process.env.CDP_API_KEY_ID = "test-key-id";
 process.env.CDP_API_KEY_SECRET = "super-secret-value";
@@ -73,7 +73,7 @@ test("creates a sandbox Apple Pay order for the signed-in saver", async () => {
   assert.equal(sent.paymentMethod, "GUEST_CHECKOUT_APPLE_PAY");
   assert.equal(sent.purchaseCurrency, "USDC");
   assert.equal(sent.destinationNetwork, "base");
-  assert.equal(sent.domain, "plutos-financial.github.io");
+  assert.equal(sent.domain, "winplutos.tech");
   assert.equal(sent.clientIp, "1.2.3.4");
 });
 

@@ -4,7 +4,7 @@ Pluto's Financial · prize-linked savings · **test money only**
 
 Plutos is a savings account with a prize draw: savers keep every dollar they put in, and the interest is handed out as prizes. This repo holds everything: the website, the smart contracts, and a small money server.
 
-The site is at **https://plutos-financial.github.io/kairos-site/** (Base Sepolia, Base's free test network). It has:
+The site is at **https://winplutos.tech** (Base Sepolia, Base's free test network). The old address, plutos-financial.github.io/kairos-site, forwards there. It has:
 
 - **Chainlink VRF draws**: winners are picked with a verifiable random number, and the Draws page animates every draw step by step (entries lined up, Chainlink's number, one spot on the line per prize), redoing the vault's math in the browser and checking it against the blockchain.
 - **Add money with Apple Pay** through Coinbase's onramp, in Coinbase's test mode (no card is charged; test dollars arrive instead).
@@ -84,7 +84,7 @@ Local test chain: run `anvil`, deploy with `forge script script/Deploy.s.sol` (d
 
 - Contracts: set up on Base Sepolia with `KairosBetaSetup` (`contracts/deployments/84532-beta.json`). To redo it, open `/deploy.html` with MetaMask (about 0.003 test ETH).
 - Money server: running on Netlify with `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` (secret) and `ALLOWED_ORIGINS`. Coinbase Onramp is in trial mode (25 orders, $5 max each).
-- Still to do: add your own domain to GitHub Pages, Coinbase (Embedded Wallets clients, Onramp domain allowlist) and `ALLOWED_ORIGINS`; apply for full Onramp access before launch.
+- Domain: winplutos.tech (registered at Name.com through the GitHub Student Pack; DNS points at GitHub Pages). It is set in GitHub Pages, Coinbase (Embedded Wallets domains, Onramp domain allowlist) and `ALLOWED_ORIGINS`. Still to do: apply for full Onramp access before launch.
 - Coinbase gas sponsor: if the Paymaster has a contract allowlist, it must include the USDC, vault and T-bill addresses in `84532-beta.json` (or be empty).
 
 ## Security

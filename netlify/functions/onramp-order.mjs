@@ -15,7 +15,7 @@
 // Environment variables (Netlify: Site configuration -> Environment variables):
 //   CDP_API_KEY_ID       Coinbase Developer Platform secret API key id
 //   CDP_API_KEY_SECRET   the key's secret (mark it secret in Netlify; never put it in the website)
-//   ALLOWED_ORIGINS      comma-separated sites allowed to call this, e.g. https://plutos-financial.github.io
+//   ALLOWED_ORIGINS      comma-separated sites allowed to call this, e.g. https://winplutos.tech,https://plutos-financial.github.io
 //   SIGN_IN_REQUIRED     optional. "false" switches off the sign-in check (only for troubleshooting).
 const HOST = "api.cdp.coinbase.com";
 const PATH = "/platform/v2/onramp/orders";
