@@ -447,7 +447,7 @@ function renderLatest(draws) {
   $("latestMeta").textContent = `${fmt(drawTotal(x))} to ${people} saver${people === 1 ? "" : "s"} on ${drawWhen(x)}, out of ${x.entrants} who entered.`;
 }
 
-let historyKey = "";
+let historyKey = null; // null so a brand-new vault with no draws still renders "No draws yet"
 function renderHistory(draws) {
   const key = draws.map((x) => `${x.id}:${x.d.awarded}`).join(",") + (state.address || "");
   if (key === historyKey) return;
