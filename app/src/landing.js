@@ -136,3 +136,6 @@ calculator();
 waitlist();
 film();
 navOverFilm();
+
+// With reduced motion on, the moon on the orbit behind the phone holds still.
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.querySelector(".orbit")?.pauseAnimations?.();

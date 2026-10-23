@@ -12,7 +12,7 @@ html.ds-open { overflow: hidden; }
 .ds-x:hover { background: var(--bg-3); }
 .ds-kicker { margin: 0; color: var(--gold); font-weight: 600; font-size: 14px; }
 .ds.is-pretend .ds-kicker { color: var(--accent); }
-.ds-title { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 6vw, 3.1rem); letter-spacing: -0.015em; line-height: 1; margin: 8px 52px 12px 0; }
+.ds-title { font-family: var(--display); font-stretch: 112%; font-weight: 520; font-size: clamp(2rem, 6vw, 3.1rem); letter-spacing: -0.035em; line-height: 1; margin: 8px 52px 12px 0; }
 .ds-sub { color: var(--muted); margin: 0 0 18px; font-size: 16px; line-height: 1.5; max-width: 40rem; }
 .ds-sub:empty { display: none; }
 .ds-sub b { color: var(--gold); font-weight: 650; }

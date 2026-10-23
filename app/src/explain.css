@@ -2,7 +2,7 @@
 .wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 24px; }
 .ex { display: block; max-width: none; padding: 0 0 40px; }
 .ex-head { padding: 72px 24px 24px; }
-.ex-head h1 { font-family: var(--display); font-weight: 400; font-size: clamp(2.8rem, 6.4vw, 4.6rem); line-height: 1; letter-spacing: -0.015em; margin: 0 0 22px; }
+.ex-head h1 { font-family: var(--display); font-stretch: 112%; font-weight: 520; font-size: clamp(2.8rem, 6.4vw, 4.6rem); line-height: 1; letter-spacing: -0.035em; margin: 0 0 22px; }
 .ex-lede { font-size: clamp(18px, 2vw, 22px); line-height: 1.5; color: var(--muted); margin: 0 0 30px; }
 .toc { display: flex; flex-wrap: wrap; gap: 8px; }
 .toc a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; padding: 7px 13px; border: 1px solid var(--line-2); border-radius: 999px; }
@@ -11,7 +11,7 @@
 .ex-sec { position: relative; padding-top: 64px; padding-bottom: 8px; scroll-margin-top: 64px; }
 .ex-sec + .ex-sec { border-top: 1px solid var(--line); margin-top: 48px; }
 .ex-sec .sec-n { margin: 0 0 10px; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent); font-variant-numeric: tabular-nums; }
-.ex-sec h2 { font-family: var(--display); font-weight: 400; font-size: clamp(1.9rem, 4vw, 2.7rem); letter-spacing: -0.015em; line-height: 1.02; margin: 0 0 18px; }
+.ex-sec h2 { font-family: var(--display); font-stretch: 112%; font-weight: 520; font-size: clamp(1.9rem, 4vw, 2.7rem); letter-spacing: -0.035em; line-height: 1.02; margin: 0 0 18px; }
 .ex-sec > p, .qa p, .honest li, .odds-mini p, details p { font-size: 17.5px; line-height: 1.65; color: #cfccc6; margin: 0 0 16px; }
 .ex-sec b { color: var(--text); font-weight: 650; }
 .ex-sec a:not(.btn):not(.text-link) { color: var(--accent); }
@@ -46,7 +46,7 @@
 .r-row.total { border-bottom: 0; padding-top: 14px; font-size: 18px; }
 .r-row.total span { color: #1a1712; font-weight: 650; }
 .r-row.total small { display: block; margin-top: 2px; font-size: 13.5px; font-weight: 400; color: #6b655c; }
-.r-row.total b { font-family: var(--display); font-weight: 450; font-size: 26px; letter-spacing: -0.005em; }
+.r-row.total b { font-family: var(--display); font-stretch: 104%; font-weight: 540; font-size: 26px; letter-spacing: -0.02em; }
 .r-foot { margin: 8px 0 0; font-size: 13.5px; color: #6b655c; line-height: 1.5; }
 
 /* the draw */
@@ -56,7 +56,7 @@
 .om-title { margin: 0 0 6px !important; color: var(--text) !important; font-weight: 650; font-size: 18px !important; }
 .odds-mini > p:not(.om-title) { font-size: 16px; color: var(--muted); }
 .om-row { display: flex; justify-content: space-between; padding: 12px 0; border-top: 1px solid var(--line); font-size: 16px; color: var(--muted); }
-.om-row b { font-family: var(--display); font-weight: 500; font-size: 20px; color: var(--accent) !important; }
+.om-row b { font-family: var(--display); font-stretch: 104%; font-weight: 560; font-size: 20px; color: var(--accent) !important; }
 .try { color: var(--muted) !important; }
 .try .text-link { margin: 0 4px 0 0; }
 
@@ -75,7 +75,7 @@ details[open] summary::after { content: "–"; }
 details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted) !important; }
 
 .ex-end { padding-top: 80px; padding-bottom: 40px; text-align: center; }
-.ex-end h2 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.015em; margin: 0 0 24px; }
+.ex-end h2 { font-family: var(--display); font-stretch: 112%; font-weight: 520; font-size: clamp(2rem, 5vw, 3.2rem); letter-spacing: -0.035em; margin: 0 0 24px; }
 .ex-end .cta-row { justify-content: center; }
 
 @media (max-width: 640px) {
@@ -94,7 +94,7 @@ details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted
 .ex-h3 { font-size: 19px; font-weight: 650; letter-spacing: -0.02em; margin: 30px 0 8px; }
 .stat-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0 0 26px; }
 .stat-strip div { background: var(--bg-1); border: 1px solid var(--line); border-radius: 16px; padding: 14px 14px 12px; }
-.stat-strip b { display: block; font-family: var(--display); font-weight: 400; font-size: 30px; line-height: 1.05; color: var(--accent); letter-spacing: -0.01em; }
+.stat-strip b { display: block; font-family: var(--display); font-stretch: 104%; font-weight: 520; font-size: 30px; line-height: 1.05; color: var(--accent); letter-spacing: -0.025em; }
 .stat-strip span { display: block; margin-top: 6px; font-size: 13px; line-height: 1.35; color: var(--muted); }
 
 .promise-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 22px; }

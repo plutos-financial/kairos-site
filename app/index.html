@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Plutos · The savings account with a prize draw</title>
   <meta name="description" content="Plutos is a savings account where the interest goes into a monthly prize draw. Keep your full deposit, withdraw anytime, and start with $1." />
-  <meta name="theme-color" content="#0A0E1A" />
+  <meta name="theme-color" content="#070A14" />
   <link rel="icon" type="image/svg+xml" href="/src/media/plutos-icon.svg" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
   <meta property="og:title" content="Plutos · Save money. Win prizes." />
@@ -71,6 +71,12 @@
           </ul>
         </div>
         <div class="hero-visual" aria-hidden="true">
+        <svg class="orbit" viewBox="0 0 640 640" focusable="false">
+          <g transform="rotate(-16 320 320)">
+            <path id="orbitPath" d="M30 320a290 104 0 1 0 580 0a290 104 0 1 0-580 0" />
+            <circle class="moon" r="5"><animateMotion dur="16s" repeatCount="indefinite" rotate="auto"><mpath href="#orbitPath" /></animateMotion></circle>
+          </g>
+        </svg>
         <div class="float notif">
           <span class="f-ball">P</span>
           <div>
@@ -163,7 +169,7 @@
             <div class="step-vis" aria-hidden="true">
               <div class="sv-pay"><span class="sv-amt">$50</span><span class="sv-btn">Add money</span><span class="sv-sub">Apple Pay · Debit card · USDC</span></div>
             </div>
-            <p class="step-n">01</p>
+            <span class="step-n">1</span>
             <h3>Add money</h3>
             <p>Start with as little as $1. Pay with Apple Pay or a debit card through Coinbase.</p>
           </article>
@@ -171,7 +177,7 @@
             <div class="step-vis" aria-hidden="true">
               <div class="sv-entries"><span class="sv-big">500</span><span class="sv-sub">entries in this month's draw</span></div>
             </div>
-            <p class="step-n">02</p>
+            <span class="step-n">2</span>
             <h3>Get entries</h3>
             <p>Every dollar you save is one entry in every monthly draw, for as long as it stays saved.</p>
           </article>
@@ -183,7 +189,7 @@
                 <div class="mp"><span class="av" style="background:linear-gradient(140deg,#b9b3d6,#4a4f7a)"></span><b>$100</b><i style="height:24px"></i></div>
               </div>
             </div>
-            <p class="step-n">03</p>
+            <span class="step-n">3</span>
             <h3>Win prizes</h3>
             <p>The interest everyone's savings earn becomes the prizes. Winnings go straight into your savings.</p>
           </article>
@@ -219,26 +225,48 @@
           <h2>Fair, and you can check it</h2>
           <p>Every part of Plutos can be checked by anyone. <a class="text-link" href="./security.html">How it’s tested</a></p>
         </div>
-        <div class="cards">
-          <article class="card-t">
-            <span class="ic"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/><circle cx="9" cy="9" r="1.3"/><circle cx="15" cy="15" r="1.3"/><circle cx="15" cy="9" r="1.3"/><circle cx="9" cy="15" r="1.3"/></svg></span>
-            <h3>Winners picked by Chainlink</h3>
-            <p>Each draw uses a random number from Chainlink VRF, with a proof that anyone can check. Nobody at Plutos can choose who wins.</p>
+        <div class="bento">
+          <article class="tile wide">
+            <div class="tile-copy">
+              <h3>Winners picked by Chainlink</h3>
+              <p>Each draw uses a random number from Chainlink VRF, with a proof that anyone can check. Nobody at Plutos can choose who wins.</p>
+            </div>
+            <div class="tile-vis line-vis" aria-hidden="true">
+              <div class="lv-track"><i style="flex:5"></i><i style="flex:2"></i><i style="flex:8"></i><i class="hit" style="flex:4"></i><i style="flex:3"></i><i style="flex:6"></i><i style="flex:2"></i></div>
+              <div class="lv-pin" style="left:57%"><span>Saver 4F2A wins</span></div>
+              <p class="lv-cap"><span>Every saver's stretch of the line, sized by savings × time</span></p>
+            </div>
           </article>
-          <article class="card-t">
-            <span class="ic"><svg viewBox="0 0 24 24"><path d="M3 10h18M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18M12 3l9 5H3z"/></svg></span>
-            <h3>Prizes paid from Treasury interest</h3>
-            <p>Savings are held in short-term U.S. Treasury bills. The interest they earn pays for the prizes, so deposits are never used.</p>
+          <article class="tile">
+            <div class="tile-copy">
+              <h3>Prizes paid from Treasury interest</h3>
+              <p>Savings are held in short-term U.S. Treasury bills. The interest pays for the prizes, so deposits are never used.</p>
+            </div>
+            <div class="tile-vis split-vis" aria-hidden="true">
+              <div class="sp-row"><span>Your $500</span><b>Stays yours</b></div>
+              <div class="sp-bar"><i class="dep"></i><i class="int"></i></div>
+              <div class="sp-row"><span></span><b class="gold">Interest becomes prizes</b></div>
+            </div>
           </article>
-          <article class="card-t">
-            <span class="ic"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2.5"/><path d="M3 10h18M7 14.5h3"/></svg></span>
-            <h3>Money in and out with Coinbase</h3>
-            <p>Add money with Apple Pay or a debit card, and cash out to your bank account, through Coinbase.</p>
+          <article class="tile">
+            <div class="tile-copy">
+              <h3>Money in and out with Coinbase</h3>
+              <p>Add money with Apple Pay or a debit card, and cash out to your bank account, through Coinbase.</p>
+            </div>
+            <div class="tile-vis pay-vis" aria-hidden="true">
+              <span>Apple Pay</span><span>Debit card</span><span>Bank account</span>
+            </div>
           </article>
-          <article class="card-t">
-            <span class="ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg></span>
-            <h3>Every transaction is public</h3>
-            <p>Plutos runs on Base. Deposits, draws and prize payments are recorded publicly, so the numbers can always be checked.</p>
+          <article class="tile wide">
+            <div class="tile-copy">
+              <h3>Every transaction is public</h3>
+              <p>Plutos runs on Base. Deposits, draws and prize payments are recorded publicly, so the numbers can always be checked.</p>
+            </div>
+            <div class="tile-vis ledger-vis" aria-hidden="true">
+              <div class="lg-row"><span class="lg-k">Draw #12</span><span>Closed with 1,204 savers</span><b>$4,820</b></div>
+              <div class="lg-row"><span class="lg-k">Prize</span><span>Paid to Saver 4F2A</span><b class="gold">+$1,000</b></div>
+              <div class="lg-row"><span class="lg-k">Deposit</span><span>From Saver 91C0</span><b>+$50</b></div>
+            </div>
           </article>
         </div>
       </div>
