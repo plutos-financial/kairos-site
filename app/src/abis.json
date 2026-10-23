@@ -33,7 +33,7 @@
     },
     {
       "type": "function",
-      "name": "TOP_UP_DAILY_LIMIT",
+      "name": "TOP_UP_MAX",
       "inputs": [],
       "outputs": [
         {
@@ -263,44 +263,6 @@
       ],
       "outputs": [],
       "stateMutability": "nonpayable"
-    },
-    {
-      "type": "function",
-      "name": "topUpDay",
-      "inputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "toppedUp",
-      "inputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "uint256",
-          "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
     },
     {
       "type": "function",
@@ -1584,29 +1546,26 @@
     },
     {
       "type": "function",
-      "name": "accounts",
-      "inputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
+      "name": "ROUNDING_RESERVE",
+      "inputs": [],
       "outputs": [
         {
-          "name": "acc",
+          "name": "",
           "type": "uint256",
           "internalType": "uint256"
-        },
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "activeSavers",
+      "inputs": [],
+      "outputs": [
         {
-          "name": "lastUpdate",
-          "type": "uint64",
-          "internalType": "uint64"
-        },
-        {
-          "name": "period",
-          "type": "uint64",
-          "internalType": "uint64"
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "stateMutability": "view"
@@ -1693,6 +1652,19 @@
     },
     {
       "type": "function",
+      "name": "awardDraw",
+      "inputs": [
+        {
+          "name": "drawId",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
       "name": "balanceOf",
       "inputs": [
         {
@@ -1732,6 +1704,40 @@
           "name": "",
           "type": "uint256",
           "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "currentLine",
+      "inputs": [
+        {
+          "name": "t",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "start",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "count",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "savers",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "weights",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
         }
       ],
       "stateMutability": "view"
@@ -1780,7 +1786,7 @@
       "name": "depositors",
       "inputs": [
         {
-          "name": "",
+          "name": "i",
           "type": "uint256",
           "internalType": "uint256"
         }
@@ -1790,6 +1796,40 @@
           "name": "",
           "type": "address",
           "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "drawLine",
+      "inputs": [
+        {
+          "name": "drawId",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "start",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "count",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "savers",
+          "type": "address[]",
+          "internalType": "address[]"
+        },
+        {
+          "name": "weights",
+          "type": "uint256[]",
+          "internalType": "uint256[]"
         }
       ],
       "stateMutability": "view"
@@ -1890,6 +1930,26 @@
           "name": "randomWord",
           "type": "uint256",
           "internalType": "uint256"
+        },
+        {
+          "name": "start",
+          "type": "uint64",
+          "internalType": "uint64"
+        },
+        {
+          "name": "randomReady",
+          "type": "bool",
+          "internalType": "bool"
+        },
+        {
+          "name": "entrants",
+          "type": "uint32",
+          "internalType": "uint32"
+        },
+        {
+          "name": "lineSize",
+          "type": "uint32",
+          "internalType": "uint32"
         }
       ],
       "stateMutability": "view"
@@ -2004,6 +2064,26 @@
               "name": "randomWord",
               "type": "uint256",
               "internalType": "uint256"
+            },
+            {
+              "name": "start",
+              "type": "uint64",
+              "internalType": "uint64"
+            },
+            {
+              "name": "randomReady",
+              "type": "bool",
+              "internalType": "bool"
+            },
+            {
+              "name": "entrants",
+              "type": "uint32",
+              "internalType": "uint32"
+            },
+            {
+              "name": "lineSize",
+              "type": "uint32",
+              "internalType": "uint32"
             }
           ]
         },
@@ -2047,25 +2127,6 @@
           "name": "",
           "type": "uint256",
           "internalType": "uint256"
-        }
-      ],
-      "stateMutability": "view"
-    },
-    {
-      "type": "function",
-      "name": "isDepositor",
-      "inputs": [
-        {
-          "name": "",
-          "type": "address",
-          "internalType": "address"
-        }
-      ],
-      "outputs": [
-        {
-          "name": "",
-          "type": "bool",
-          "internalType": "bool"
         }
       ],
       "stateMutability": "view"
@@ -2439,6 +2500,51 @@
     },
     {
       "type": "function",
+      "name": "retryRandomness",
+      "inputs": [
+        {
+          "name": "drawId",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "saverAt",
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "saverCount",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "setAllowlisted",
       "inputs": [
         {
@@ -2648,7 +2754,33 @@
     },
     {
       "type": "function",
+      "name": "totalHarvestedToPrizes",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "totalLiabilities",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalPrizesPaid",
       "inputs": [],
       "outputs": [
         {
@@ -2740,6 +2872,42 @@
     },
     {
       "type": "function",
+      "name": "treeDepth",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "treeTotals",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "balances",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "depth",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "leaves",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "unpause",
       "inputs": [],
       "outputs": [],
@@ -2797,6 +2965,25 @@
     },
     {
       "type": "event",
+      "name": "AllowlistSet",
+      "inputs": [
+        {
+          "name": "who",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "allowed",
+          "type": "bool",
+          "indexed": false,
+          "internalType": "bool"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "Approval",
       "inputs": [
         {
@@ -2816,6 +3003,68 @@
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "CashBandsSet",
+      "inputs": [
+        {
+          "name": "targetBps",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "minTarget",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "lowBps",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "highBps",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "emergencyBps",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "smallLimit",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "DepositRulesSet",
+      "inputs": [
+        {
+          "name": "minDeposit",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "allowlistOn",
+          "type": "bool",
+          "indexed": false,
+          "internalType": "bool"
         }
       ],
       "anonymous": false
@@ -2897,12 +3146,44 @@
     },
     {
       "type": "event",
+      "name": "DrawPeriodSet",
+      "inputs": [
+        {
+          "name": "seconds_",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "FeeSet",
+      "inputs": [
+        {
+          "name": "recipient",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "bps",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "FeesPaid",
       "inputs": [
         {
           "name": "to",
           "type": "address",
-          "indexed": false,
+          "indexed": true,
           "internalType": "address"
         },
         {
@@ -2973,6 +3254,19 @@
     },
     {
       "type": "event",
+      "name": "PrizeSplitsSet",
+      "inputs": [
+        {
+          "name": "splits",
+          "type": "uint16[]",
+          "indexed": false,
+          "internalType": "uint16[]"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "QueuePaid",
       "inputs": [
         {
@@ -2983,6 +3277,38 @@
         },
         {
           "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RandomSourceSet",
+      "inputs": [
+        {
+          "name": "source",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "RandomnessReceived",
+      "inputs": [
+        {
+          "name": "drawId",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
+        },
+        {
+          "name": "randomWord",
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"
@@ -3021,6 +3347,25 @@
         },
         {
           "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "SaverJoined",
+      "inputs": [
+        {
+          "name": "saver",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "leaf",
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"
@@ -3238,6 +3583,33 @@
       "type": "error",
       "name": "ReentrancyGuardReentrantCall",
       "inputs": []
+    },
+    {
+      "type": "error",
+      "name": "SafeCastOverflowedIntDowncast",
+      "inputs": [
+        {
+          "name": "bits",
+          "type": "uint8",
+          "internalType": "uint8"
+        },
+        {
+          "name": "value",
+          "type": "int256",
+          "internalType": "int256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "SafeCastOverflowedUintToInt",
+      "inputs": [
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ]
     },
     {
       "type": "error",
