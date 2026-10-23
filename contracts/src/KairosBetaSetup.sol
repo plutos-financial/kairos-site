@@ -9,7 +9,7 @@ import {KairosVault, ITBillFund} from "./KairosVault.sol";
 import {ChainlinkVRFSource} from "./ChainlinkVRFSource.sol";
 
 /// @title KairosBetaSetup
-/// @notice Sets up the whole Kairos beta in ONE transaction: test USDC, the T-bill fund, the vault,
+/// @notice Sets up the whole Plutos beta in ONE transaction: test USDC, the T-bill fund, the vault,
 ///         a Chainlink VRF v2.5 subscription (funded with the ETH sent along), and the VRF source
 ///         that the vault uses for its draws. Everything is then handed to `finalOwner`.
 ///         The VRF source and the subscription use Chainlink's two-step ownership, so `finalOwner`
@@ -34,6 +34,7 @@ contract KairosBetaSetup {
         usdc.setMinter(address(tbill), true);
         vault = new KairosVault(IERC20(address(usdc)), ITBillFund(address(tbill)), finalOwner_);
         tbill.setAllowlisted(address(vault), true);
+        usdc.mint(address(vault), vault.ROUNDING_RESERVE()); // the $1 rounding reserve (test dollars)
 
         IVRFCoordinatorV2Plus c = IVRFCoordinatorV2Plus(coordinator_);
         subscriptionId = c.createSubscription();

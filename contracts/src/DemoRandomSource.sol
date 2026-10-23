@@ -16,6 +16,7 @@ contract DemoRandomSource is IRandomSource {
     event Fulfilled(uint256 indexed drawId, uint256 randomWord);
 
     constructor(address vault_) {
+        require(vault_ != address(0), "no vault");
         vault = vault_;
     }
 

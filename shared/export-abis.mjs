@@ -11,4 +11,6 @@ for (const n of names) {
 }
 writeFileSync(new URL("./abis.json", import.meta.url), JSON.stringify(out, null, 2));
 writeFileSync(new URL("./bytecode.json", import.meta.url), JSON.stringify(bytecode));
-console.log("Wrote shared/abis.json and shared/bytecode.json");
+// The one-transaction setup on its own, for the setup page (/deploy.html).
+writeFileSync(new URL("./setup.json", import.meta.url), JSON.stringify({ abi: out.KairosBetaSetup, bytecode: bytecode.KairosBetaSetup }));
+console.log("Wrote shared/abis.json, shared/bytecode.json and shared/setup.json");

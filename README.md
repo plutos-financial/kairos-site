@@ -7,9 +7,10 @@ Plutos is a savings account with a prize draw: savers keep every dollar they put
 The site is at **https://winplutos.tech** (Base Sepolia, Base's free test network). The old address, plutos-financial.github.io/kairos-site, forwards there. It has:
 
 - **Chainlink VRF draws**: winners are picked with a verifiable random number, and the Draws page animates every draw step by step (entries lined up, Chainlink's number, one spot on the line per prize), redoing the vault's math in the browser and checking it against the blockchain.
-- **Add money in one tap**: free test dollars go straight into savings (up to $10,000 a day per account, the test-dollar contract's limit). **Apple Pay** through Coinbase's onramp is there too, as a preview of the real checkout, in Coinbase's test mode (no card is charged; Coinbase's guest checkout allows $500 a week).
+- **Add money in one tap**: free test dollars go straight into savings, as many as you like (up to $1,000,000 a tap). **Apple Pay** through Coinbase's onramp is there too, as a preview of the real checkout, in Coinbase's test mode (no card is charged; Coinbase's guest checkout allows $500 a week).
 - **A Plutos wallet** with send, receive and cash out (cash out is simulated: Coinbase has no test mode for it).
-- **Savings as kUSD tokens**, one per dollar saved, non-transferable.
+- **Savings as pUSD tokens** (Plutos Savings), one per dollar saved, non-transferable.
+- **Draws that run themselves and scale**: a keeper closes each round and pays the winners, and the draw costs the same with 10 savers or 10,000 (see below).
 
 Old `/beta/` links redirect to the main site. The original demo edition (simple random source, free test dollars, contracts in `deployments/84532.json`) is still in the code and can be built with `node sync.mjs && npx vite build`.
 
@@ -29,21 +30,29 @@ Push to `main` and GitHub builds and publishes the site by itself (`.github/work
 | `contracts/` | Solidity contracts and tests (Foundry). `deployments/` holds the live addresses. |
 | `shared/` | Contract ABIs and bytecode, exported from `contracts/` for the app. |
 | `netlify/` | The money server: one function that creates Coinbase Apple Pay orders. Runs on Netlify (https://majestic-raindrop-515139.netlify.app) because GitHub Pages can't run server code. |
-| `keeper/` | Optional bot that rebalances and closes draws on a timer. |
+| `keeper/` | The keeper: closes rounds, pays winners and rebalances. GitHub runs one tick every 10 minutes (`.github/workflows/keeper.yml`) using the `KEEPER_PRIVATE_KEY` secret, a throwaway test wallet that only pays gas. |
 | `waitlist/` | The Google Apps Script that saves waitlist sign-ups to the Plutos Google Sheet. |
 
 ### The contracts
 
 | Contract | Role | Real-world equivalent |
 |---|---|---|
-| `MockUSDC` | Test dollars: hourly faucet, plus `topUp(amount)` up to $10,000 a day for the beta's Add money | USDC |
+| `MockUSDC` | Test dollars: hourly faucet, plus `topUp(amount)` for the beta's Add money (any amount, up to $1,000,000 a call) | USDC |
 | `MockTBill` | Test T-bill fund: rising price, allowlist, settlement delay, optional instant route | BUIDL, BENJI, USTB |
-| `KairosVault` | Deposits (minted 1:1 as non-transferable kUSD), cash drawer, 85/15 interest split, time-weighted draws, withdrawal queue | The Plutos product |
+| `KairosVault` | Deposits (minted 1:1 as non-transferable pUSD), cash drawer, 85/15 interest split, time-weighted entries in a sum tree (every deposit, draw and winner is O(log n)), withdrawal queue, $1 rounding reserve | The Plutos product |
 | `DemoRandomSource` | Simple two-step randomness (the demo) | |
 | `ChainlinkVRFSource` | Chainlink VRF v2.5 randomness (the beta) | Chainlink VRF |
 | `KairosBetaSetup` | Sets up the whole beta in one transaction: all of the above plus a funded Chainlink subscription | |
 
 Fees: there is **no deposit or withdrawal fee**. Plutos keeps 15% of the interest; 85% becomes prizes.
+
+### How the draw scales
+
+A saver's entries are balance x seconds held. The vault keeps them in a binary sum tree (one leaf per saver): each branch holds the total balance below it and the total of `change x (time of change - round start)`, so any subtree's entries are `roundLength x balance - that total`. A deposit updates one leaf-to-root path; closing a draw reads the root; each winner is one walk down. Two copies of the second total (one per round parity) keep a closed draw's entries frozen while the next round runs; old rounds are cleared lazily by a round stamp. Closing a draw costs about 212k gas at any size (the first version needed 94 million at 2,000 savers). `forge test --match-test test_DrawCostStaysFlat -vv` prints the table. The case study page (`app/case-study.html`) explains it for everyone else.
+
+### Tests
+
+`forge test` runs 31 tests: scenario tests, a brute-force check of 1,000 randomized four-round draws against a slow reference model, and invariant tests (256 runs x 150 random actions) that check solvency, "prizes only from interest", every saver's ledger and the entries tree after every action, then withdraw everyone and check each gets every cent back. `.github/workflows/contracts.yml` runs them on every contract change. Slither reports no high-severity findings. Details for everyone: `app/security.html`.
 
 ---
 
@@ -68,7 +77,7 @@ Edit, commit, push to `main`, and the site updates. Text and layout live in the 
 |---|---|
 | `app.js` | The Savings page (`app.html`): sign-in, balance, save / withdraw, next draw |
 | `draws.js` | The Draws page (`draws.html`): countdown, winners, past draws, the team's draw controls |
-| `drawshow.js` | The draw animation: lines up the entries (read from the vault's storage), shows the random number, picks each prize's spot, checks the result |
+| `drawshow.js` | The draw animation: lines up the entries (read from the vault with `drawLine`), shows the random number, picks each prize's spot, checks the result |
 | `beta-wallet.js` | The wallet: Add money (Coinbase Apple Pay), send, receive, cash out |
 | `pretend.js` | Pretend draws with the real savers and prize pool |
 | `appbar.js` | The header on the app pages (tabs, account menu) |
@@ -86,6 +95,7 @@ Local test chain: run `anvil`, deploy with `forge script script/Deploy.s.sol` (d
 - Money server: running on Netlify with `CDP_API_KEY_ID`, `CDP_API_KEY_SECRET` (secret) and `ALLOWED_ORIGINS`. Coinbase Onramp is in trial mode (25 orders, $5 max each).
 - Domain: winplutos.tech (registered at Name.com through the GitHub Student Pack; DNS points at GitHub Pages). It is set in GitHub Pages, Coinbase (Embedded Wallets domains, Onramp domain allowlist) and `ALLOWED_ORIGINS`. Still to do: apply for full Onramp access before launch.
 - Coinbase gas sponsor: if the Paymaster has a contract allowlist, it must include the USDC, vault and T-bill addresses in `84532-beta.json` (or be empty).
+- Keeper: `.github/workflows/keeper.yml` every 10 minutes. Needs the `KEEPER_PRIVATE_KEY` repository secret (a separate test wallet with a little Base Sepolia ETH). Scheduled workflows pause after 60 days without a commit; re-enable under Actions if that happens.
 
 ## Security
 
@@ -103,4 +113,3 @@ Local test chain: run `anvil`, deploy with `forge script script/Deploy.s.sol` (d
 - **A real tokenized T-bill fund** behind an adapter matching `ITBillFund`, with the issuer's allowlisting.
 - **Identity checks (KYC)**: the vault has an allowlist switch (`setDepositRules`).
 - **Admin keys in a multisig** (Safe), a timelock on changes, and two independent audits. Today the owner is one MetaMask key, and the owner can point the vault at a different random source, so a stolen key could rig future prizes (never deposits).
-- **Scale:** the draw loops over all savers. Fine for a beta, but it needs a sortition tree before thousands of users.

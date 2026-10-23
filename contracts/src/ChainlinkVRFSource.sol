@@ -25,6 +25,7 @@ contract ChainlinkVRFSource is VRFConsumerBaseV2Plus, IRandomSource {
     constructor(address coordinator, address vault_, uint256 subId, bytes32 keyHash_)
         VRFConsumerBaseV2Plus(coordinator)
     {
+        require(vault_ != address(0), "no vault");
         vault = vault_;
         subscriptionId = subId;
         keyHash = keyHash_;

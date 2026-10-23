@@ -28,6 +28,7 @@ contract KairosTest is Test {
         usdc.setMinter(address(tbill), true);
         vault = new KairosVault(IERC20(address(usdc)), ITBillFund(address(tbill)), treasury);
         tbill.setAllowlisted(address(vault), true);
+        usdc.mint(address(vault), 1e6); // the $1 rounding reserve, as KairosBetaSetup does
         rng = new DemoRandomSource(address(vault));
         vault.setRandomSource(rng);
         vault.setDrawPeriod(7 days);

@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Plutos · How it's built</title>
+  <meta name="description" content="A case study: the problem Plutos solves, how it's built, how the prize draw was redesigned to scale to millions of savers, and how it's kept safe." />
+  <meta name="theme-color" content="#0A0E1A" />
+  <link rel="icon" type="image/svg+xml" href="/src/media/plutos-icon.svg" />
+  <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
+  <meta property="og:title" content="Building Plutos: a prize-linked savings app" />
+  <meta property="og:description" content="How Plutos turns Treasury interest into fair, verifiable prize draws, and how the draw was redesigned so its cost doesn't grow with the number of savers." />
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/landing.css" />
+  <link rel="stylesheet" href="/src/explain.css" />
+</head>
+<body class="landing explain">
+  <header class="nav" id="nav">
+    <div class="nav-in">
+      <a class="brand" href="./" aria-label="Plutos home">
+        <span class="name">Plutos</span>
+      </a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="./#how">Overview</a>
+        <a href="./how-it-works.html">How it works</a>
+        <a href="./draws.html">Draws</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="ex">
+    <header class="ex-head wrap-narrow">
+      <p class="ex-kicker">Case study</p>
+      <h1>Building Plutos</h1>
+      <p class="ex-lede">A savings account where the interest becomes prizes. This is how it works under the hood, the hardest problem in building it, and how it's kept safe.</p>
+      <div class="stat-strip">
+        <div><b>440&times;</b><span>cheaper to close a draw with 2,000 savers</span></div>
+        <div><b>O(log n)</b><span>cost per deposit, draw and winner</span></div>
+        <div><b>31</b><span>automated tests on every change</span></div>
+        <div><b>10 min</b><span>between automatic checks for a finished round</span></div>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <a href="#problem">The problem</a>
+        <a href="#product">The product</a>
+        <a href="#architecture">How it fits together</a>
+        <a href="#scale">Making the draw scale</a>
+        <a href="#fair">Fair and checkable</a>
+        <a href="#safe">Safe</a>
+        <a href="#auto">Runs by itself</a>
+        <a href="#next">What's next</a>
+      </nav>
+    </header>
+
+    <section class="ex-sec wrap-narrow" id="problem">
+      <p class="sec-n">01</p>
+      <h2>The problem</h2>
+      <p>Americans spent about <b>$109 billion</b> on lottery tickets in 2025, and about half of adults play in a given year. A $2 Powerball ticket has a 1 in 292.2 million chance at the jackpot, and the money is gone the moment it loses. Meanwhile $500 in a savings account at 4% earns $1.67 a month, which is too small to feel.</p>
+      <p>The UK solved this in 1956 with <b>Premium Bonds</b>: savers keep their money, and the interest it would have earned is paid out as prizes. More than 22 million people hold them. In the U.S., credit unions ran a version called Save to Win, but it stayed local and branch-based. Nobody has built the national, mobile version.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="product">
+      <p class="sec-n">02</p>
+      <h2>The product</h2>
+      <ol class="flow">
+        <li><b>Add money.</b><span>From $1. Sign in with email; there's no crypto wallet or seed phrase to manage.</span></li>
+        <li><b>It's held in U.S. Treasury bills.</b><span>A cash drawer pays most withdrawals instantly; the rest earns interest.</span></li>
+        <li><b>Interest becomes prizes.</b><span>85% of it is paid out in a monthly draw, 15% runs the service. Every dollar saved is an entry.</span></li>
+        <li class="end"><b>Your deposit never moves.</b><span>Win or not, it stays yours, and you can take it out anytime.</span></li>
+      </ol>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="architecture">
+      <p class="sec-n">03</p>
+      <h2>How it fits together</h2>
+      <div class="arch" role="img" aria-label="Diagram: the saver's phone talks to Coinbase for sign-in and payments and to the Plutos vault on Base. The vault invests in a Treasury bill fund, gets random numbers from Chainlink, and is run on a schedule by the keeper.">
+        <div class="arch-row"><div class="arch-box you"><b>The saver's phone</b><span>Website and app (GitHub Pages)</span></div></div>
+        <div class="arch-row two">
+          <div class="arch-box"><b>Coinbase</b><span>Email sign-in, gas-free transactions, Apple Pay</span></div>
+          <div class="arch-box"><b>Money server</b><span>Checks the sign-in, then starts a payment (Netlify)</span></div>
+        </div>
+        <div class="arch-row"><div class="arch-box core"><b>Plutos vault</b><span>Savings receipts, cash drawer, interest split, entries tree, draws (Base)</span></div></div>
+        <div class="arch-row three">
+          <div class="arch-box"><b>T-bill fund</b><span>Earns the interest</span></div>
+          <div class="arch-box"><b>Chainlink VRF</b><span>Provably random numbers</span></div>
+          <div class="arch-box"><b>Keeper</b><span>Closes rounds, pays winners (GitHub Actions)</span></div>
+        </div>
+      </div>
+      <ul class="honest">
+        <li><b>The vault</b> is a Solidity contract on Base, an Ethereum network with fees of a fraction of a cent. Savings are receipts that can't be transferred, one per dollar. Only interest above what's owed is ever "harvested" into prizes.</li>
+        <li><b>The app</b> is a static site with a strict security policy: pages only run their own code and only talk to the services above. Savers sign in with email through Coinbase, which keeps the account's keys and pays the network fees.</li>
+        <li><b>Payments</b> go through Coinbase's Apple Pay checkout, started by a small server that only creates a payment for a signed-in saver, into their own account.</li>
+        <li><b>One transaction sets everything up</b>: the test dollars, the T-bill fund, the vault, and a funded Chainlink subscription.</li>
+      </ul>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="scale">
+      <p class="sec-n">04</p>
+      <h2>The hard part: making the draw scale</h2>
+      <p>Entries are fair only if they count <b>time</b>: $100 saved for the whole month should count the same as $200 saved for half of it, so a big deposit the night before a draw doesn't win an unfair edge. Each saver's entries are their balance multiplied by the seconds it was held.</p>
+      <p>The first version worked like a spreadsheet. When a round closed, it went down the list of every saver, worked out their entries, and wrote down a running total, so a random number could find its spot on the line. That costs a little for every saver, every draw. At 1,000 savers, closing a draw took <b>47 million gas</b>; at 2,000 it took <b>94 million</b>, more than fits in a single transaction. The draw would simply stop working at a few hundred savers.</p>
+
+      <h3 class="ex-h3">The fix: a sum tree</h3>
+      <p>Every saver gets one leaf of a binary tree, and every branch stores the totals of the leaves below it. Entries can't be stored directly (they grow every second), but they can be written as two numbers that only change when someone deposits or withdraws:</p>
+      <pre class="code formula"><code>entries = L &times; balance  &minus;  &Sigma; ( change &times; seconds since the round began )
+          (L = the round's length)</code></pre>
+      <p>So each branch keeps a total of balances and a total of that second term. The root holds everyone's entries; a deposit updates one path from a leaf to the root; and picking a winner is one walk from the root down, choosing left or right at each branch. All of it costs <b>O(log n)</b>: one more step each time the number of savers doubles.</p>
+      <p>One more problem: after a round closes, the random number takes a minute or so to arrive, and people keep saving in the meantime. Those changes must not alter the closed round's entries. The vault keeps <b>two</b> copies of the second term, one for each round parity. While the new round runs in one, changes are also recorded in the closed round's copy as if they happened at its close, which cancels out exactly, so its entries stay frozen until the winners are paid. Old rounds are cleared lazily: a branch stamped with an older round simply reads as zero, so starting a round costs nothing.</p>
+
+      <div class="gas">
+        <p class="g-title">Gas to close a draw</p>
+        <div class="g-row"><span class="g-n">10 savers</span><div class="g-bars"><i class="old" style="width:0.72%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">0.68M &rarr; <b>0.21M</b></span></div>
+        <div class="g-row"><span class="g-n">100</span><div class="g-bars"><i class="old" style="width:5.2%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">4.9M &rarr; <b>0.21M</b></span></div>
+        <div class="g-row"><span class="g-n">500</span><div class="g-bars"><i class="old" style="width:25.2%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">23.6M &rarr; <b>0.21M</b></span></div>
+        <div class="g-row"><span class="g-n">1,000</span><div class="g-bars"><i class="old" style="width:50.1%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">47.0M &rarr; <b>0.21M</b></span></div>
+        <div class="g-row"><span class="g-n">2,000</span><div class="g-bars"><i class="old" style="width:100%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">93.7M &rarr; <b>0.21M</b></span></div>
+        <p class="g-key"><span><i class="old"></i>First version</span><span><i class="new"></i>Sum tree</span></p>
+        <p class="r-foot">Measured by the test suite. Paying three winners takes 0.5M&ndash;1.0M gas whatever the size, and a deposit 0.18M&ndash;0.32M.</p>
+      </div>
+      <p>To make sure the fast version is right, a test rebuilds every draw the slow way and requires the exact same winners, across 1,000 randomized runs (see <a href="./security.html#tests">Security</a>).</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="fair">
+      <p class="sec-n">05</p>
+      <h2>Fair, and anyone can check it</h2>
+      <p>Each draw's random number comes from <b>Chainlink VRF</b> with a cryptographic proof that the blockchain checks before accepting it, so nobody, including Plutos, can choose or predict it. The number is mixed with each prize's position to pick one spot on the line per prize.</p>
+      <p>The <a href="./draws.html">Draws page</a> shows it happening: everyone's stretch of the line, the random number arriving, and each prize landing. Your browser reads the line from the blockchain, re-does the math itself, and checks that it gets the same winners the blockchain recorded.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="safe">
+      <p class="sec-n">06</p>
+      <h2>Safe</h2>
+      <p>The promises (your deposit is always yours, prizes only come from interest, the vault always holds what it owes) are written as tests that random programs try to break: 256 sequences of 150 random actions, checked after every action, ending with every saver withdrawing everything and getting every cent back. Those tests found one real issue, a rounding gap of a millionth of a dollar, which is now fixed. An independent scanner reports no high-severity findings. <a href="./security.html">Read the details</a>.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="auto">
+      <p class="sec-n">07</p>
+      <h2>Runs by itself</h2>
+      <p>A keeper checks every 10 minutes. When a round is over it closes it, which asks Chainlink for a random number. Chainlink answers by itself, and in most draws the winners are paid in the same step. When a draw is too big for that, the keeper pays them on its next check. It also keeps the cash drawer topped up. Everything the keeper does is something anyone is allowed to do, so if it ever stops, anyone can finish a draw.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="next">
+      <p class="sec-n">08</p>
+      <h2>What's next</h2>
+      <ul class="honest">
+        <li>The legal structure first, likely with a bank or credit union partner, since prize-linked savings is clearly allowed for them in about 34 states.</li>
+        <li>A real Treasury bill fund or bank partner in place of the test fund, plus identity checks.</li>
+        <li>Two independent security audits, a multisig owner with a time delay, and monitoring.</li>
+        <li>A capped pilot with real deposits in select states.</li>
+      </ul>
+    </section>
+
+    <section class="ex-end wrap-narrow">
+      <h2>Try it on the test network</h2>
+      <div class="cta-row">
+        <a href="./app.html" class="btn btn-primary btn-lg">Open the app</a>
+        <a href="./draws.html" class="btn btn-ghost btn-lg">Watch a draw</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap foot">
+      <div class="foot-brand">
+        <p>© 2026 Pluto's Financial. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="./">Home</a>
+        <a href="./app.html">App</a>
+        <a href="./draws.html">Draws</a>
+        <a href="./security.html">Security</a>
+        <a href="./privacy.html">Privacy</a>
+      </nav>
+    </div>
+  </footer>
+  <script type="module" src="/src/fresh.js"></script>
+</body>
+</html>

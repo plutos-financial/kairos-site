@@ -89,6 +89,8 @@ export default defineConfig({
         draws: page("draws.html"),
         how: page("how-it-works.html"),
         privacy: page("privacy.html"),
+        security: page("security.html"),
+        caseStudy: page("case-study.html"),
         control: page("control.html"),
         deploy: page("deploy.html"),
       },

@@ -58,15 +58,13 @@ contract BetaTest is Test {
         assertGt(setup.vault().balanceOf(alice) + setup.vault().balanceOf(bob), 501e6); // prizes landed in savings
     }
 
-    function test_topUpDailyLimit() public {
+    function test_topUpHasNoDailyLimit() public {
         MockUSDC usdc = setup.usdc();
         vm.startPrank(alice);
-        usdc.topUp(10_000e6);
-        vm.expectRevert(bytes("topup: over the daily limit"));
-        usdc.topUp(1);
-        vm.warp(block.timestamp + 1 days);
-        usdc.topUp(5e6);
+        for (uint256 i = 0; i < 5; i++) usdc.topUp(1_000_000e6);
+        vm.expectRevert(bytes("topup: up to $1,000,000 at a time"));
+        usdc.topUp(1_000_000e6 + 1);
         vm.stopPrank();
-        assertEq(usdc.balanceOf(alice), 10_005e6);
+        assertEq(usdc.balanceOf(alice), 5_000_000e6);
     }
 }

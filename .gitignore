@@ -2,6 +2,7 @@ node_modules/
 contracts/out/
 contracts/cache/
 contracts/lib/
+contracts/lib
 contracts/broadcast/
 keeper/.env
 .env

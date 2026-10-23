@@ -12,6 +12,7 @@ const file = edition === "beta" ? `${chainId}-beta.json` : `${chainId}.json`;
 const dep = new URL(`../contracts/deployments/${file}`, import.meta.url);
 copyFileSync(new URL("../shared/abis.json", import.meta.url), new URL("./src/abis.json", import.meta.url));
 copyFileSync(new URL("../shared/bytecode.json", import.meta.url), new URL("./src/bytecode.json", import.meta.url));
+copyFileSync(new URL("../shared/setup.json", import.meta.url), new URL("./src/setup.json", import.meta.url));
 
 let deployment = null;
 if (existsSync(dep)) deployment = JSON.parse(readFileSync(dep, "utf8"));

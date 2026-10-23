@@ -1,0 +1,34 @@
+name: Run the draws (keeper)
+# Every few minutes: closes the round when it's over, pays the winners once Chainlink's random
+# number arrives, and keeps the cash drawer in its band. Everything it does is something anyone
+# is allowed to do; it uses a throwaway test wallet (the KEEPER_PRIVATE_KEY secret) only to pay gas.
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: keeper
+  cancel-in-progress: false
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: keeper/package-lock.json
+      - name: Install
+        working-directory: keeper
+        run: npm ci
+      - name: One tick
+        working-directory: keeper
+        env:
+          KEEPER_PRIVATE_KEY: ${{ secrets.KEEPER_PRIVATE_KEY }}
+          CHAIN_ID: "84532"
+          EDITION: beta
+        run: node keeper.mjs --once

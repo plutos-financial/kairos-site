@@ -3,6 +3,7 @@ import { createPublicClient, createWalletClient, custom, http, parseEther, parse
 import { baseSepolia, foundry } from "viem/chains";
 import abis from "./abis.json";
 import bytecode from "./bytecode.json";
+import setup from "./setup.json"; // the one-transaction beta setup (KairosBetaSetup)
 import built from "./site-config.json";
 import "./fresh.js"; // stale-page reload and frame guard
 const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -80,8 +81,8 @@ async function setUpBeta() {
     throw new Error(`This wallet needs about 0.003 Base Sepolia ETH. Get some from a faucet, then try again.`);
   const li = log("Setting up everything in one transaction… confirm in your wallet");
   const hash = await wallet.deployContract({
-    abi: abis.KairosBetaSetup,
-    bytecode: bytecode.KairosBetaSetup,
+    abi: setup.abi,
+    bytecode: setup.bytecode,
     args: [VRF.coordinator, VRF.keyHash, addr, 86400n, 52560n],
     value: parseEther(VRF_FUNDING),
     account: addr,
@@ -89,7 +90,7 @@ async function setUpBeta() {
   li.innerHTML = "Waiting for Base to confirm…";
   const r = await pub.waitForTransactionReceipt({ hash });
   if (r.status !== "success") throw new Error("The setup transaction failed. Nothing was set up. Try again.");
-  const ready = parseEventLogs({ abi: abis.KairosBetaSetup, logs: r.logs, eventName: "Ready" })[0];
+  const ready = parseEventLogs({ abi: setup.abi, logs: r.logs, eventName: "Ready" })[0];
   if (!ready) throw new Error("Set up, but couldn't read the addresses. Send Claude the transaction link.");
   const a = ready.args;
   li.innerHTML = `✓ Everything is set up: <a href="${explorer}/tx/${hash}" target="_blank" rel="noopener noreferrer">see the transaction</a>`;

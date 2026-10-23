@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Plutos · Security</title>
+  <meta name="description" content="The promises Plutos makes about your money, how each one is tested, what the tests found, and what still has to happen before real money." />
+  <meta name="theme-color" content="#0A0E1A" />
+  <link rel="icon" type="image/svg+xml" href="/src/media/plutos-icon.svg" />
+  <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
+  <meta property="og:title" content="How Plutos keeps savings safe" />
+  <meta property="og:description" content="31 automated tests, 38,400 random actions per safety check, and an independent scanner, on every change." />
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="/src/landing.css" />
+  <link rel="stylesheet" href="/src/explain.css" />
+</head>
+<body class="landing explain">
+  <header class="nav" id="nav">
+    <div class="nav-in">
+      <a class="brand" href="./" aria-label="Plutos home">
+        <span class="name">Plutos</span>
+      </a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="./#how">Overview</a>
+        <a href="./how-it-works.html">How it works</a>
+        <a href="./draws.html">Draws</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="ex">
+    <header class="ex-head wrap-narrow">
+      <h1>How Plutos keeps savings safe</h1>
+      <p class="ex-lede">Plutos makes four promises about your money. Each one is written down as a test that a computer tries to break, thousands of times, every time the code changes.</p>
+      <div class="stat-strip">
+        <div><b>31</b><span>automated tests</span></div>
+        <div><b>38,400</b><span>random actions per safety check</span></div>
+        <div><b>1,000</b><span>randomized draws checked against a brute-force model</span></div>
+        <div><b>0</b><span>high-severity scanner findings</span></div>
+      </div>
+      <nav class="toc" aria-label="On this page">
+        <a href="#promises">The promises</a>
+        <a href="#tests">How they're tested</a>
+        <a href="#found">What the tests found</a>
+        <a href="#scan">The scanner</a>
+        <a href="#owner">What the owner can and can't do</a>
+        <a href="#before">Before real money</a>
+        <a href="#yourself">Check it yourself</a>
+      </nav>
+    </header>
+
+    <section class="ex-sec wrap-narrow" id="promises">
+      <p class="sec-n">01</p>
+      <h2>The promises</h2>
+      <div class="promise-grid">
+        <div class="promise"><span class="p-n">1</span><b>Your deposit is always yours</b><p>You can withdraw everything, at any time, even if deposits are paused. Nobody else can move your savings.</p></div>
+        <div class="promise"><span class="p-n">2</span><b>Prizes only come from interest</b><p>Every prize dollar is interest the Treasury bills earned. Deposits are never used for prizes.</p></div>
+        <div class="promise"><span class="p-n">3</span><b>Nobody chooses the winners</b><p>Chainlink supplies the random number with a proof the blockchain checks. Plutos can't pick or change it.</p></div>
+        <div class="promise"><span class="p-n">4</span><b>The vault holds what it owes</b><p>At every moment, the vault holds at least everyone's savings, plus prizes and fees not yet paid.</p></div>
+      </div>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="tests">
+      <p class="sec-n">02</p>
+      <h2>How they're tested</h2>
+      <p>The savings contract is tested three ways. All of it runs automatically on every change to the code.</p>
+
+      <h3 class="ex-h3">Invariant tests: try to break the promises</h3>
+      <p>A program plays savers, the keeper and the team at once: deposits and withdrawals of any size, long waits, weekends when the T-bill fund is slow to pay out, prize changes, draws, and draws whose random number arrives late. It runs <b>256 random sequences of 150 actions</b>, and after every single action it checks:</p>
+      <ul class="honest">
+        <li><b>Solvent:</b> what the vault holds covers everything it owes.</li>
+        <li><b>Prizes only from interest:</b> every prize dollar paid, waiting or locked in a draw was harvested interest, and total savings equal deposits minus withdrawals plus prizes, to the cent.</li>
+        <li><b>Every saver's ledger:</b> each balance equals what that person put in, minus what they took out, plus what they won.</li>
+        <li><b>Entries add up:</b> everyone's entries sum to the total the draw will use.</li>
+      </ul>
+      <p>At the end of every sequence, every saver withdraws everything, the test waits for the T-bill fund to settle, and checks that <b>each one got back every cent</b>.</p>
+
+      <h3 class="ex-h3">A brute-force check of every draw</h3>
+      <p>The vault picks winners with a fast data structure (a sum tree, explained in <a href="./case-study.html#scale">how it's built</a>). The test rebuilds each draw the slow, obvious way: it integrates every saver's balance over time, lines everyone up, and searches one by one. Across <b>1,000 randomized runs of four rounds each</b>, including savers who join while a draw waits for its random number, the vault has to agree exactly: the same entries, the same totals, the same winners.</p>
+
+      <h3 class="ex-h3">Scenario tests</h3>
+      <p>Twenty-six tests walk through specific situations: the full loop from deposit to prize to withdrawal, withdrawals during a weekend that wait for the fund to settle, the last saver leaving, withdrawals while deposits are paused, savings that can't be transferred, a draw whose random number arrives without enough gas to pay the winners in the same step, a random number that never arrives, and a real Chainlink VRF setup on a simulated network.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="found">
+      <p class="sec-n">03</p>
+      <h2>What the tests found</h2>
+      <p>The invariant tests found one real problem, and it's fixed.</p>
+      <div class="finding">
+        <p class="f-tag">Fixed</p>
+        <b>Rounding could leave the vault a millionth of a dollar short</b>
+        <p>Buying T-bill fund tokens rounds down, by up to two millionths of a dollar per purchase. Right after a deposit was invested, the vault could briefly owe a millionth of a dollar more than it held. Harmless in practice, but it broke promise 4, and it could add up. The fix is standard: a <b>$1 rounding reserve</b>, put in once when the vault is set up. It never counts as interest, so it's never paid out as prizes, and it covers rounding hundreds of thousands of times over.</p>
+      </div>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="scan">
+      <p class="sec-n">04</p>
+      <h2>The scanner</h2>
+      <p>Every contract was also run through <b>Slither</b>, an open-source analyzer from Trail of Bits that looks for known patterns of smart-contract bugs. After fixes it reports <b>no high-severity findings</b>.</p>
+      <ul class="honest">
+        <li><b>Fixed:</b> checks that addresses aren't empty, events whenever the owner changes a setting (so every change is on the public record), and clearer code where the scanner couldn't follow how winners were stored.</li>
+        <li><b>"Reentrancy" (reviewed, safe):</b> every function that moves money is locked against being re-entered mid-way, and it only ever calls Plutos's own T-bill fund and USDC.</li>
+        <li><b>"Unused return values" (reviewed, intended):</b> after each call to the fund, the vault reads its balances again rather than trusting what the call said.</li>
+        <li><b>"Strict equality" (reviewed, intended):</b> these are checks for "is this zero?", which is exactly what's meant.</li>
+        <li><b>Low and informational:</b> mostly that rounds are timed with the blockchain's clock, which is how they're meant to work.</li>
+      </ul>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="owner">
+      <p class="sec-n">05</p>
+      <h2>What the owner can and can't do</h2>
+      <p>Whoever controls the owner account can change settings: how long rounds last, how prizes are split, the minimum deposit, pausing deposits, and the platform's share of interest, up to a hard cap of 25%. Every change is recorded publicly.</p>
+      <p>The owner <b>can't</b> withdraw anyone's savings or mint savings for themselves: there's no function for it. Withdrawals keep working even when deposits are paused.</p>
+      <p>One power matters for fairness: the owner can switch the source of random numbers. That's why, before real money, the owner has to be a multisig wallet (several people must sign) with a time delay, so any change is visible days before it takes effect.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="before">
+      <p class="sec-n">06</p>
+      <h2>Before real money</h2>
+      <p>Tests and scanners catch a lot, but they aren't an audit. Plutos runs on a test network with test money, and won't take real deposits until all of this is done:</p>
+      <ul class="honest">
+        <li>Two independent security audits, and a bug bounty.</li>
+        <li>A multisig owner with a time delay, plus monitoring and alerts.</li>
+        <li>The right legal structure, likely with a bank or credit union partner.</li>
+        <li>A real Treasury bill fund or bank partner in place of the test fund, and identity checks for every saver.</li>
+      </ul>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="yourself">
+      <p class="sec-n">07</p>
+      <h2>Check it yourself</h2>
+      <p>The contracts and tests are public. With <a href="https://getfoundry.sh" target="_blank" rel="noopener noreferrer">Foundry</a> installed:</p>
+      <pre class="code"><code>cd contracts
+./install-deps.sh
+forge test        # all 31 tests, including the invariants
+forge test --match-test test_DrawCostStaysFlat -vv   # the gas table</code></pre>
+      <p>On the test network, every deposit, draw and prize is public on <a href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer">Basescan</a>, and the <a href="./draws.html">Draws page</a> re-does each draw's math in your browser and checks it against what the blockchain recorded.</p>
+    </section>
+
+    <section class="ex-end wrap-narrow">
+      <h2>See how it's built</h2>
+      <div class="cta-row">
+        <a href="./case-study.html" class="btn btn-primary btn-lg">How Plutos is built</a>
+        <a href="./app.html" class="btn btn-ghost btn-lg">Try the app</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap foot">
+      <div class="foot-brand">
+        <p>© 2026 Pluto's Financial. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <a href="./">Home</a>
+        <a href="./app.html">App</a>
+        <a href="./draws.html">Draws</a>
+        <a href="./case-study.html">How it's built</a>
+        <a href="./privacy.html">Privacy</a>
+      </nav>
+    </div>
+  </footer>
+  <script type="module" src="/src/fresh.js"></script>
+</body>
+</html>

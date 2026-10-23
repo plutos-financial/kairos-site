@@ -1,0 +1,28 @@
+name: Test the contracts
+# Every change to the contracts runs the full test suite: scenario tests, the brute-force draw check
+# (1,000 randomized runs) and the invariant tests (256 runs x 150 random actions).
+on:
+  push:
+    branches: [main]
+    paths: ["contracts/**", ".github/workflows/contracts.yml"]
+  pull_request:
+    paths: ["contracts/**"]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: contracts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Install libraries
+        run: ./install-deps.sh
+      - name: Build
+        run: forge build --sizes
+      - name: Test
+        run: forge test
