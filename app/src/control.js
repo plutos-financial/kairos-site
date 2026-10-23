@@ -1,6 +1,6 @@
 // Control room: live Rebalancer view, draw simulator, activity feed.
 import { keccak256, encodeAbiParameters, formatUnits, parseUnits } from "viem";
-import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey } from "./core.js";
+import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey, readPages } from "./core.js";
 import { saverName } from "./winners-ui.js";
 
 const YEAR = 365n * 24n * 3600n;
@@ -192,10 +192,8 @@ async function runSimulation() {
     const pool = ((interestAt(t) + accrue) * (10000n - s.feeBps)) / 10000n + s.reserve;
 
     // Real savers and their weights (balance x time held this round).
-    const n = Number(s.savers);
-    const addrs = await Promise.all(Array.from({ length: n }, (_, i) => read("vault", "depositors", [BigInt(i)])));
-    const weights = await Promise.all(addrs.map((a) => read("vault", "weightAt", [a, end])));
-    const people = addrs.map((a, i) => ({ who: a, w: weights[i], bal: 0n })).filter((p) => p.w > 0n);
+    const pages = await readPages(s.savers, (start, count) => read("vault", "currentLine", [end, start, count]));
+    const people = pages.flatMap(([addrs, weights]) => addrs.map((a, i) => ({ who: a, w: weights[i], bal: 0n }))).filter((p) => p.w > 0n);
     const bals = await Promise.all(people.map((p) => read("vault", "balanceOf", [p.who])));
     people.forEach((p, i) => (p.bal = bals[i]));
     if (extra > 0n) {

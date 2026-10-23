@@ -174,10 +174,10 @@ function signInProblem(x) {
 
 // ------------------------------------------------------------------ save / withdraw
 
-// In the beta, "Add money" adds free test dollars and saves them in one step (any amount up to the
-// test-dollar contract's $10,000 a day per account). Apple Pay through Coinbase is still there as a
+// In the beta, "Add money" adds free test dollars and saves them in one step, as much as anyone likes
+// (up to $1,000,000 a tap, so the numbers stay readable). Apple Pay through Coinbase is still there as a
 // preview of the real checkout, but it isn't needed to try Plutos.
-const TOP_UP_LIMIT = 10_000_000_000n; // MockUSDC.TOP_UP_DAILY_LIMIT, $10,000 a day per account
+const TOP_UP_MAX = 1_000_000_000_000n; // MockUSDC.TOP_UP_MAX, $1,000,000 per tap
 const CHIPS = {
   deposit: isBeta ? ["100", "500", "1000", "5000"] : ["10", "50", "100", "max"],
   withdraw: ["10", "50", "100", "max"],
@@ -271,30 +271,13 @@ async function doDeposit() {
   await run($("go"), await saveCalls(amt), () => `Saved ${fmt(amt, 0)}. ${moreEntries(amt)}`);
 }
 
-/** How many more test dollars this account can add today. */
-async function topUpLeft() {
-  const [day, used] = await Promise.all([read("usdc", "topUpDay", [state.address]), read("usdc", "toppedUp", [state.address])]);
-  const today = BigInt(Math.floor((Date.now() / 1000 + s.chainOffset) / 86400));
-  return day === today ? (used >= TOP_UP_LIMIT ? 0n : TOP_UP_LIMIT - used) : TOP_UP_LIMIT;
-}
-
 /** Beta: add test dollars and save them, in one step (one tap with the email sign-in). */
 async function doAdd() {
   if (busy) return;
   const amt = amountInput();
   if (amt === null) return;
   if (amt < s.minDeposit) return toast(`The smallest amount you can add is ${fmt(s.minDeposit, 0)}.`, true);
-  let left = TOP_UP_LIMIT;
-  try {
-    left = await topUpLeft();
-  } catch {}
-  if (amt > left)
-    return toast(
-      left > 0n
-        ? `You can add up to ${fmt(left, 0)} more today. Test dollars are limited to $10,000 a day per account.`
-        : "You've added today's $10,000 of test dollars. Come back tomorrow for more.",
-      true
-    );
+  if (amt > TOP_UP_MAX) return toast("You can add up to $1,000,000 at a time. Add it in a few goes.", true);
   const calls = [{ c: "usdc", fn: "topUp", args: [amt] }, ...(await saveCalls(amt))];
   await run($("go"), calls, () => `Added ${fmt(amt, 0)} to your savings. ${moreEntries(amt)}`);
 }
@@ -389,7 +372,7 @@ function updatePreview() {
 
 function updateHint() {
   if (isBeta && tab === "deposit") {
-    $("hint").textContent = "Free test dollars, saved straight away. Up to $10,000 a day.";
+    $("hint").textContent = "Free test dollars, saved straight away. Add as much as you like.";
     return;
   }
   const b = document.createElement("b");

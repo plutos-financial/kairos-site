@@ -6,27 +6,24 @@
 //   3. For prize k (k = 0, 1, 2, …) the number is mixed with k (keccak256), divided by the length of
 //      the line, and the remainder is a spot on the line. Whoever's stretch holds that spot wins prize k.
 //
-// That is exactly KairosVault.fulfillRandomness, redone in the browser. For real draws the result is
-// checked against the winners the blockchain recorded.
+// That is exactly KairosVault.awardDraw, redone in the browser (the vault walks a sum tree to the same
+// spot; the browser lines everyone up and searches). For real draws the result is checked against the
+// winners the blockchain recorded.
 //
 // Three ways in: watchDraw(id) as Chainlink answers, replayDraw(id) for a finished draw, and
 // playPretend(...) for a pretend draw (pretend.js).
-import { keccak256, encodeAbiParameters, toHex, hexToBigInt, getAddress } from "viem";
+import { keccak256, encodeAbiParameters, hexToBigInt, getAddress } from "viem";
 import abis from "./abis.json";
-import { $, state, fmt, read, sleep, usesChainlink } from "./core.js";
+import { $, state, fmt, read, act, sleep, usesChainlink, lineFromPages, readPages } from "./core.js";
 import { podiumHTML, groupWinners, myWin, saverName, hueOf } from "./winners-ui.js";
 import "./drawshow.css";
 
-// Where KairosVault keeps each draw's line (from `forge inspect KairosVault storageLayout`).
-// drawUsers[drawId] and drawCumWeights[drawId] are internal, so they're read from storage.
-const SLOT_USERS = 36n;
-const SLOT_CUM = 37n;
 const U256x2 = [{ type: "uint256" }, { type: "uint256" }];
 
 /** keccak256(abi.encode(randomNumber, k)), as the vault computes it for prize k. */
 export const ticketHash = (word, k) => hexToBigInt(keccak256(encodeAbiParameters(U256x2, [BigInt(word), BigInt(k)])));
 
-/** Index of the saver whose stretch of the line holds `ticket` (same binary search as the vault). */
+/** Index of the saver whose stretch of the line holds `ticket` (the vault walks its tree to the same answer). */
 export function findWinner(cum, ticket) {
   let lo = 0;
   let hi = cum.length - 1;
@@ -38,29 +35,17 @@ export function findWinner(cum, ticket) {
   return lo;
 }
 
-/** The line exactly as the vault saved it when the round closed: savers in order, running totals. */
-export async function drawSnapshot(drawId, entrants, totalWeight) {
-  const n = Number(entrants);
-  if (!n || n > 2000) return null;
+/** The line exactly as the draw used it, read from the vault (it keeps the newest draw's line). */
+export async function drawSnapshot(drawId, lineSize, totalWeight) {
+  const n = Number(lineSize || 0);
+  if (!n || n > 20_000) return null;
   try {
-    const vault = state.cfg.vault;
-    const head = (slot) => keccak256(encodeAbiParameters(U256x2, [BigInt(drawId), slot]));
-    const at = (slot) => state.pub.getStorageAt({ address: vault, slot: head(slot) });
-    const [lenU, lenC] = await Promise.all([at(SLOT_USERS), at(SLOT_CUM)]);
-    if (hexToBigInt(lenU || "0x0") !== BigInt(n) || hexToBigInt(lenC || "0x0") !== BigInt(n)) return null; // not the layout we expect
-    const items = (slot) => {
-      const base = hexToBigInt(keccak256(head(slot)));
-      return Promise.all(Array.from({ length: n }, (_, i) => state.pub.getStorageAt({ address: vault, slot: toHex(base + BigInt(i), { size: 32 }) })));
-    };
-    const [u, c] = await Promise.all([items(SLOT_USERS), items(SLOT_CUM)]);
-    const users = u.map((x) => getAddress("0x" + String(x).slice(-40)));
-    const cum = c.map((x) => hexToBigInt(x));
-    for (let i = 1; i < n; i++) if (cum[i] <= cum[i - 1]) return null;
-    if (totalWeight !== undefined && cum[n - 1] !== BigInt(totalWeight)) return null;
-    return { users, cum, total: cum[n - 1] };
-  } catch (e) {
-    console.warn("Couldn't read the draw's entries line", e);
-    return null;
+    const line = lineFromPages(await readPages(n, (start, count) => read("vault", "drawLine", [BigInt(drawId), start, count])));
+    if (!line.users.length) return null;
+    if (totalWeight !== undefined && line.total !== BigInt(totalWeight)) return null;
+    return line;
+  } catch {
+    return null; // an older draw: only the newest one keeps its full line
   }
 }
 
@@ -426,7 +411,7 @@ function verifyLine(ok, tx, hadLine) {
   const cl = chainlinkLink();
   if (cl && usesChainlink()) links.push(`<a href="${cl}" target="_blank" rel="noopener noreferrer">Plutos on Chainlink</a>`);
   const head = !hadLine
-    ? "The spots above come straight from the blockchain's random number."
+    ? "Only the newest draw keeps its full line on the blockchain, so this shows the random number and the winners it recorded."
     : ok
       ? "&check; Your browser redid the math and got the same winners the blockchain recorded."
       : "Your browser's math didn't match the blockchain's record. The blockchain's record is what counts.";
@@ -471,7 +456,7 @@ async function playFromChain(drawId, id, live) {
   let [d, winners, amounts, entrants] = await read("vault", "getDraw", [BigInt(drawId)]);
   if (id !== run) throw STOP;
   if (d.prize === 0n && d.awarded) return notice(`Draw #${drawId} had no prize, so nobody was picked.`);
-  const line = (await drawSnapshot(drawId, entrants, d.totalWeight)) || { users: null, cum: null, total: d.totalWeight };
+  const line = (await drawSnapshot(drawId, d.lineSize ?? entrants, d.totalWeight)) || { users: null, cum: null, total: d.totalWeight };
   if (id !== run) throw STOP;
   renderLine(line, me);
   await pause(1500, id);
@@ -485,11 +470,20 @@ async function playFromChain(drawId, id, live) {
   if (!d.awarded) {
     // Wait for Chainlink. It answers on its own, usually within a minute on the test network.
     const t0 = Date.now();
+    let tried = false;
     for (let i = 0; !d.awarded; i++) {
       const secs = Math.round((Date.now() - t0) / 1000);
-      $("dsRngNote").textContent = chainlink
-        ? `Plutos asked Chainlink for a number nobody can predict or change. Waiting for the answer… ${secs}s. This usually takes under a minute.`
-        : `Waiting for the random number… ${secs}s`;
+      $("dsRngNote").textContent = d.randomReady
+        ? "The random number is in. Paying the winners…"
+        : chainlink
+          ? `Plutos asked Chainlink for a number nobody can predict or change. Waiting for the answer… ${secs}s. This usually takes under a minute.`
+          : `Waiting for the random number… ${secs}s`;
+      // The number arrived but the winners weren't paid in the same step (a very big draw)? Anyone can
+      // finish it. With the email sign-in it's free and needs no confirmation; otherwise the keeper does it.
+      if (d.randomReady && !tried && state.mode === "email") {
+        tried = true;
+        act([{ c: "vault", fn: "awardDraw", args: [BigInt(drawId)] }]).catch((e) => console.warn("awardDraw", e));
+      }
       if (Date.now() - t0 > 6 * 60_000) {
         clearInterval(scrambleTimer);
         return notice("Chainlink hasn't answered yet. The winners will appear by themselves once it does. Check back in a few minutes.");

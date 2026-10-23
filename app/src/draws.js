@@ -217,6 +217,16 @@ async function findPending(cur) {
 
 /** The random source needs one more block after the round closes, then anyone can finish it. */
 async function pickWinners(drawId, status) {
+  // The random number is already in but the winners weren't paid in the same step (a very big draw)?
+  // Anyone can pay them: one walk down the vault's tree per prize.
+  const [d0] = await read("vault", "getDraw", [drawId]);
+  if (d0.randomReady && !d0.awarded) {
+    setStep(3);
+    status("Paying the winners…");
+    await act([{ c: "vault", fn: "awardDraw", args: [drawId], gas: 8_000_000n }], status);
+    setStep(4);
+    return replayDraw(drawId);
+  }
   if (usesChainlink()) {
     // Chainlink answers by itself, usually within a minute. Show it happening, live.
     status("Chainlink is picking a random number…");
@@ -238,6 +248,12 @@ async function pickWinners(drawId, status) {
       await act([{ c: "rng", fn: "fulfill", args: [drawId], gas: 3_000_000n }], status);
       const ev = (await vaultEvents("DrawAwarded"))[0];
       if (ev) {
+        setStep(4);
+        return replayDraw(drawId);
+      }
+      const [d1] = await read("vault", "getDraw", [drawId]);
+      if (d1.randomReady && !d1.awarded) {
+        await act([{ c: "vault", fn: "awardDraw", args: [drawId], gas: 8_000_000n }], status);
         setStep(4);
         return replayDraw(drawId);
       }
@@ -443,7 +459,7 @@ function renderHistory(draws) {
   const me = state.address;
   $("history").innerHTML = rest
     .map((x) => {
-      if (!x.d.awarded) return row(x, `<span class="badge wait">Chainlink is picking…</span>`, "");
+      if (!x.d.awarded) return row(x, `<span class="badge wait">${x.d.randomReady ? "Paying the winners…" : "Chainlink is picking…"}</span>`, "");
       if (!x.winners.length) return row(x, `<span class="tiny">No prize this round</span>`, "");
       const g = groupWinners(x.winners, x.amounts);
       const top = g[0];

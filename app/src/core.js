@@ -11,6 +11,7 @@ import {
   http,
   formatUnits,
   encodeFunctionData,
+  getAddress,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, foundry } from "viem/chains";
@@ -357,6 +358,9 @@ export function friendlyError(e) {
     const r = reason.replace(/^(kairos|fund): /, "");
     if (/faucet: wait an hour/.test(r)) return "You already got test dollars this hour. Try again later.";
     if (/topup: over the daily limit/.test(r)) return "That's over the $10,000-a-day limit for test dollars. Try a smaller amount.";
+    if (/topup: up to/.test(r)) return "You can add up to $1,000,000 at a time. Add it in a few goes.";
+    if (/last draw still picking/.test(r)) return "The last draw is still paying its winners. Try again in a minute.";
+    if (/not ready to award/.test(r)) return "Those winners were already paid, or the random number hasn't arrived yet.";
     return r.charAt(0).toUpperCase() + r.slice(1) + ".";
   }
   if (name) return name;
@@ -386,3 +390,25 @@ export function humanDuration(s) {
   if (s % 60 === 0) return `${s / 60} minute${s === 60 ? "" : "s"}`;
   return `${s} seconds`;
 }
+
+// ------------------------------------------------------------------ the draw line, a page at a time
+
+const PAGE = 500n;
+
+/** Savers in order and running totals, from pages of [savers, entries] (people with no entries left out). */
+export function lineFromPages(pages) {
+  const users = [];
+  const cum = [];
+  let total = 0n;
+  for (const [savers, weights] of pages)
+    savers.forEach((a, i) => {
+      if (weights[i] === 0n) return;
+      users.push(getAddress(a));
+      cum.push((total += weights[i]));
+    });
+  return { users, cum, total };
+}
+
+/** Reads a line a page at a time: fn(start, count) -> [savers, entries]. */
+export const readPages = (size, fn) =>
+  Promise.all(Array.from({ length: Math.ceil(Number(size) / Number(PAGE)) }, (_, p) => fn(BigInt(p) * PAGE, PAGE)));

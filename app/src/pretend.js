@@ -1,7 +1,7 @@
 // Pretend draws: what the next draw could pay, using the real savers and the real prize pool.
-// Same picking math as KairosVault.fulfillRandomness, with a random number from this browser.
+// Same picking math as KairosVault.awardDraw, with a random number from this browser.
 // Nothing is sent to the network, so anyone can run one, signed in or not. drawshow.js shows it.
-import { state, read } from "./core.js";
+import { state, read, lineFromPages, readPages } from "./core.js";
 import { playPretend, showNotice } from "./drawshow.js";
 
 const YEAR = 365n * 24n * 3600n;
@@ -31,17 +31,8 @@ async function load() {
   const accrue = tokens > 0n ? (tokens * (nav(end) - nav(now))) / 10n ** 18n : 0n;
   const pool = reserve + ((interest + accrue) * (10000n - feeBps)) / 10000n;
 
-  // The line the vault would save if the round closed at the draw time: same order, same weights.
-  const addrs = await Promise.all(Array.from({ length: Number(n) }, (_, i) => read("vault", "depositors", [BigInt(i)])));
-  const weights = await Promise.all(addrs.map((a) => read("vault", "weightAt", [a, end])));
-  const users = [];
-  const cum = [];
-  let total = 0n;
-  addrs.forEach((a, i) => {
-    if (weights[i] === 0n) return;
-    users.push(a);
-    cum.push((total += weights[i]));
-  });
+  // The line the vault would use if the round closed at the draw time: same order, same entries.
+  const { users, cum, total } = lineFromPages(await readPages(n, (start, count) => read("vault", "currentLine", [end, start, count])));
   snap = { at: Date.now(), drawId, users, cum, total, pool, splits: splits.map(BigInt), later: when(Number(end - now)) };
   return snap;
 }
