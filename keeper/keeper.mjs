@@ -13,7 +13,7 @@
 // Environment: KEEPER_PRIVATE_KEY (a throwaway test wallet with a little Base Sepolia ETH),
 // RPC_URL (default https://sepolia.base.org), CHAIN_ID (84532), EDITION (beta), TICK_SECONDS (60).
 import { readFileSync, existsSync } from "node:fs";
-import { createPublicClient, createWalletClient, http, formatUnits, formatEther } from "viem";
+import { createPublicClient, createWalletClient, http, fallback, formatUnits, formatEther } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, foundry } from "viem/chains";
 
@@ -34,13 +34,35 @@ if (!existsSync(file)) {
 const deployment = JSON.parse(readFileSync(file));
 const chain = CHAIN_ID === 84532 ? baseSepolia : { ...foundry, id: CHAIN_ID };
 
+// In GitHub Actions, problems also show up as annotations on the run, readable without the full log.
+const inActions = Boolean(process.env.GITHUB_ACTIONS);
+const note = (level, msg) => {
+  console.log(msg);
+  if (inActions) console.log(`::${level} title=keeper::${msg.replace(/\r?\n/g, " ")}`);
+};
+
 if (!process.env.KEEPER_PRIVATE_KEY) {
   console.log("KEEPER_PRIVATE_KEY isn't set, so the keeper can't send anything. (In GitHub: Settings > Secrets > Actions.)");
   process.exit(0);
 }
-const account = privateKeyToAccount(process.env.KEEPER_PRIVATE_KEY);
-const pub = createPublicClient({ chain, transport: http(RPC_URL) });
-const wallet = createWalletClient({ chain, account, transport: http(RPC_URL) });
+// MetaMask exports keys without the 0x, and copying can add spaces, quotes or a line break: accept all of those.
+const rawKey = process.env.KEEPER_PRIVATE_KEY.trim().replace(/^["']|["']$/g, "").trim();
+const key = /^0x/i.test(rawKey) ? "0x" + rawKey.slice(2) : "0x" + rawKey;
+if (!/^0x[0-9a-fA-F]{64}$/.test(key)) {
+  note("error", `KEEPER_PRIVATE_KEY doesn't look like a private key (it should be 64 letters and numbers, with or without 0x; this one has ${rawKey.replace(/^0x/i, "").length} characters). Replace the secret in GitHub: Settings > Secrets and variables > Actions.`);
+  process.exit(1);
+}
+const account = privateKeyToAccount(key);
+// Base's public node limits how often anyone can call it, and GitHub's machines share addresses,
+// so fall back to other public nodes when it says no.
+const RPCS = process.env.RPC_URL
+  ? [RPC_URL]
+  : CHAIN_ID === 84532
+    ? ["https://sepolia.base.org", "https://base-sepolia-rpc.publicnode.com", "https://base-sepolia.drpc.org"]
+    : [RPC_URL];
+const transport = fallback(RPCS.map((u) => http(u, { retryCount: 2, retryDelay: 800 })));
+const pub = createPublicClient({ chain, transport });
+const wallet = createWalletClient({ chain, account, transport });
 
 const vault = { address: deployment.vault, abi: abis.KairosVault };
 const usd = (x) => "$" + Number(formatUnits(x, 6)).toLocaleString("en-US", { maximumFractionDigits: 2 });
@@ -70,9 +92,11 @@ async function tick() {
     `[${new Date().toISOString()}] round ${current} · next draw ${nextDraw <= now ? "due now" : `in ${Math.round(Number(nextDraw - now) / 60)} min`} · prize pool ~${usd(prizeReserve + (interest * 85n) / 100n)} · drawer ${usd(cash)} · keeper ${Number(formatEther(eth)).toFixed(5)} ETH`
   );
   if (eth === 0n) {
-    console.log("  The keeper wallet has no test ETH, so it can't send anything. Send it a little Base Sepolia ETH.");
+    note("error", `The keeper wallet ${account.address} has no Base Sepolia ETH, so it can't run the draws. Send it about 0.01 test ETH from a faucet.`);
+    process.exitCode = 1;
     return;
   }
+  if (eth < 200_000_000_000_000n) note("warning", `The keeper wallet ${account.address} is low on test ETH (${Number(formatEther(eth)).toFixed(5)}). Top it up from a faucet soon.`);
 
   // 1. Rebalance only when it would do something.
   if (queued > 0n || pending > 0n || cash < low || cash > high) {
@@ -130,7 +154,10 @@ console.log(`Plutos keeper on chain ${CHAIN_ID} (${EDITION}) as ${account.addres
 try {
   await tick();
 } catch (e) {
-  console.error("Tick failed:", e.shortMessage || e.message);
-  if (once) process.exitCode = 1;
+  const msg = (e.shortMessage || e.message || String(e)).split("\n")[0];
+  // The public nodes being busy isn't worth an alarm: the next tick, a few minutes later, tries again.
+  const busy = /429|rate limit|timed? ?out|fetch failed|ECONNRESET|ENOTFOUND|503|502|HTTP request failed/i.test(msg);
+  note(busy ? "warning" : "error", `Tick ${busy ? "skipped, the blockchain node was busy" : "failed"}: ${msg}`);
+  if (once && !busy) process.exitCode = 1;
 }
 if (!once) setInterval(() => tick().catch((e) => console.error("Tick failed:", e.shortMessage || e.message)), TICK_SECONDS * 1000);
