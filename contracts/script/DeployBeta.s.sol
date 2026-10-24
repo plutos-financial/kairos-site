@@ -21,13 +21,16 @@ contract DeployBeta is Script {
         bytes32 keyHash = BASE_SEPOLIA_KEY_HASH;
         uint256 funding = 0.01 ether;
         uint256 period = 1 days;
+        uint256 speed = 30; // a month of interest every day
         if (block.chainid == 31337) {
             coordinator = address(new VRFCoordinatorV2_5Mock(0.0001 ether, 1e9, 4e15));
             keyHash = bytes32(uint256(1));
             funding = 10 ether;
             period = 10 minutes;
+            speed = 4_380; // a month of interest every 10 minutes
         }
-        KairosBetaSetup s = new KairosBetaSetup{value: funding}(coordinator, keyHash, me, period, 52_560);
+        // $100,000 of house money: earns for the prizes, never in the draw
+        KairosBetaSetup s = new KairosBetaSetup{value: funding}(coordinator, keyHash, me, period, speed, 100_000e6);
         vm.stopBroadcast();
 
         string memory o = "beta";

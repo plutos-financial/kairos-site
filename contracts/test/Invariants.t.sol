@@ -26,6 +26,10 @@ contract Handler is Test {
     uint256 public totalWithdrawn;
     uint256 public draws;
     uint256 public awards;
+    // the house: sponsorship money that earns for the prizes but has no entries
+    address public constant HOUSE = address(0x4005E);
+    uint256 public sponsoredIn;
+    uint256 public sponsoredOut;
 
     constructor(MockUSDC u, MockTBill t, KairosVault v, ManualRandom r, address o) {
         usdc = u;
@@ -65,6 +69,26 @@ contract Handler is Test {
         vault.withdraw(amount);
         withdrawn[a] += amount;
         totalWithdrawn += amount;
+    }
+
+    function sponsor(uint256 amount) external {
+        amount = bound(amount, 1, 2_000_000e6);
+        vm.startPrank(HOUSE);
+        usdc.topUp(amount > 1_000_000e6 ? 1_000_000e6 : amount);
+        if (amount > 1_000_000e6) usdc.topUp(amount - 1_000_000e6);
+        usdc.approve(address(vault), amount);
+        vault.sponsor(amount);
+        vm.stopPrank();
+        sponsoredIn += amount;
+    }
+
+    function unsponsor(uint256 amount) external {
+        uint256 have = vault.sponsored(HOUSE);
+        if (have == 0) return;
+        amount = bound(amount, 1, have);
+        vm.prank(HOUSE);
+        vault.withdrawSponsorship(amount);
+        sponsoredOut += amount;
     }
 
     function wait(uint256 secs) external {
@@ -169,6 +193,7 @@ contract InvariantsTest is StdInvariant, Test {
             handler.totalDeposited() + vault.totalPrizesPaid() - handler.totalWithdrawn(),
             "savings = deposits - withdrawals + prizes"
         );
+        assertEq(vault.totalSponsored(), handler.sponsoredIn() - handler.sponsoredOut(), "sponsorship ledger");
     }
 
     /// Each saver's balance is exactly what they put in, minus what they took out, plus what they won.
@@ -190,13 +215,26 @@ contract InvariantsTest is StdInvariant, Test {
         for (uint256 i = 0; i < handler.actorCount(); i++) sum += vault.weightAt(handler.actors(i), end);
         (, uint256 total) = vault.projectedOdds(address(0));
         assertEq(sum, total, "entries add up");
+        assertEq(vault.weightAt(handler.HOUSE(), end), 0, "sponsor money has no entries");
     }
 
-    /// At the end of every run, every saver takes out everything, and gets every cent back.
+    /// At the end of every run, every saver and the house take out everything, and get every cent back.
     function afterInvariant() public {
         uint256 n = handler.actorCount();
-        uint256[] memory owed = new uint256[](n);
-        uint256[] memory cashBefore = new uint256[](n);
+        uint256[] memory owed = new uint256[](n + 1);
+        uint256[] memory cashBefore = new uint256[](n + 1);
+        address house = handler.HOUSE();
+        owed[n] = vault.sponsored(house);
+        cashBefore[n] = usdc.balanceOf(house);
+        for (uint256 q = vault.queueHead(); q < vault.queueHead() + vault.queueLength(); q++) {
+            (address user, uint256 amount) = vault.queue(q);
+            if (user == house) owed[n] += amount;
+        }
+        if (vault.sponsored(house) > 0) {
+            uint256 sp = vault.sponsored(house);
+            vm.prank(house);
+            vault.withdrawSponsorship(sp);
+        }
         for (uint256 i = 0; i < n; i++) {
             address a = handler.actors(i);
             owed[i] = vault.balanceOf(a);
@@ -222,6 +260,8 @@ contract InvariantsTest is StdInvariant, Test {
             address a = handler.actors(i);
             assertEq(usdc.balanceOf(a) - cashBefore[i], owed[i], "got every cent back");
         }
+        assertEq(usdc.balanceOf(house) - cashBefore[n], owed[n], "the house got every cent back");
+        assertEq(vault.totalSponsored(), 0);
         assertEq(vault.totalSupply(), 0);
         assertGe(vault.totalAssets(), vault.totalLiabilities(), "still solvent after everyone left");
     }

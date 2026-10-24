@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="/src/media/plutos-icon.svg" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
   <meta property="og:title" content="How Plutos keeps savings safe" />
-  <meta property="og:description" content="31 automated tests, 38,400 random actions per safety check, and an independent scanner, on every change." />
+  <meta property="og:description" content="37 automated tests, 38,400 random actions per safety check, and an independent scanner, on every change." />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/landing.css" />
   <link rel="stylesheet" href="/src/explain.css" />
@@ -37,9 +37,9 @@
       <h1>How Plutos keeps savings safe</h1>
       <p class="ex-lede">Plutos makes four promises about your money. Each one is written down as a test that a computer tries to break, thousands of times, every time the code changes.</p>
       <div class="stat-strip">
-        <div><b>31</b><span>automated tests</span></div>
+        <div><b>37</b><span>automated tests</span></div>
         <div><b>38,400</b><span>random actions per safety check</span></div>
-        <div><b>1,000</b><span>randomized draws checked against a brute-force model</span></div>
+        <div><b>2,000</b><span>randomized draw histories checked against a brute-force model</span></div>
         <div><b>0</b><span>high-severity scanner findings</span></div>
       </div>
       <nav class="toc" aria-label="On this page">
@@ -47,7 +47,6 @@
         <a href="#tests">How they're tested</a>
         <a href="#found">What the tests found</a>
         <a href="#scan">The scanner</a>
-        <a href="#owner">What the owner can and can't do</a>
         <a href="#before">Before real money</a>
         <a href="#yourself">Check it yourself</a>
       </nav>
@@ -70,20 +69,21 @@
       <p>The savings contract is tested three ways. All of it runs automatically on every change to the code.</p>
 
       <h3 class="ex-h3">Invariant tests: try to break the promises</h3>
-      <p>A program plays savers, the keeper and the team at once: deposits and withdrawals of any size, long waits, weekends when the T-bill fund is slow to pay out, prize changes, draws, and draws whose random number arrives late. It runs <b>256 random sequences of 150 actions</b>, and after every single action it checks:</p>
+      <p>A program plays savers, the keeper and the team at once: deposits and withdrawals of any size, house money going in and out, long waits, weekends when the T-bill fund is slow to pay out, prize changes, draws, and draws whose random number arrives late. It runs <b>256 random sequences of 150 actions</b>, and after every single action it checks:</p>
       <ul class="honest">
         <li><b>Solvent:</b> what the vault holds covers everything it owes.</li>
         <li><b>Prizes only from interest:</b> every prize dollar paid, waiting or locked in a draw was harvested interest, and total savings equal deposits minus withdrawals plus prizes, to the cent.</li>
         <li><b>Every saver's ledger:</b> each balance equals what that person put in, minus what they took out, plus what they won.</li>
-        <li><b>Entries add up:</b> everyone's entries sum to the total the draw will use.</li>
+        <li><b>Entries add up:</b> everyone's entries sum to the total the draw will use, and house money never has any.</li>
       </ul>
-      <p>At the end of every sequence, every saver withdraws everything, the test waits for the T-bill fund to settle, and checks that <b>each one got back every cent</b>.</p>
+      <p>At the end of every sequence, every saver and the house withdraw everything, the test waits for the T-bill fund to settle, and checks that <b>each one got back every cent</b>.</p>
 
       <h3 class="ex-h3">A brute-force check of every draw</h3>
       <p>The vault picks winners with a fast data structure (a sum tree, explained in <a href="./case-study.html#scale">how it's built</a>). The test rebuilds each draw the slow, obvious way: it integrates every saver's balance over time, lines everyone up, and searches one by one. Across <b>1,000 randomized runs of four rounds each</b>, including savers who join while a draw waits for its random number, the vault has to agree exactly: the same entries, the same totals, the same winners.</p>
+      <p>A second brute-force check does the same for the <b>loyalty boost</b>. Over <b>1,000 randomized runs of 16 rounds</b>, it keeps every saver's deposits as dated lots, ages each dollar round by round, takes withdrawals from the newest dollars first, and requires the vault's entries and winners to match at every step.</p>
 
       <h3 class="ex-h3">Scenario tests</h3>
-      <p>Twenty-six tests walk through specific situations: the full loop from deposit to prize to withdrawal, withdrawals during a weekend that wait for the fund to settle, the last saver leaving, withdrawals while deposits are paused, savings that can't be transferred, a draw whose random number arrives without enough gas to pay the winners in the same step, a random number that never arrives, and a real Chainlink VRF setup on a simulated network.</p>
+      <p>Thirty-one tests walk through specific situations: the full loop from deposit to prize to withdrawal, withdrawals during a weekend that wait for the fund to settle, the last saver leaving, withdrawals while deposits are paused, savings that can't be transferred, a draw whose random number arrives without enough gas to pay the winners in the same step, a random number that never arrives, house money that earns for the prizes but can never win, each step of the loyalty boost, and a real Chainlink VRF setup on a simulated network.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="found">
@@ -110,33 +110,25 @@
       </ul>
     </section>
 
-    <section class="ex-sec wrap-narrow" id="owner">
-      <p class="sec-n">05</p>
-      <h2>What the owner can and can't do</h2>
-      <p>Whoever controls the owner account can change settings: how long rounds last, how prizes are split, the minimum deposit, pausing deposits, and the platform's share of interest, up to a hard cap of 25%. Every change is recorded publicly.</p>
-      <p>The owner <b>can't</b> withdraw anyone's savings or mint savings for themselves: there's no function for it. Withdrawals keep working even when deposits are paused.</p>
-      <p>One power matters for fairness: the owner can switch the source of random numbers. That's why, before real money, the owner has to be a multisig wallet (several people must sign) with a time delay, so any change is visible days before it takes effect.</p>
-    </section>
-
     <section class="ex-sec wrap-narrow" id="before">
-      <p class="sec-n">06</p>
+      <p class="sec-n">05</p>
       <h2>Before real money</h2>
       <p>Tests and scanners catch a lot, but they aren't an audit. Plutos runs on a test network with test money, and won't take real deposits until all of this is done:</p>
       <ul class="honest">
         <li>Two independent security audits, and a bug bounty.</li>
-        <li>A multisig owner with a time delay, plus monitoring and alerts.</li>
+        <li>Settings that need several people to sign off, with a delay before any change takes effect, plus monitoring and alerts.</li>
         <li>The right legal structure, likely with a bank or credit union partner.</li>
         <li>A real Treasury bill fund or bank partner in place of the test fund, and identity checks for every saver.</li>
       </ul>
     </section>
 
     <section class="ex-sec wrap-narrow" id="yourself">
-      <p class="sec-n">07</p>
+      <p class="sec-n">06</p>
       <h2>Check it yourself</h2>
       <p>The contracts and tests are public. With <a href="https://getfoundry.sh" target="_blank" rel="noopener noreferrer">Foundry</a> installed:</p>
       <pre class="code"><code>cd contracts
 ./install-deps.sh
-forge test        # all 31 tests, including the invariants
+forge test        # all 37 tests, including the invariants
 forge test --match-test test_DrawCostStaysFlat -vv   # the gas table</code></pre>
       <p>On the test network, every deposit, draw and prize is public on <a href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer">Basescan</a>, and the <a href="./draws.html">Draws page</a> re-does each draw's math in your browser and checks it against what the blockchain recorded.</p>
     </section>

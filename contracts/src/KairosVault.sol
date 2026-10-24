@@ -27,8 +27,11 @@ interface ITBillFund is IERC20 {
 /// @notice Prize-linked savings. Savers deposit USDC and get Plutos Savings shares 1:1 (pUSD).
 ///         Shares never grow: every dollar of interest above total deposits is "harvested",
 ///         85% to the prize pool and 15% to the platform fee. Each period, winners are drawn
-///         with odds weighted by balance x time held, and prizes are added to their savings.
-///         A USDC "cash drawer" pays withdrawals instantly; the rest sits in T-bill fund tokens.
+///         with odds weighted by balance x time held, boosted for dollars that have stayed in
+///         a long time (the loyalty boost), and prizes are added to their savings.
+///         Sponsors (the house) can add money that earns interest for the prizes but has no
+///         entries, so it can never win. A USDC "cash drawer" pays withdrawals instantly; the
+///         rest sits in T-bill fund tokens.
 ///
 ///         Golden rule: principal never enters the prize pool. Only the surplus above
 ///         (deposits + queued withdrawals + unpaid prizes + unpaid fees) is ever harvested.
@@ -44,6 +47,11 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     ///         millionths of a cent each time; this keeps that rounding from ever making the vault
     ///         owe more than it holds. It's put in once at setup (KairosBetaSetup), not by savers.
     uint256 public constant ROUNDING_RESERVE = 1e6;
+    /// @notice Entries are stored in halves (so the 1.5x tier is a whole number): a saver's entries
+    ///         in a round are weight / (ENTRY_SCALE x round length) dollars.
+    uint256 public constant ENTRY_SCALE = 2;
+    /// @dev Deposits are remembered by round for this many rounds (12 for the top tier + 1 for the closed draw).
+    uint256 internal constant RING = 13;
 
     IERC20 public immutable usdc;
     ITBillFund public immutable tbill;
@@ -85,6 +93,10 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     uint256 public queueHead;
     uint256 public queuedTotal;
 
+    // Sponsorship: money that earns interest for the prize pool, with no entries (it can't win).
+    mapping(address => uint256) public sponsored;
+    uint256 public totalSponsored;
+
     // ------------------------------------------------------------------ entries (time-weighted balances)
     // A saver's entries in a round are their balance x seconds held during it. Over a round that
     // started at S and lasts L seconds:
@@ -102,8 +114,24 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     // happened at the close (change x L), which cancels out in L x bal - pen. That keeps the closed
     // round's entries exactly frozen until its winners are paid and the next draw closes. A tree is
     // emptied lazily: a node stamped with an older round reads as zero.
+    //
+    // The loyalty boost. Each dollar's entries grow with how many rounds it has stayed in:
+    //     joined this round or the last 2: 1x   3-5 rounds ago: 1.5x   6-11: 2x   12 or more: 3x
+    // (rounds are months at launch; on the test network they're the draw period). A withdrawal takes
+    // the newest dollars first, so the boost is the same as "lowest balance over the last 3, 6 and
+    // 12 rounds": E = A + 0.5 M3 + 0.5 M6 + M12. Taking money out during a round loses that money's
+    // boost for the whole round; adding money never changes anyone's boost until it has aged.
+    // Each node also keeps `dep`: the dollars still in below it, by the round they arrived, for the
+    // last 13 rounds (older ones are simply "old": balance minus the ring). A dollar's age is read
+    // from the ring, so boosts step up on their own as rounds pass, with no transaction needed.
+    // All weights are in halves (ENTRY_SCALE), and pen is too.
     struct Pen {
         int192 value;
+        uint64 round;
+    }
+
+    struct Dep {
+        uint192 amount;
         uint64 round;
     }
 
@@ -113,7 +141,8 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     mapping(address => uint256) internal leafPlusOne; // 0 = no leaf yet
     mapping(uint256 => address) public saverAt; // leaf index -> saver
     mapping(uint256 => uint256) internal bal; // node -> sum of balances below it
-    mapping(uint256 => Pen)[2] internal pen; // [round % 2] node -> that round's penalty sum
+    mapping(uint256 => Pen)[2] internal pen; // [round % 2] node -> that round's penalty sum (in halves)
+    mapping(uint256 => Dep[13]) internal dep; // node -> [round % 13] dollars below it that arrived that round
 
     uint256 public currentDrawId = 1;
     uint256 public periodStart;
@@ -158,6 +187,8 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     event CashBandsSet(uint256 targetBps, uint256 minTarget, uint256 lowBps, uint256 highBps, uint256 emergencyBps, uint256 smallLimit);
     event DepositRulesSet(uint256 minDeposit, bool allowlistOn);
     event AllowlistSet(address indexed who, bool allowed);
+    event Sponsored(address indexed sponsor, uint256 amount);
+    event SponsorshipWithdrawn(address indexed sponsor, uint256 amount);
 
     constructor(IERC20 usdc_, ITBillFund tbill_, address feeRecipient_)
         ERC20("Plutos Savings", "pUSD")
@@ -192,16 +223,40 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     function withdraw(uint256 amount) external nonReentrant {
         require(amount > 0, "kairos: zero");
         _burn(msg.sender, amount); // reverts if balance too low
+        _payOut(msg.sender, amount);
+    }
 
+    /// @notice Adds money that earns interest for the prize pool. It has no entries, so it can never
+    ///         win, and it never shows up as anyone's savings. The sponsor can take it back any time.
+    function sponsor(uint256 amount) external nonReentrant whenNotPaused {
+        require(amount > 0, "kairos: zero");
+        usdc.safeTransferFrom(msg.sender, address(this), amount);
+        sponsored[msg.sender] += amount;
+        totalSponsored += amount;
+        emit Sponsored(msg.sender, amount);
+    }
+
+    function withdrawSponsorship(uint256 amount) external nonReentrant {
+        require(amount > 0 && sponsored[msg.sender] >= amount, "kairos: not that much sponsored");
+        sponsored[msg.sender] -= amount;
+        totalSponsored -= amount;
+        emit SponsorshipWithdrawn(msg.sender, amount);
+        _payOut(msg.sender, amount);
+    }
+
+    /// @dev Paid from the cash drawer when possible, otherwise through the fund's instant route,
+    ///      otherwise queued for the next settlement.
+    function _payOut(address to, uint256 amount) internal {
         uint256 cash = usdc.balanceOf(address(this));
         uint256 e = (targetCash() * emergencyBps) / BPS;
-        // Never hold back more for the emergency floor than the other savers actually have deposited.
-        if (e > totalSupply()) e = totalSupply();
+        // Never hold back more for the emergency floor than everyone else actually has in.
+        uint256 others = totalSupply() + totalSponsored;
+        if (e > others) e = others;
         bool queueEmpty = queueHead == queue.length;
 
         if (queueEmpty && cash >= amount && (cash - amount >= e || amount <= smallInstantLimit)) {
-            usdc.safeTransfer(msg.sender, amount);
-            emit Withdrawn(msg.sender, amount, "drawer");
+            usdc.safeTransfer(to, amount);
+            emit Withdrawn(to, amount, "drawer");
             return;
         }
 
@@ -209,15 +264,15 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
             uint256 shortBy = amount > cash ? amount - cash : amount;
             _redeemInstant(shortBy);
             if (usdc.balanceOf(address(this)) >= amount) {
-                usdc.safeTransfer(msg.sender, amount);
-                emit Withdrawn(msg.sender, amount, "fund-instant");
+                usdc.safeTransfer(to, amount);
+                emit Withdrawn(to, amount, "fund-instant");
                 return;
             }
         }
 
-        queue.push(QueuedWithdrawal(msg.sender, amount));
+        queue.push(QueuedWithdrawal(to, amount));
         queuedTotal += amount;
-        emit WithdrawalQueued(msg.sender, amount, queue.length - queueHead);
+        emit WithdrawalQueued(to, amount, queue.length - queueHead);
     }
 
     /// @notice Shares are a non-transferable savings receipt. Every mint and burn updates the entries tree.
@@ -244,7 +299,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
 
     /// @notice Everything the vault owes to someone. Assets above this line are new interest.
     function totalLiabilities() public view returns (uint256) {
-        return totalSupply() + queuedTotal + prizeReserve + prizesPending + feesAccrued;
+        return totalSupply() + totalSponsored + queuedTotal + prizeReserve + prizesPending + feesAccrued;
     }
 
     function availableInterest() public view returns (uint256) {
@@ -276,7 +331,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     // ================================================================== cash drawer
 
     function targetCash() public view returns (uint256 r) {
-        r = (totalSupply() * targetCashBps) / BPS;
+        r = ((totalSupply() + totalSponsored) * targetCashBps) / BPS;
         if (r < minTargetCash) r = minTargetCash;
     }
 
@@ -395,9 +450,48 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         p.round = uint64(round);
     }
 
-    /// @dev Entries under `node` for a round of `length` seconds: length x balances - penalty.
+    function _depOf(uint256 node, uint256 round) internal view returns (uint256) {
+        Dep storage d = dep[node][round % RING];
+        return d.round == round ? uint256(d.amount) : 0;
+    }
+
+    function _addDep(uint256 node, uint256 round, int256 x) internal {
+        Dep storage d = dep[node][round % RING];
+        int256 v = (d.round == round ? int256(uint256(d.amount)) : int256(0)) + x;
+        d.amount = SafeCast.toUint192(SafeCast.toUint256(v));
+        d.round = uint64(round);
+    }
+
+    /// @dev The boost on top of 1x, in halves, for a dollar that arrived `age` rounds ago.
+    function _boostHalves(uint256 age) internal pure returns (uint256) {
+        if (age < 3) return 0; // 1x
+        if (age < 6) return 1; // 1.5x
+        if (age < 12) return 2; // 2x
+        return 4; // 3x
+    }
+
+    /// @dev The boost under `node` in `round`, in halves of a dollar: 0.5 for every dollar 3+ rounds
+    ///      old, another 0.5 at 6+, another 1 at 12+. Dollars that arrived after the round don't count.
+    function _bonusHalves(uint256 round, uint256 node) internal view returns (uint256) {
+        uint256 t = bal[node];
+        for (uint256 s = round + 1; s <= currentDrawId; s++) t -= _depOf(node, s);
+        uint256 r3;
+        uint256 r6;
+        uint256 r12;
+        for (uint256 k = 0; k < 12 && k < round; k++) {
+            uint256 a = _depOf(node, round - k);
+            if (a == 0) continue;
+            if (k < 3) r3 += a;
+            if (k < 6) r6 += a;
+            r12 += a;
+        }
+        return 4 * t - r3 - r6 - 2 * r12;
+    }
+
+    /// @dev Entries under `node` for a round of `length` seconds, in halves:
+    ///      2 x length x balances - penalty + length x boost.
     function _weight(uint256 round, uint256 length, uint256 node) internal view returns (uint256) {
-        int256 w = SafeCast.toInt256(length * bal[node]) - _penOf(round, node);
+        int256 w = SafeCast.toInt256(ENTRY_SCALE * length * bal[node] + length * _bonusHalves(round, node)) - _penOf(round, node);
         require(w >= 0, "kairos: negative entries");
         return uint256(w);
     }
@@ -422,14 +516,49 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         }
         uint256 index = leaf - 1;
         uint256 round = currentDrawId;
-        int256 nowPen = delta * int256(block.timestamp - periodStart);
+        int256 nowPen = int256(ENTRY_SCALE) * delta * int256(block.timestamp - periodStart);
         (uint256 frozen, int256 frozenLength) = _frozenDraw();
-        int256 frozenPen = delta * frozenLength;
+        int256 frozenPen = int256(ENTRY_SCALE) * delta * frozenLength;
         for (uint256 level = 0; level <= treeDepth; level++) {
             uint256 node = _node(level, index >> level);
             bal[node] = uint256(int256(bal[node]) + delta);
             _addPen(round, node, nowPen);
             if (frozen != 0) _addPen(frozen, node, frozenPen);
+        }
+
+        if (delta > 0) {
+            // New dollars arrive this round (1x for now).
+            for (uint256 level = 0; level <= treeDepth; level++) _addDep(_node(level, index >> level), round, delta);
+            return;
+        }
+        _takeNewest(index, round, uint256(-delta), frozen, frozenLength);
+    }
+
+    /// @dev A withdrawal takes the newest dollars first. The closed draw keeps its entries: whatever
+    ///      boost the taken dollars had in it is put back through its penalty.
+    function _takeNewest(uint256 index, uint256 round, uint256 left, uint256 frozen, int256 frozenLength) internal {
+        uint256 leafNode = _node(0, index);
+        for (uint256 k = 0; k < RING && k < round && left > 0; k++) {
+            uint256 s = round - k;
+            uint256 have = _depOf(leafNode, s);
+            if (have == 0) continue;
+            uint256 take = have < left ? have : left;
+            left -= take;
+            int256 fix = frozen != 0 && s <= frozen ? -frozenLength * int256(_boostHalves(frozen - s) * take) : int256(0);
+            _takeLot(index, s, take, frozen, fix);
+        }
+        // The rest is older than the ring: 3x in the closed draw too.
+        if (left > 0 && frozen != 0) {
+            int256 fix = -frozenLength * int256(4 * left);
+            for (uint256 level = 0; level <= treeDepth; level++) _addPen(frozen, _node(level, index >> level), fix);
+        }
+    }
+
+    function _takeLot(uint256 index, uint256 round, uint256 take, uint256 frozen, int256 fix) internal {
+        for (uint256 level = 0; level <= treeDepth; level++) {
+            uint256 node = _node(level, index >> level);
+            _addDep(node, round, -int256(take));
+            if (fix != 0) _addPen(frozen, node, fix);
         }
     }
 
@@ -440,6 +569,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         bal[newRoot] = bal[oldRoot];
         pen[0][newRoot] = pen[0][oldRoot];
         pen[1][newRoot] = pen[1][oldRoot];
+        for (uint256 i = 0; i < RING; i++) dep[newRoot][i] = dep[oldRoot][i];
         treeDepth++;
     }
 
@@ -461,7 +591,8 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
 
     // ================================================================== odds
 
-    /// @notice A saver's entries this round if the round ended at time t (balance x seconds held).
+    /// @notice A saver's entries this round if the round ended at time t (balance x seconds held, with
+    ///         the loyalty boost, in halves: divide by ENTRY_SCALE x round length for dollars).
     function weightAt(address user, uint256 t) public view returns (uint256) {
         uint256 leaf = leafPlusOne[user];
         if (leaf == 0) return 0;
@@ -607,6 +738,34 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
             savers[i] = saverAt[start + i];
             weights[i] = _weight(round, length, _node(0, start + i));
         }
+    }
+
+    /// @notice A saver's dollars by loyalty tier this round (0: 1x, 1: 1.5x, 2: 2x, 3: 3x), and the soonest
+    ///         step up: in `nextIn` rounds, `nextAmount` dollars reach tier `nextTier` (all 0 if none will).
+    function boostOf(address user)
+        external
+        view
+        returns (uint256[4] memory tiers, uint256 nextIn, uint256 nextAmount, uint256 nextTier)
+    {
+        uint256 leaf = leafPlusOne[user];
+        if (leaf == 0) return (tiers, 0, 0, 0);
+        uint256 node = _node(0, leaf - 1);
+        uint256 round = currentDrawId;
+        uint256 ringTotal;
+        for (uint256 k = 0; k < 12 && k < round; k++) {
+            uint256 a = _depOf(node, round - k);
+            if (a == 0) continue;
+            ringTotal += a;
+            uint256 tier = k < 3 ? 0 : k < 6 ? 1 : 2;
+            tiers[tier] += a;
+            uint256 step = k < 3 ? 3 - k : k < 6 ? 6 - k : 12 - k;
+            if (nextIn == 0 || step < nextIn) {
+                (nextIn, nextAmount, nextTier) = (step, a, tier + 1);
+            } else if (step == nextIn && tier + 1 == nextTier) {
+                nextAmount += a;
+            }
+        }
+        tiers[3] = bal[node] - ringTotal;
     }
 
     /// @notice What the tree's root holds, for checking it against the token's own totals.

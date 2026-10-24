@@ -1,6 +1,6 @@
 // Control room: live Rebalancer view, draw simulator, activity feed.
 import { keccak256, encodeAbiParameters, formatUnits, parseUnits } from "viem";
-import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey, readPages } from "./core.js";
+import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey, readPages, eventsBack, entriesOf } from "./core.js";
 import { saverName } from "./winners-ui.js";
 
 const YEAR = 365n * 24n * 3600n;
@@ -27,7 +27,8 @@ async function snapshot() {
     read("tbill", "settlementDelay"), read("tbill", "instantRedeemEnabled"),
   ]);
   const [cash, , pending, queued, r, low, high, emerg] = drawer;
-  s = { tvl, cash, pending, queued, r, low, high, emerg, reserve, pendingPrizes, fees, queuedTotal, feeBps, nextDraw, period, splits, savers, lowBps, highBps, emBps, smallLimit, navCp, cpTime, apy, speed, tokens, minSub, minRed, delay, instant };
+  const [periodStart, sponsoredTotal] = await Promise.all([read("vault", "periodStart"), read("vault", "totalSponsored").catch(() => 0n)]);
+  s = { periodStart, sponsoredTotal, tvl, cash, pending, queued, r, low, high, emerg, reserve, pendingPrizes, fees, queuedTotal, feeBps, nextDraw, period, splits, savers, lowBps, highBps, emBps, smallLimit, navCp, cpTime, apy, speed, tokens, minSub, minRed, delay, instant };
 }
 
 const nowChain = () => BigInt(Math.floor(Date.now() / 1000) + chainOffset);
@@ -36,7 +37,7 @@ const navAt = (t) => s.navCp + (s.navCp * s.apy * (t - s.cpTime) * s.speed) / (1
 const fundValue = (t) => (s.tokens * navAt(t)) / 10n ** 18n;
 const interestAt = (t) => {
   const assets = s.cash + fundValue(t) + s.pending;
-  const owed = s.tvl + s.queuedTotal + s.reserve + s.pendingPrizes + s.fees;
+  const owed = s.tvl + s.sponsoredTotal + s.queuedTotal + s.reserve + s.pendingPrizes + s.fees;
   return assets > owed ? assets - owed : 0n;
 };
 
@@ -46,6 +47,7 @@ function renderLive() {
   if (!s) return;
   const t = nowChain();
   $("kTvl").textContent = fmt(s.tvl);
+  $("kHouse").textContent = fmt(s.sponsoredTotal);
   $("kCash").textContent = fmt(s.cash);
   $("kFund").textContent = fmt(fundValue(t));
   $("kPending").textContent = fmt(s.pending);
@@ -111,13 +113,15 @@ function renderBand() {
 
 // ------------------------------------------------------------------ activity feed
 
-const ICON = { Deposited: "↓", Withdrawn: "↑", WithdrawalQueued: "…", QueuePaid: "✓", Harvested: "+", Rebalanced: "⇄", RedemptionSettled: "✓", DrawClosed: "#", DrawAwarded: "★", FeesPaid: "$" };
+const ICON = { Deposited: "↓", Withdrawn: "↑", WithdrawalQueued: "…", QueuePaid: "✓", Harvested: "+", Rebalanced: "⇄", RedemptionSettled: "✓", DrawClosed: "#", DrawAwarded: "★", FeesPaid: "$", Sponsored: "♦", SponsorshipWithdrawn: "♦" };
 
 function describe(e) {
   const a = e.args;
   const who = (x) => saverName(x, state.address);
   switch (e.eventName) {
     case "Deposited": return `${who(a.user)} saved ${fmt(a.amount)}`;
+    case "Sponsored": return `${fmt(a.amount)} of house money went in. It earns for the prize pool and can't win.`;
+    case "SponsorshipWithdrawn": return `${fmt(a.amount)} of house money came out`;
     case "Withdrawn": return `${who(a.user)} took out ${fmt(a.amount)}${a.route === "drawer" ? " instantly" : ""}`;
     case "WithdrawalQueued": return `${who(a.user)} asked to take out ${fmt(a.amount)}. It's waiting for T-bills to turn into cash.`;
     case "QueuePaid": return `${who(a.user)} got their ${fmt(a.amount)}`;
@@ -143,18 +147,12 @@ async function loadFeed() {
   try {
     const latest = await state.pub.getBlockNumber();
     const latestBlock = await state.pub.getBlock({ blockNumber: latest });
-    const events = [];
-    const step = 5000n;
-    for (let k = 0n; k < 8n && events.length < 40; k++) {
-      const to = latest - k * step;
-      if (to < 0n) break;
-      const from = to - step + 1n > 0n ? to - step + 1n : 0n;
-      const chunk = await state.pub.getContractEvents({ ...state.contracts.vault, fromBlock: from, toBlock: to });
-      events.unshift(...chunk);
-      if (from === 0n) break;
-    }
-    const recent = events.filter((e) => ICON[e.eventName]).slice(-40).reverse();
-    if (!recent.length) return ($("feed").innerHTML = `<p class="sub">Nothing yet. Deposit in the app to get things moving.</p>`);
+    // The last few hours (Base makes a block every 2 seconds; its public node hands out 200 at a time).
+    const span = state.cfg.chainId === 84532 ? 7200n : 40000n;
+    const found = await eventsBack({ fromBlock: latest > span ? latest - span : 0n, toBlock: latest, max: 60 });
+    // (the keeper's routine "nothing to do" checks are left out)
+    const recent = found.filter((e) => ICON[e.eventName] && !(e.eventName === "Rebalanced" && e.args.action === "hold")).slice(0, 40);
+    if (!recent.length) return ($("feed").innerHTML = `<p class="sub">Nothing in the last few hours. Deposit in the app to get things moving.</p>`);
     const secs = state.cfg.chainId === 84532 ? 2 : 1;
     $("feed").innerHTML = recent
       .map((e) => {
@@ -197,8 +195,8 @@ async function runSimulation() {
     const bals = await Promise.all(people.map((p) => read("vault", "balanceOf", [p.who])));
     people.forEach((p, i) => (p.bal = bals[i]));
     if (extra > 0n) {
-      // A pretend saver who deposits now and holds until the draw.
-      const w = extra * (end > t ? end - t : 1n);
+      // A pretend saver who deposits now and holds until the draw (new money: 1x).
+      const w = state.entryScale * extra * (end > t ? end - t : 1n);
       people.push({ who: "pretend", w, bal: extra, pretend: true });
     }
     if (!people.length) {
@@ -241,14 +239,12 @@ async function runSimulation() {
       if (r % 500 === 499) await new Promise((res) => setTimeout(res)); // keep the page responsive
     }
 
-    const label = (p) => (p.pretend ? "You (pretend)" : saverName(p.who, state.address));
-    // Show odds as boosts (relative to the saver with the fewest entries), never as exact percentages.
-    const minW = people.reduce((m, p) => (p.w < m ? p.w : m), people[0].w);
+    const label = (p) => (p.pretend ? "Pretend saver" : saverName(p.who, state.address));
+    const length = end > s.periodStart ? end - s.periodStart : 1n;
     const rows = people
-      .map((p, i) => ({ p, wins: wins[i], boost: Number((p.w * 1000n) / (minW || 1n)) / 1000, avg: won[i] / BigInt(runs) }))
+      .map((p, i) => ({ p, wins: wins[i], entries: entriesOf(p.w, length), avg: won[i] / BigInt(runs) }))
       .sort((a, b) => b.wins - a.wins);
     const maxWins = Math.max(...rows.map((r) => r.wins), 1);
-    const bx = (x) => (x >= 10 ? Math.round(x).toLocaleString() : Number(x.toFixed(1)).toString()) + "×";
 
     $("simOut").innerHTML = `
       <div class="sim-summary">
@@ -257,20 +253,20 @@ async function runSimulation() {
         <div><p class="label">Savers in the draw</p><p class="mid">${people.length}</p><p class="tiny">${runs.toLocaleString()} pretend draws</p></div>
       </div>
       <table class="sim">
-        <thead><tr><th>Saver</th><th>Savings</th><th>Odds boost</th><th>Won something in</th><th>Average prize</th></tr></thead>
+        <thead><tr><th>Saver</th><th>Savings</th><th>Entries</th><th>Won something in</th><th>Average prize</th></tr></thead>
         <tbody>${rows
           .map(
-            ({ p, wins: w, boost, avg }) => `<tr class="${p.pretend ? "pretend" : ""}">
+            ({ p, wins: w, entries, avg }) => `<tr class="${p.pretend ? "pretend" : ""}">
               <td><b>${label(p)}</b></td>
               <td class="mono">${fmt(p.bal)}</td>
-              <td class="boostcell">${bx(boost)}</td>
+              <td class="boostcell">${Math.floor(entries).toLocaleString("en-US")}</td>
               <td><div class="barcell"><div class="bar" style="width:${(w / maxWins) * 140}px"></div><span class="tiny">${w.toLocaleString()} of ${runs.toLocaleString()}</span></div></td>
               <td class="mono">${fmt(avg)}</td></tr>`
           )
           .join("")}</tbody>
       </table>
       <div class="sample"><b>One pretend draw:</b> ${sampleText(sample, people, label)}.</div>
-      <p class="tiny">Odds boost compares each saver with whoever has the fewest entries. Entries count dollars and how long they've been saved this round. One person can win more than one prize.</p>`;
+      <p class="tiny">${state.hasBoost ? "Each dollar is one entry for the part of the round it was saved, times its loyalty boost: 1x for new money, 1.5x after 3 draws, 2x after 6, 3x after 12." : "Each dollar is one entry for the part of the round it was saved."} House money earns for the prize pool and has no entries. One person can win more than one prize.</p>`;
   } catch (e) {
     console.error(e);
     toastError(e);

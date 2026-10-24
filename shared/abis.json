@@ -1546,6 +1546,19 @@
     },
     {
       "type": "function",
+      "name": "ENTRY_SCALE",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "ROUNDING_RESERVE",
       "inputs": [],
       "outputs": [
@@ -1676,6 +1689,40 @@
       "outputs": [
         {
           "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "boostOf",
+      "inputs": [
+        {
+          "name": "user",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "tiers",
+          "type": "uint256[4]",
+          "internalType": "uint256[4]"
+        },
+        {
+          "name": "nextIn",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "nextAmount",
+          "type": "uint256",
+          "internalType": "uint256"
+        },
+        {
+          "name": "nextTier",
           "type": "uint256",
           "internalType": "uint256"
         }
@@ -2689,6 +2736,38 @@
     },
     {
       "type": "function",
+      "name": "sponsor",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "sponsored",
+      "inputs": [
+        {
+          "name": "",
+          "type": "address",
+          "internalType": "address"
+        }
+      ],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
       "name": "symbol",
       "inputs": [],
       "outputs": [
@@ -2781,6 +2860,19 @@
     {
       "type": "function",
       "name": "totalPrizesPaid",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "totalSponsored",
       "inputs": [],
       "outputs": [
         {
@@ -2953,6 +3045,19 @@
     {
       "type": "function",
       "name": "withdraw",
+      "inputs": [
+        {
+          "name": "amount",
+          "type": "uint256",
+          "internalType": "uint256"
+        }
+      ],
+      "outputs": [],
+      "stateMutability": "nonpayable"
+    },
+    {
+      "type": "function",
+      "name": "withdrawSponsorship",
       "inputs": [
         {
           "name": "amount",
@@ -3375,6 +3480,44 @@
     },
     {
       "type": "event",
+      "name": "Sponsored",
+      "inputs": [
+        {
+          "name": "sponsor",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
+      "name": "SponsorshipWithdrawn",
+      "inputs": [
+        {
+          "name": "sponsor",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ],
+      "anonymous": false
+    },
+    {
+      "type": "event",
       "name": "Transfer",
       "inputs": [
         {
@@ -3597,6 +3740,33 @@
           "name": "value",
           "type": "int256",
           "internalType": "int256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "SafeCastOverflowedIntToUint",
+      "inputs": [
+        {
+          "name": "value",
+          "type": "int256",
+          "internalType": "int256"
+        }
+      ]
+    },
+    {
+      "type": "error",
+      "name": "SafeCastOverflowedUintDowncast",
+      "inputs": [
+        {
+          "name": "bits",
+          "type": "uint8",
+          "internalType": "uint8"
+        },
+        {
+          "name": "value",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ]
     },
@@ -4120,6 +4290,11 @@
           "name": "speed",
           "type": "uint256",
           "internalType": "uint256"
+        },
+        {
+          "name": "houseMoney_",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "stateMutability": "payable"
@@ -4146,6 +4321,19 @@
           "name": "",
           "type": "address",
           "internalType": "address"
+        }
+      ],
+      "stateMutability": "view"
+    },
+    {
+      "type": "function",
+      "name": "houseMoney",
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256",
+          "internalType": "uint256"
         }
       ],
       "stateMutability": "view"
@@ -4245,6 +4433,12 @@
         },
         {
           "name": "subscriptionId",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "houseMoney",
           "type": "uint256",
           "indexed": false,
           "internalType": "uint256"

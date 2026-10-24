@@ -69,10 +69,23 @@
     <!-- Signed in -->
     <section id="dash" class="dash" hidden>
       <div class="bal-block">
-        <p class="label">Your savings</p>
+        <p class="label">Saved, in the draw</p>
         <p id="savings" class="balance-num">$0.00</p>
         <p id="wonLine" class="won-line">Every $1 you save is an entry in every draw.</p>
-        <p id="tokensLine" class="tokens-line" hidden></p>
+        <!-- two kinds of money, side by side: saved (in the draw, as savings tokens) and cash (not in it) -->
+        <div class="money-split" id="moneySplit" hidden>
+          <div class="ms-bar" aria-hidden="true"><i class="ms-in" id="msBarIn"></i><i class="ms-out" id="msBarOut"></i></div>
+          <div class="ms-row in">
+            <span class="ms-dot" aria-hidden="true"></span>
+            <span class="ms-text"><b>Saved</b><small id="msSavedNote">Held as savings tokens, $1 each. These count in the draw.</small></span>
+            <b class="ms-amt" id="msSaved">$0.00</b>
+          </div>
+          <div class="ms-row out">
+            <span class="ms-dot" aria-hidden="true"></span>
+            <span class="ms-text"><b>Cash</b><small>In your Plutos wallet. Not in the draw until you save it.</small></span>
+            <b class="ms-amt" id="msCash">$0.00</b>
+          </div>
+        </div>
       </div>
 
       <!-- new savers: what to do next -->
@@ -151,8 +164,10 @@
         <div class="round-foot tiny"><span id="roundStart">Round started</span><span id="roundEnd">Draw</span></div>
         <div class="next-stats">
           <div><p class="label">Your entries</p><p id="entries" class="stat-num">—</p></div>
+          <div id="boostStat" hidden><p class="label">Loyalty boost</p><p id="boost" class="stat-num">1x</p></div>
           <div><p class="label">Prizes each draw</p><p id="winnersN" class="stat-num">—</p></div>
         </div>
+        <p class="tiny entries-note" id="boostNote" hidden></p>
         <p class="tiny entries-note" id="entriesNote" hidden></p>
         <div class="next-actions">
           <button id="pretendBtn" class="btn btn-light" type="button">See how a draw works</button>

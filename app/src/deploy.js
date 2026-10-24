@@ -17,6 +17,9 @@ const VRF = {
 };
 const VRF_FUNDING = "0.002"; // test ETH sent to the Chainlink subscription; each draw costs a tiny fraction of this
 const GAS_ALLOWANCE = "0.0004"; // the setup transaction itself costs far less than this on Base Sepolia
+const DRAW_PERIOD = 86_400n; // a draw every day
+const SPEED = 30n; // a month of interest every day, so the prize pool visibly grows
+const HOUSE_MONEY = 100_000_000_000n; // $100,000 of test dollars that earn for the prizes and can never win
 
 const $ = (id) => document.getElementById(id);
 // ?rpc=http://127.0.0.1:8545 deploys to a local test chain instead (for developers).
@@ -66,7 +69,7 @@ async function call(wallet, addr, label, address, abi, functionName, args) {
 
 if (isBeta) {
   $("dTitle").textContent = "Set up the Plutos beta";
-  $("dIntro").innerHTML = `One transaction sets up everything: test USDC, the T-bill fund, the vault, and a Chainlink VRF subscription for fair draws. It sends ${VRF_FUNDING} test ETH to Chainlink to pay for random numbers. The wallet you use becomes the owner.`;
+  $("dIntro").innerHTML = `One transaction sets up everything: test USDC, the T-bill fund, the vault, a Chainlink VRF subscription for fair draws, and $100,000 of house money that earns for the prize pool and can never win. It sends ${VRF_FUNDING} test ETH to Chainlink to pay for random numbers. The wallet you use becomes the owner.`;
   $("dSteps").innerHTML = `<li>Use your Plutos test wallet in MetaMask (never one with real money).</li>
     <li>Make sure it has about 0.003 Base Sepolia ETH (free from a faucet).</li>
     <li>Click the button and approve the one transaction.</li>`;
@@ -83,7 +86,7 @@ async function setUpBeta() {
   const hash = await wallet.deployContract({
     abi: setup.abi,
     bytecode: setup.bytecode,
-    args: [VRF.coordinator, VRF.keyHash, addr, 86400n, 52560n],
+    args: [VRF.coordinator, VRF.keyHash, addr, DRAW_PERIOD, SPEED, HOUSE_MONEY],
     value: parseEther(VRF_FUNDING),
     account: addr,
   });

@@ -31,6 +31,24 @@
 .won-line { margin: 0; font-size: 16px; font-weight: 600; color: var(--muted); }
 .won-line.up { color: var(--gold); }
 
+/* saved (in the draw) vs cash (not in it) */
+.money-split { margin: 22px 0 0; max-width: 520px; border: 1px solid var(--line); border-radius: 18px; background: var(--bg-1); box-shadow: var(--edge); padding: 14px 16px 6px; }
+.ms-bar { display: flex; gap: 3px; height: 8px; border-radius: 999px; overflow: hidden; margin-bottom: 8px; background: var(--bg-3); }
+.ms-bar i { display: block; height: 100%; border-radius: 999px; transition: flex-grow 0.5s ease; }
+.ms-in { background: var(--gold); }
+.ms-out { background: #4a5372; }
+.ms-row { display: grid; grid-template-columns: 12px 1fr auto; gap: 12px; align-items: center; padding: 10px 0; }
+.ms-row + .ms-row { border-top: 1px solid var(--line); }
+.ms-dot { width: 10px; height: 10px; border-radius: 50%; }
+.ms-row.in .ms-dot { background: var(--gold); box-shadow: 0 0 0 3px var(--gold-soft); }
+.ms-row.out .ms-dot { background: #4a5372; }
+.ms-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ms-text b { font-size: 15px; font-weight: 650; }
+.ms-text small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+.ms-amt { font-family: var(--display); font-stretch: 104%; font-weight: 580; font-size: 19px; letter-spacing: -0.02em; white-space: nowrap; }
+.ms-row.in .ms-amt { color: var(--gold); }
+.ms-row.out .ms-amt { color: var(--text); }
+
 /* latest winners */
 .latest { border-color: rgba(205, 174, 109, 0.28); background: radial-gradient(520px 220px at 50% 0%, rgba(205, 174, 109, 0.09), transparent 70%), var(--bg-1); }
 .latest .card-head { margin-bottom: 10px; }
@@ -387,7 +405,7 @@
 .round-bar { height: 8px; border-radius: 999px; background: var(--bg-3); overflow: hidden; margin: 20px 0 8px; }
 .round-fill { height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, rgba(205, 174, 109, 0.45), var(--gold)); transition: width 1s linear; }
 .round-foot { display: flex; justify-content: space-between; gap: 12px; color: var(--dim); }
-.next-stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; margin-top: 18px; border: 1px solid var(--line); }
+.next-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1px; background: var(--line); border-radius: 16px; overflow: hidden; margin-top: 18px; border: 1px solid var(--line); }
 .next-stats > div { background: var(--bg-1); padding: 14px 16px; }
 .stat-num { font-family: var(--display); font-stretch: 104%; font-weight: 540; font-size: 26px; letter-spacing: -0.02em; margin: 4px 0 0; font-variant-numeric: proportional-nums; }
 .next-actions { display: flex; align-items: center; gap: 10px 16px; flex-wrap: wrap; margin-top: 18px; }

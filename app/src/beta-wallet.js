@@ -44,10 +44,6 @@ export function initBetaWallet(c) {
 export function renderWallet(wallet, savings) {
   $("walletCard").hidden = wallet === 0n; // only when there's money that isn't saved
   $("walletBal").textContent = fmt(wallet);
-  const line = $("tokensLine");
-  const tokens = Number(savings) / 1e6;
-  line.hidden = savings === 0n;
-  line.textContent = `${tokens.toLocaleString(undefined, { maximumFractionDigits: 2 })} Plutos savings tokens · each one is worth $1`;
 }
 
 // ------------------------------------------------------------------ the sheet

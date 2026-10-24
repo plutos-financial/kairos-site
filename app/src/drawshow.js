@@ -13,8 +13,7 @@
 // Three ways in: watchDraw(id) as Chainlink answers, replayDraw(id) for a finished draw, and
 // playPretend(...) for a pretend draw (pretend.js).
 import { keccak256, encodeAbiParameters, hexToBigInt, getAddress } from "viem";
-import abis from "./abis.json";
-import { $, state, fmt, read, act, sleep, usesChainlink, lineFromPages, readPages } from "./core.js";
+import { $, state, fmt, read, act, sleep, usesChainlink, lineFromPages, readPages, eventsBack } from "./core.js";
 import { podiumHTML, groupWinners, myWin, saverName, hueOf } from "./winners-ui.js";
 import "./drawshow.css";
 
@@ -325,12 +324,14 @@ async function pickAll({ word, line, amounts, chainWinners, me }, id) {
     list.insertAdjacentHTML(
       "beforeend",
       `<li class="pk" id="pk${k}"><span class="pk-n">Prize ${k + 1}</span><b class="pk-amt">${fmt(amounts[k])}</b>` +
-        `<span class="pk-math"><code>${shortHash(h)}</code> &rarr; spot ${x.toFixed(2)}%</span><span class="pk-who"><span class="spinner" aria-hidden="true"></span></span></li>`
+        `<span class="pk-math"><code>${shortHash(h)}</code> &rarr; <span class="pk-spot">finding the spot…</span></span><span class="pk-who"><span class="spinner" aria-hidden="true"></span></span></li>`
     );
     list.scrollTop = list.scrollHeight;
     const slow = k < 3;
     await movePin(x, slow ? 1700 : n > 10 ? 320 : 700, slow ? 1 : 0, id);
     if (id !== run) throw STOP;
+    // only now, with the pin landed, say where
+    $(`pk${k}`).querySelector(".pk-spot").textContent = `spot ${x.toFixed(2)}%`;
     setPin(x, `Prize ${k + 1}`);
     $("dsMarks").insertAdjacentHTML("beforeend", `<span class="ds-mark" style="left:${x}%" title="Prize ${k + 1}"></span>`);
     const seg = idx >= 0 ? $("dsLine").querySelector(`[data-i="${idx}"]`) : null;
@@ -387,18 +388,15 @@ function chainlinkLink() {
   return state.cfg?.chainId === 84532 && sub ? `https://vrf.chain.link/base-sepolia/${sub}` : "";
 }
 
-/** The transaction where the random number arrived (recent draws only; public nodes limit how far back). */
-async function awardTx(drawId) {
+/** The transaction where the random number arrived: searched from the draw's close, a few minutes' worth of blocks. */
+async function awardTx(drawId, closeTime) {
   try {
-    const latest = await state.pub.getBlockNumber();
-    const logs = await state.pub.getContractEvents({
-      address: state.cfg.vault,
-      abi: abis.KairosVault,
-      eventName: "DrawAwarded",
-      args: { drawId: BigInt(drawId) },
-      fromBlock: latest > 9000n ? latest - 9000n : 0n,
-      toBlock: latest,
-    });
+    const latest = await state.pub.getBlock();
+    const perBlock = state.cfg.chainId === 84532 ? 2n : 1n;
+    const ago = closeTime && latest.timestamp > BigInt(closeTime) ? (latest.timestamp - BigInt(closeTime)) / perBlock : 0n;
+    const from = latest.number > ago + 20n ? latest.number - ago - 20n : 0n; // a little before the close
+    const to = from + 1200n < latest.number ? from + 1200n : latest.number; // Chainlink answers within a few minutes
+    const logs = await eventsBack({ eventName: "DrawAwarded", args: { drawId: BigInt(drawId) }, fromBlock: from, toBlock: to, max: 1 });
     return logs[0]?.transactionHash || null;
   } catch {
     return null;
@@ -495,7 +493,7 @@ async function playFromChain(drawId, id, live) {
   } else {
     await pause(900, id);
   }
-  const txPromise = awardTx(drawId);
+  const txPromise = awardTx(drawId, d.closeTime);
   $("dsRngNote").textContent = chainlink
     ? "It arrives with a cryptographic proof, and the blockchain checks the proof before accepting it. Nobody, including Plutos, can choose it."
     : "On the test network this comes from the chain itself. The live Plutos uses Chainlink.";

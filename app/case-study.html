@@ -40,7 +40,7 @@
       <div class="stat-strip">
         <div><b>440&times;</b><span>cheaper to close a draw with 2,000 savers</span></div>
         <div><b>O(log n)</b><span>cost per deposit, draw and winner</span></div>
-        <div><b>31</b><span>automated tests on every change</span></div>
+        <div><b>37</b><span>automated tests on every change</span></div>
         <div><b>10 min</b><span>between automatic checks for a finished round</span></div>
       </div>
       <nav class="toc" aria-label="On this page">
@@ -109,6 +109,8 @@
           (L = the round's length)</code></pre>
       <p>So each branch keeps a total of balances and a total of that second term. The root holds everyone's entries; a deposit updates one path from a leaf to the root; and picking a winner is one walk from the root down, choosing left or right at each branch. All of it costs <b>O(log n)</b>: one more step each time the number of savers doubles.</p>
       <p>One more problem: after a round closes, the random number takes a minute or so to arrive, and people keep saving in the meantime. Those changes must not alter the closed round's entries. The vault keeps <b>two</b> copies of the second term, one for each round parity. While the new round runs in one, changes are also recorded in the closed round's copy as if they happened at its close, which cancels out exactly, so its entries stay frozen until the winners are paid. Old rounds are cleared lazily: a branch stamped with an older round simply reads as zero, so starting a round costs nothing.</p>
+      <h3 class="ex-h3">Adding the loyalty boost</h3>
+      <p>Dollars that stay in earn more entries: 1.5x after 3 rounds, 2x after 6, 3x after 12. A withdrawal takes the newest dollars first, which makes this the same as counting the lowest balance over the last 3, 6 and 12 rounds. The catch is that boosts step up on their own as rounds pass, with no transaction to update the tree. So each branch also keeps a small ring of the dollars below it by the round they arrived, for the last 13 rounds. A dollar's age is read from the ring, anything older is simply "old" (3x), and the root still holds everyone's boosted entries, so closing a draw stays one read.</p>
 
       <div class="gas">
         <p class="g-title">Gas to close a draw</p>
@@ -118,9 +120,9 @@
         <div class="g-row"><span class="g-n">1,000</span><div class="g-bars"><i class="old" style="width:50.1%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">47.0M &rarr; <b>0.21M</b></span></div>
         <div class="g-row"><span class="g-n">2,000</span><div class="g-bars"><i class="old" style="width:100%"></i><i class="new" style="width:0.23%"></i></div><span class="g-v">93.7M &rarr; <b>0.21M</b></span></div>
         <p class="g-key"><span><i class="old"></i>First version</span><span><i class="new"></i>Sum tree</span></p>
-        <p class="r-foot">Measured by the test suite. Paying three winners takes 0.5M&ndash;1.0M gas whatever the size, and a deposit 0.18M&ndash;0.32M.</p>
+        <p class="r-foot">Measured by the test suite, with the loyalty boost. Paying three winners takes 0.8M&ndash;1.9M gas, and a deposit 0.23M&ndash;0.44M.</p>
       </div>
-      <p>To make sure the fast version is right, a test rebuilds every draw the slow way and requires the exact same winners, across 1,000 randomized runs (see <a href="./security.html#tests">Security</a>).</p>
+      <p>To make sure the fast version is right, a test rebuilds every draw the slow way and requires the exact same winners, across 1,000 randomized runs, and a second test does the same for the boost over 16-round histories (see <a href="./security.html#tests">Security</a>).</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="fair">

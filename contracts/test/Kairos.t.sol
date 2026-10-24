@@ -152,8 +152,41 @@ contract KairosTest is Test {
         vm.warp(block.timestamp + 1 hours);
         uint256 a = vault.weightAt(alice, block.timestamp);
         uint256 b = vault.weightAt(bob, block.timestamp);
-        assertEq(a, 1_000e6 * 7 days);
-        assertEq(b, 1_000e6 * 1 hours);
+        // weights are in halves (ENTRY_SCALE = 2)
+        assertEq(a, 2 * 1_000e6 * 7 days);
+        assertEq(b, 2 * 1_000e6 * 1 hours);
+    }
+
+    function test_SponsorMoneyEarnsForPrizesButCannotWin() public {
+        address house = address(0x4005E);
+        usdc.mint(house, 50_000e6);
+        vm.startPrank(house);
+        usdc.approve(address(vault), type(uint256).max);
+        vault.sponsor(50_000e6);
+        vm.stopPrank();
+        assertEq(vault.balanceOf(house), 0, "no savings tokens");
+        assertEq(vault.totalSponsored(), 50_000e6);
+        assertEq(vault.weightAt(house, block.timestamp + 1 days), 0, "no entries");
+
+        _deposit(alice, 100e6); // a small saver
+        vault.rebalance(); // the house money goes into T-bills and earns
+        vm.warp(block.timestamp + 7 days);
+        uint256 id = _runDraw();
+        (KairosVault.Draw memory d, address[] memory winners,,) = vault.getDraw(id);
+        assertGt(d.prize, 0, "the house money's interest made a prize");
+        for (uint256 i = 0; i < winners.length; i++) assertEq(winners[i], alice, "only savers win");
+
+        // the house can take it back, every cent
+        vm.prank(house);
+        vault.withdrawSponsorship(50_000e6);
+        vault.rebalance();
+        vm.warp(block.timestamp + 3 days);
+        vault.processQueue(10);
+        assertEq(usdc.balanceOf(house), 50_000e6, "sponsor gets every cent back");
+        assertEq(vault.totalSponsored(), 0);
+        vm.prank(house);
+        vm.expectRevert("kairos: not that much sponsored");
+        vault.withdrawSponsorship(1);
     }
 
     function test_SoleSaverWinsEveryPrize() public {

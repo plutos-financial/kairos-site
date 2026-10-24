@@ -1,6 +1,7 @@
 // Landing page: odds calculator, waitlist (Google Sheet), brand film.
 import { $ } from "./core.js";
 import built from "./site-config.json";
+import { phone } from "./phone.js";
 
 
 // ------------------------------------------------------------------ odds calculator
@@ -13,14 +14,17 @@ const times = (x) => (x >= 10 ? Math.round(x) : Number(x.toFixed(x < 1 ? 2 : 1))
 function calculator() {
   const range = $("calcRange");
   range.max = String(STEPS.length - 1);
-  $("ladder").innerHTML = RUNGS.map((r) => `<button type="button" class="rung" data-v="${r}">${money(r)} <b>${times(r / 100)}</b></button>`).join("");
+  $("ladder").innerHTML = RUNGS.map((r) => `<button type="button" class="rung" data-v="${r}">${money(r)}</button>`).join("");
+  let kept = 1; // the loyalty boost for how long it stays in
   const render = () => {
     const amt = STEPS[Number(range.value)];
+    const entries = amt * kept;
     $("calcAmt").textContent = money(amt);
-    $("calcEntries").textContent = amt.toLocaleString("en-US");
-    $("calcBoost").textContent = times(amt / 100);
+    $("calcEntries").textContent = entries.toLocaleString("en-US");
+    $("calcBoost").textContent = times(entries / 100);
     range.style.setProperty("--fill", `${(Number(range.value) / (STEPS.length - 1)) * 100}%`);
     document.querySelectorAll(".rung").forEach((b) => b.classList.toggle("on", Number(b.dataset.v) === amt));
+    document.querySelectorAll("#kept button").forEach((b) => b.setAttribute("aria-checked", String(Number(b.dataset.x) === kept)));
   };
   range.addEventListener("input", render);
   $("ladder").addEventListener("click", (e) => {
@@ -28,6 +32,22 @@ function calculator() {
     if (!b) return;
     range.value = String(STEPS.indexOf(Number(b.dataset.v)));
     render();
+  });
+  const choices = [...document.querySelectorAll("#kept button")];
+  $("kept").addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    kept = Number(b.dataset.x);
+    render();
+  });
+  // arrow keys move between the choices, like any radio group
+  $("kept").addEventListener("keydown", (e) => {
+    const i = choices.indexOf(document.activeElement);
+    if (i < 0 || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+    e.preventDefault();
+    const next = choices[(i + (e.key === "ArrowLeft" || e.key === "ArrowUp" ? choices.length - 1 : 1)) % choices.length];
+    next.focus();
+    next.click();
   });
   render();
 }
@@ -133,6 +153,7 @@ function navOverFilm() {
 }
 
 calculator();
+phone();
 waitlist();
 film();
 navOverFilm();

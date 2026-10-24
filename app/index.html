@@ -70,18 +70,18 @@
             <li>Draws verified by Chainlink</li>
           </ul>
         </div>
-        <div class="hero-visual" aria-hidden="true">
-        <svg class="orbit" viewBox="0 0 640 640" focusable="false">
+        <div class="hero-visual" role="group" aria-label="Try the Plutos app, with sample numbers">
+        <svg class="orbit" viewBox="0 0 640 640" focusable="false" aria-hidden="true">
           <g transform="rotate(-16 320 320)">
             <path id="orbitPath" d="M30 320a290 104 0 1 0 580 0a290 104 0 1 0-580 0" />
             <circle class="moon" r="5"><animateMotion dur="16s" repeatCount="indefinite" rotate="auto"><mpath href="#orbitPath" /></animateMotion></circle>
           </g>
         </svg>
-        <div class="float notif">
+        <div class="float notif" id="pNotif" aria-hidden="true">
           <span class="f-ball">P</span>
           <div>
             <p class="f-top"><b>Plutos</b><span>now</span></p>
-            <p class="f-msg">You won <b class="gold">$250.00</b> in Draw #12.</p>
+            <p class="f-msg" id="pNotifMsg">You won <b class="gold">$250.00</b> in Draw #12.</p>
           </div>
         </div>
 
@@ -101,50 +101,97 @@
             <div class="app">
               <div class="a-head">
                 <span class="a-brand"><b>Plutos</b></span>
-                <span class="a-icons">
+                <span class="a-icons" aria-hidden="true">
                   <svg viewBox="0 0 24 24"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.5h-15z M10 20.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
                   <span class="a-av">A</span>
                 </span>
               </div>
 
-              <p class="a-label">Your savings</p>
-              <p class="a-bal">$1,250<span>.00</span></p>
-              <p class="a-won"><span class="chip-gold">+$250.00</span><span>won in prizes</span></p>
-
-              <svg class="a-chart" viewBox="0 0 244 74" preserveAspectRatio="none">
-                <defs><linearGradient id="aFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E3CB94" stop-opacity=".35"/><stop offset="1" stop-color="#E3CB94" stop-opacity="0"/></linearGradient></defs>
-                <path d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14 V74 H0 Z" fill="url(#aFill)"/>
-                <path d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14" fill="none" stroke="#E3CB94" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
-              </svg>
-              <div class="a-range"><span>1W</span><span>1M</span><span class="on">3M</span><span>1Y</span><span>All</span></div>
-
-              <div class="a-draw">
-                <div class="ad-row"><span>Next draw</span><span>Prize pool</span></div>
-                <div class="ad-row big"><b>2d 14h 37m</b><b class="gold">$48,210</b></div>
-                <div class="ad-bar"><i></i></div>
+              <!-- Home -->
+              <div class="pane" id="pane-home" role="tabpanel" aria-label="Home">
+                <p class="a-label">Saved, in the draw</p>
+                <p class="a-bal" id="pBal">$1,250<span>.00</span></p>
+                <p class="a-won"><span class="chip-gold" id="pWon">+$250.00</span><span>won in prizes</span></p>
+                <svg class="a-chart" viewBox="0 0 244 74" preserveAspectRatio="none" aria-hidden="true">
+                  <defs><linearGradient id="aFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E6CE97" stop-opacity=".35"/><stop offset="1" stop-color="#E6CE97" stop-opacity="0"/></linearGradient></defs>
+                  <path id="pFill" d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14 V74 H0 Z" fill="url(#aFill)"/>
+                  <path id="pLine" d="M0 62 L40 60 L46 54 L96 53 L102 47 L150 46 C158 46 160 16 168 16 L244 14" fill="none" stroke="#E6CE97" stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>
+                </svg>
+                <div class="a-range" id="pRange" role="group" aria-label="Chart range"><button type="button">1W</button><button type="button">1M</button><button type="button" class="on" aria-pressed="true">3M</button><button type="button">1Y</button><button type="button">All</button></div>
+                <div class="a-draw">
+                  <div class="ad-row"><span>Next draw</span><span>Prize pool</span></div>
+                  <div class="ad-row big"><b id="pCount">2d 14h 37m</b><b class="gold" id="pPool">$48,210.00</b></div>
+                  <div class="ad-bar"><i id="pRound"></i></div>
+                </div>
+                <div class="a-entries">
+                  <div><span>Your entries</span><b id="pEntries">2,750</b></div>
+                  <span class="chip-blue" id="pBoost">2.2× boost</span>
+                </div>
+                <div class="a-acts">
+                  <button type="button" class="a-btn gold" data-open="add">Add money</button>
+                  <button type="button" class="a-btn" data-open="out">Withdraw</button>
+                </div>
               </div>
 
-              <div class="a-entries">
-                <div><span>Your entries</span><b>1,250</b></div>
-                <span class="chip-blue">2× boost</span>
+              <!-- Draws -->
+              <div class="pane" id="pane-draws" role="tabpanel" aria-label="Draws" hidden>
+                <p class="a-label">Draw #13</p>
+                <p class="a-big" id="pCount2">2d 14h 37m</p>
+                <p class="a-sub">Prize pool <b class="gold" id="pPool2">$48,210.00</b>, growing every second</p>
+                <div class="p-line" aria-hidden="true">
+                  <div class="pl-track" id="pLineTrack"><i style="flex:9"></i><i style="flex:5"></i><i class="you" style="flex:6"></i><i style="flex:12"></i><i style="flex:4"></i><i style="flex:8"></i><i style="flex:3"></i></div>
+                  <span class="pl-pin" id="pPin"></span>
+                </div>
+                <p class="a-tiny">Every saver gets a stretch of the line. Yours is gold.</p>
+                <button type="button" class="a-btn gold wide" id="pDrawGo">Watch a pretend draw</button>
+                <p class="a-result" id="pResult" role="status" aria-live="polite"></p>
               </div>
 
-              <div class="a-wins">
-                <p>Latest winners</p>
-                <div class="aw"><span class="av" style="background:linear-gradient(140deg,#d9b38c,#8a4b5c)"></span><span>Saver 4F2A</span><b>+$1,000</b></div>
-                <div class="aw"><span class="av" style="background:linear-gradient(140deg,#a9c6bd,#3f5f7f)"></span><span>You</span><b>+$250</b></div>
+              <!-- Winners -->
+              <div class="pane" id="pane-winners" role="tabpanel" aria-label="Winners" hidden>
+                <p class="a-label">Draw #12 winners</p>
+                <ol class="a-list" id="pWinners">
+                  <li><span class="av" style="background:linear-gradient(140deg,#d9b38c,#8a4b5c)"></span><span>Saver 4F2A</span><b>+$1,000</b></li>
+                  <li><span class="av" style="background:linear-gradient(140deg,#a9c6bd,#3f5f7f)"></span><span>You</span><b>+$250</b></li>
+                  <li><span class="av" style="background:linear-gradient(140deg,#b9b3d6,#4a4f7a)"></span><span>Saver 91C0</span><b>+$100</b></li>
+                  <li><span class="av" style="background:linear-gradient(140deg,#c9b98c,#5a6b4c)"></span><span>Saver 07DE</span><b>+$100</b></li>
+                </ol>
+                <p class="a-tiny">1,204 savers entered. Every winner kept their deposit, and prizes went straight into savings.</p>
               </div>
+
+              <!-- Account -->
+              <div class="pane" id="pane-account" role="tabpanel" aria-label="Account" hidden>
+                <p class="a-label">Your money</p>
+                <div class="a-split">
+                  <div class="as-row in"><span><b>Saved</b><small>In the draw</small></span><b id="pSaved">$1,250.00</b></div>
+                  <div class="as-row"><span><b>Cash</b><small>Not in the draw</small></span><b id="pCash">$0.00</b></div>
+                </div>
+                <p class="a-label a-gap">Loyalty boost</p>
+                <div class="a-tiers" id="pTiers"></div>
+                <p class="a-tiny">Dollars that stay in count for more. Taking money out takes the newest dollars first.</p>
+              </div>
+
+              <!-- Add money / withdraw, over whichever tab is open -->
+              <div class="a-sheet" id="pSheet" hidden>
+                <p class="a-label" id="pSheetTitle">Add money</p>
+                <p class="a-big" id="pSheetAmt">$100</p>
+                <div class="a-chips" id="pChips"><button type="button" data-v="50">$50</button><button type="button" data-v="100" class="on">$100</button><button type="button" data-v="500">$500</button></div>
+                <button type="button" class="a-btn gold wide" id="pSheetGo">Save $100</button>
+                <button type="button" class="a-link" id="pSheetX">Cancel</button>
+              </div>
+              <p class="a-toast" id="pToast" role="status" aria-live="polite"></p>
             </div>
 
-            <nav class="tabbar">
-              <span class="on"><svg viewBox="0 0 24 24"><path d="M4 11 12 4.5 20 11v8.5a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>Home</span>
-              <span><svg viewBox="0 0 24 24"><path d="M3.5 7.5h17v3a2 2 0 0 0 0 4v3h-17v-3a2 2 0 0 0 0-4z"/></svg>Draws</span>
-              <span><svg viewBox="0 0 24 24"><path d="M8 4.5h8v4.5a4 4 0 0 1-8 0zM8 6.5H5.5a2.5 2.5 0 0 0 2.6 3.9M16 6.5h2.5a2.5 2.5 0 0 1-2.6 3.9M12 13v3.5M8.5 20h7l-.8-3.5H9.3z"/></svg>Winners</span>
-              <span><svg viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Account</span>
+            <nav class="tabbar" role="tablist" aria-label="App sections">
+              <button type="button" role="tab" aria-selected="true" aria-controls="pane-home" data-tab="home" class="on"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11 12 4.5 20 11v8.5a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></svg>Home</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="pane-draws" data-tab="draws"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5h17v3a2 2 0 0 0 0 4v3h-17v-3a2 2 0 0 0 0-4z"/></svg>Draws</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="pane-winners" data-tab="winners"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.5h8v4.5a4 4 0 0 1-8 0zM8 6.5H5.5a2.5 2.5 0 0 0 2.6 3.9M16 6.5h2.5a2.5 2.5 0 0 1-2.6 3.9M12 13v3.5M8.5 20h7l-.8-3.5H9.3z"/></svg>Winners</button>
+              <button type="button" role="tab" aria-selected="false" aria-controls="pane-account" data-tab="account"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>Account</button>
             </nav>
             <span class="home-ind"></span>
           </div>
         </div>
+        <p class="phone-cap">Tap around. Sample numbers, nothing real.</p>
         </div>
       </div>
     </section>
@@ -179,7 +226,7 @@
             </div>
             <span class="step-n">2</span>
             <h3>Get entries</h3>
-            <p>Every dollar you save is one entry in every monthly draw, for as long as it stays saved.</p>
+            <p>Every dollar you save is an entry in every draw. Dollars that stay in count for more, up to 3x after a year.</p>
           </article>
           <article class="step">
             <div class="step-vis" aria-hidden="true">
@@ -275,18 +322,25 @@
     <section class="section" id="odds">
       <div class="wrap odds-grid">
         <div class="sec-head left">
-          <h2>More savings, more chances</h2>
-          <p>Your odds grow with what you save. Someone with $1,000 saved has ten times the chances of someone with $100.</p>
+          <h2>Save more, keep it longer</h2>
+          <p>Every dollar is an entry, and dollars that stay in count for more: 1.5x after 3 months, 2x after 6 and 3x after a year. $1,000 kept in for a year has 30 times the chances of $100 that just arrived.</p>
         </div>
         <div class="calc">
           <p class="calc-label">If you save</p>
           <p class="calc-amt num" id="calcAmt">$500</p>
           <input type="range" id="calcRange" min="0" max="19" step="1" value="9" aria-label="Amount saved" />
-          <div class="calc-out">
-            <p><b class="num" id="calcEntries">500</b> entries every month</p>
-            <p><b class="num" id="calcBoost">5×</b> the odds of someone saving $100</p>
-          </div>
           <div class="ladder" id="ladder"></div>
+          <p class="calc-label kept-label" id="keptLabel">And keep it in for</p>
+          <div class="kept" id="kept" role="radiogroup" aria-labelledby="keptLabel">
+            <button type="button" role="radio" aria-checked="true" data-x="1">Just added</button>
+            <button type="button" role="radio" aria-checked="false" data-x="1.5">3 months</button>
+            <button type="button" role="radio" aria-checked="false" data-x="2">6 months</button>
+            <button type="button" role="radio" aria-checked="false" data-x="3">A year</button>
+          </div>
+          <div class="calc-out">
+            <p><b class="num" id="calcEntries">500</b> entries in every draw</p>
+            <p><b class="num" id="calcBoost">5×</b> the chances of $100 that just arrived</p>
+          </div>
         </div>
       </div>
     </section>
@@ -319,7 +373,7 @@
           </details>
           <details>
             <summary>How are winners picked?</summary>
-            <p>Each draw uses a random number from Chainlink VRF, which comes with a proof anyone can verify. Your chances depend on how much you've saved and how long it's been saved that month.</p>
+            <p>Each draw uses a random number from Chainlink VRF, which comes with a proof anyone can verify. Your chances depend on how much you've saved, how long it was saved that month, and how long it has stayed in: dollars kept in for 3 months or more count up to three times.</p>
           </details>
           <details>
             <summary>How big are the prizes?</summary>
@@ -348,7 +402,7 @@
           <input type="hidden" name="form-name" value="waitlist" />
           <p hidden><label>Leave this empty <input name="bot-field" /></label></p>
 
-          <label class="field"><span>Name</span><input id="wlName" name="name" type="text" autocomplete="name" maxlength="100" required placeholder="Jane Doe" /></label>
+          <label class="field"><span>Name</span><input id="wlName" name="name" type="text" autocomplete="name" maxlength="100" required placeholder="Maya Rivera" /></label>
           <label class="field"><span>Email</span><input id="wlEmail" name="email" type="email" autocomplete="email" maxlength="254" required placeholder="you@example.com" /></label>
           <label class="field"><span>Phone</span><input id="wlPhone" name="phone" type="tel" autocomplete="tel" maxlength="24" required placeholder="(555) 123-4567" /></label>
           <label class="field"><span>How much would you start with? (optional)</span>

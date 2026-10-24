@@ -14,6 +14,9 @@ import {ChainlinkVRFSource} from "./ChainlinkVRFSource.sol";
 ///         that the vault uses for its draws. Everything is then handed to `finalOwner`.
 ///         The VRF source and the subscription use Chainlink's two-step ownership, so `finalOwner`
 ///         accepts them later (only needed to change VRF settings or withdraw the subscription).
+///         It also puts in the house money: test dollars sponsored by this contract, which earn
+///         interest for the prize pool from the first minute but have no entries, so they can never
+///         win. This contract has no way to take them out, so they stay in for good.
 contract KairosBetaSetup {
     MockUSDC public immutable usdc;
     MockTBill public immutable tbill;
@@ -22,12 +25,16 @@ contract KairosBetaSetup {
     address public immutable coordinator;
     uint256 public immutable subscriptionId;
     address public immutable finalOwner;
+    uint256 public immutable houseMoney;
 
-    event Ready(address usdc, address tbill, address vault, address vrf, uint256 subscriptionId);
+    event Ready(address usdc, address tbill, address vault, address vrf, uint256 subscriptionId, uint256 houseMoney);
 
-    constructor(address coordinator_, bytes32 keyHash, address finalOwner_, uint256 drawPeriod, uint256 speed) payable {
+    constructor(address coordinator_, bytes32 keyHash, address finalOwner_, uint256 drawPeriod, uint256 speed, uint256 houseMoney_)
+        payable
+    {
         coordinator = coordinator_;
         finalOwner = finalOwner_;
+        houseMoney = houseMoney_;
 
         usdc = new MockUSDC();
         tbill = new MockTBill(usdc);
@@ -51,12 +58,20 @@ contract KairosBetaSetup {
         tbill.setSpeed(speed);
         tbill.setRules(0, 0, 2 minutes, true);
 
+        // The house money: always in, earning for the prizes, never in the draw.
+        if (houseMoney_ > 0) {
+            usdc.mint(address(this), houseMoney_);
+            IERC20(address(usdc)).approve(address(vault), houseMoney_);
+            vault.sponsor(houseMoney_);
+            vault.rebalance(); // straight into T-bills, so the prize pool starts growing now
+        }
+
         usdc.transferOwnership(finalOwner_);
         tbill.transferOwnership(finalOwner_);
         vault.transferOwnership(finalOwner_);
         vrf.transferOwnership(finalOwner_); // pending until accepted
         c.requestSubscriptionOwnerTransfer(subscriptionId, finalOwner_); // pending until accepted
 
-        emit Ready(address(usdc), address(tbill), address(vault), address(vrf), subscriptionId);
+        emit Ready(address(usdc), address(tbill), address(vault), address(vrf), subscriptionId, houseMoney_);
     }
 }

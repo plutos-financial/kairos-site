@@ -17,7 +17,7 @@ contract BetaTest is Test {
     function setUp() public {
         coord = new VRFCoordinatorV2_5Mock(0.0001 ether, 1e9, 4e15);
         vm.deal(address(this), 10 ether);
-        setup = new KairosBetaSetup{value: 1 ether}(address(coord), bytes32(uint256(1)), ramy, 1 days, 52_560);
+        setup = new KairosBetaSetup{value: 1 ether}(address(coord), bytes32(uint256(1)), ramy, 1 days, 30, 100_000e6);
     }
 
     function save(address who, uint256 amount) internal {
@@ -56,6 +56,23 @@ contract BetaTest is Test {
         assertTrue(d.awarded);
         assertEq(winners.length, setup.vault().prizeSplits().length);
         assertGt(setup.vault().balanceOf(alice) + setup.vault().balanceOf(bob), 501e6); // prizes landed in savings
+    }
+
+    function test_houseMoneyIsInForGoodAndNeverWins() public {
+        KairosVault vault = setup.vault();
+        assertEq(vault.totalSponsored(), 100_000e6, "house money in");
+        assertEq(vault.sponsored(address(setup)), 100_000e6);
+        assertEq(vault.totalSupply(), 0, "it isn't anyone's savings");
+        assertGt(setup.tbill().balanceOf(address(vault)), 0, "already in T-bills");
+        vm.warp(block.timestamp + 1 hours);
+        // a month of interest a day: about $12.67 an hour on the $92,500 in T-bills at 4% (7.5% stays as cash)
+        assertApproxEqAbs(vault.availableInterest(), 12_671_233, 50_000, "the pool grows with nobody saving");
+        save(alice, 10e6);
+        vm.warp(block.timestamp + 1 days);
+        uint256 drawId = vault.closeDraw();
+        coord.fulfillRandomWords(1, address(setup.vrf()));
+        (, address[] memory winners,,) = vault.getDraw(drawId);
+        for (uint256 i = 0; i < winners.length; i++) assertEq(winners[i], alice, "only savers win");
     }
 
     function test_topUpHasNoDailyLimit() public {

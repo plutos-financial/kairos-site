@@ -39,20 +39,24 @@ Push to `main` and GitHub builds and publishes the site by itself (`.github/work
 |---|---|---|
 | `MockUSDC` | Test dollars: hourly faucet, plus `topUp(amount)` for the beta's Add money (any amount, up to $1,000,000 a call) | USDC |
 | `MockTBill` | Test T-bill fund: rising price, allowlist, settlement delay, optional instant route | BUIDL, BENJI, USTB |
-| `KairosVault` | Deposits (minted 1:1 as non-transferable pUSD), cash drawer, 85/15 interest split, time-weighted entries in a sum tree (every deposit, draw and winner is O(log n)), withdrawal queue, $1 rounding reserve | The Plutos product |
+| `KairosVault` | Deposits (minted 1:1 as non-transferable pUSD), cash drawer, 85/15 interest split, time-weighted entries with a loyalty boost in a sum tree (every deposit, draw and winner is O(log n)), house-money sponsorship (earns for prizes, never wins), withdrawal queue, $1 rounding reserve | The Plutos product |
 | `DemoRandomSource` | Simple two-step randomness (the demo) | |
 | `ChainlinkVRFSource` | Chainlink VRF v2.5 randomness (the beta) | Chainlink VRF |
-| `KairosBetaSetup` | Sets up the whole beta in one transaction: all of the above plus a funded Chainlink subscription | |
+| `KairosBetaSetup` | Sets up the whole beta in one transaction: all of the above, a funded Chainlink subscription, and $100,000 of house money | |
 
 Fees: there is **no deposit or withdrawal fee**. Plutos keeps 15% of the interest; 85% becomes prizes.
 
 ### How the draw scales
 
-A saver's entries are balance x seconds held. The vault keeps them in a binary sum tree (one leaf per saver): each branch holds the total balance below it and the total of `change x (time of change - round start)`, so any subtree's entries are `roundLength x balance - that total`. A deposit updates one leaf-to-root path; closing a draw reads the root; each winner is one walk down. Two copies of the second total (one per round parity) keep a closed draw's entries frozen while the next round runs; old rounds are cleared lazily by a round stamp. Closing a draw costs about 212k gas at any size (the first version needed 94 million at 2,000 savers). `forge test --match-test test_DrawCostStaysFlat -vv` prints the table. The case study page (`app/case-study.html`) explains it for everyone else.
+A saver's entries are balance x seconds held. The vault keeps them in a binary sum tree (one leaf per saver): each branch holds the total balance below it and the total of `change x (time of change - round start)`, so any subtree's entries are `roundLength x balance - that total`. A deposit updates one leaf-to-root path; closing a draw reads the root; each winner is one walk down. Two copies of the second total (one per round parity) keep a closed draw's entries frozen while the next round runs; old rounds are cleared lazily by a round stamp. 
+
+The loyalty boost: each dollar counts 1x when new, 1.5x after 3 rounds, 2x after 6 and 3x after 12 (months at launch; draws on the test network). Withdrawals take the newest dollars first, so this equals `E = A + 0.5 M3 + 0.5 M6 + M12` (M = lowest balance over the last 3/6/12 rounds). Each branch also keeps the dollars below it by arrival round for the last 13 rounds, so boosts step up as rounds pass with no transaction. Entries are stored in halves (`ENTRY_SCALE = 2`).
+
+Closing a draw costs about 215k gas at any size (the first version needed 94 million at 2,000 savers). `forge test --match-test test_DrawCostStaysFlat -vv` prints the table. The case study page (`app/case-study.html`) explains it for everyone else.
 
 ### Tests
 
-`forge test` runs 31 tests: scenario tests, a brute-force check of 1,000 randomized four-round draws against a slow reference model, and invariant tests (256 runs x 150 random actions) that check solvency, "prizes only from interest", every saver's ledger and the entries tree after every action, then withdraw everyone and check each gets every cent back. `.github/workflows/contracts.yml` runs them on every contract change. Slither reports no high-severity findings. Details for everyone: `app/security.html`.
+`forge test` runs 37 tests: scenario tests, brute-force checks against slow reference models (1,000 randomized four-round draws, and 1,000 randomized 16-round histories for the loyalty boost), and invariant tests (256 runs x 150 random actions) that check solvency, "prizes only from interest", every saver's ledger, the house-money ledger and the entries tree after every action, then withdraw everyone and the house and check each gets every cent back. `.github/workflows/contracts.yml` runs them on every contract change. Slither reports no high-severity findings. Details for everyone: `app/security.html`.
 
 ---
 

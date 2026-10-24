@@ -80,6 +80,7 @@
         <p class="r-foot">For example, an $8,500 top prize plus several smaller prizes. 4% is an example rate; Treasury rates change over time.</p>
       </div>
       <p>More savers means more entries in each draw, but also a bigger prize pool. Your expected share stays about the same, and there's room for more and bigger prizes.</p>
+      <p>On the test network, $100,000 of house money stays in the vault so the prize pool always grows, even before anyone saves. It earns interest for the prizes like everyone's savings, but it has no entries, so it can never win. Interest is also sped up there: a month's worth arrives every day.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="draw">
@@ -88,6 +89,10 @@
       <div class="qa">
         <h3>Every dollar is an entry</h3>
         <p>Entries also count how long your money was saved during the month. $100 saved for the whole month counts the same as $200 saved for half of it, so a large deposit made the night before a draw doesn't get an unfair advantage.</p>
+      </div>
+      <div class="qa">
+        <h3>Money that stays in counts for more</h3>
+        <p>Each dollar's entries grow the longer it stays saved: <b>1x</b> for new money, <b>1.5x</b> after 3 months, <b>2x</b> after 6 months and <b>3x</b> after a year. Adding more never resets the boost on money that's already in. Taking money out takes your newest dollars first, so your oldest dollars keep their boost. On the test network a month is one draw, so you can watch your boost step up over a few days.</p>
       </div>
       <div class="qa">
         <h3>Chainlink picks the winners</h3>
@@ -99,10 +104,11 @@
       </div>
       <div class="odds-mini">
         <p class="om-title">Your odds</p>
-        <p>Exact odds change whenever someone deposits or withdraws. The rule of thumb: double your savings and you double your chances.</p>
-        <div class="om-row"><span>$100 saved</span><b>1×</b></div>
-        <div class="om-row"><span>$500 saved</span><b>5×</b></div>
-        <div class="om-row"><span>$1,000 saved</span><b>10×</b></div>
+        <p>Exact odds change whenever someone deposits or withdraws. The rule of thumb: double your savings and you double your chances, and keep them in for a year and each dollar counts three times.</p>
+        <div class="om-row"><span>$100 saved, new</span><b>1×</b></div>
+        <div class="om-row"><span>$1,000 saved, new</span><b>10×</b></div>
+        <div class="om-row"><span>$1,000 saved for 6 months</span><b>20×</b></div>
+        <div class="om-row"><span>$1,000 saved for a year</span><b>30×</b></div>
       </div>
       <p class="try">See it for yourself: <a class="text-link" href="./draws.html">watch a draw step by step &rarr;</a> The Draws page replays every real draw from the blockchain, and runs pretend ones with the real savers and prize pool.</p>
     </section>
@@ -110,7 +116,7 @@
     <section class="ex-sec wrap-narrow" id="in-out">
       <p class="sec-n">05</p>
       <h2>Adding and withdrawing</h2>
-      <p>You add money with Apple Pay or a debit card through Coinbase, or by sending USDC to your Plutos wallet. When you save it, it turns into Plutos savings tokens, one for each dollar.</p>
+      <p>You add money with Apple Pay or a debit card through Coinbase, or by sending USDC to your Plutos wallet. When you save it, it turns into Plutos savings tokens, one for each dollar. Only saved money is in the draw: cash waiting in your Plutos wallet isn't, and the app shows the two separately.</p>
       <p>You can withdraw your savings at any time, and cash out to the bank account linked in your Coinbase account. Most withdrawals are instant because part of everyone's savings is kept in cash. If many people withdraw at once, a large withdrawal can take about a business day while Treasury bills are sold.</p>
       <p>In the test app, <b>Add money</b> gives you free test dollars and saves them straight away, as much as you like. You can also try the real Apple Pay checkout, which runs in Coinbase's test mode, so no card is ever charged.</p>
     </section>

@@ -102,7 +102,59 @@ export async function setup() {
     // The beta's draws use Chainlink VRF; the demo uses a simple on-chain random source.
     rng: cfg.vrf ? { address: cfg.vrf, abi: abis.ChainlinkVRFSource } : { address: cfg.randomSource, abi: abis.DemoRandomSource },
   };
+  // Vaults with the loyalty boost store entries in halves; older ones in whole dollar-seconds.
+  state.entryScale = await read("vault", "ENTRY_SCALE").catch(() => 1n);
+  state.hasBoost = state.entryScale > 1n;
   return true;
+}
+
+/** The loyalty boost: entries per dollar by how many draws a dollar has stayed in. */
+export const BOOST_TIERS = [
+  { x: 1, from: 0, label: "1x" },
+  { x: 1.5, from: 3, label: "1.5x" },
+  { x: 2, from: 6, label: "2x" },
+  { x: 3, from: 12, label: "3x" },
+];
+
+/** A saver's dollars by tier, and their full-round entries (dollars x boost). Null on vaults without the boost. */
+export async function boostFor(addr) {
+  if (!state.hasBoost || !addr) return null;
+  const [tiers, nextIn, nextAmount, nextTier] = await read("vault", "boostOf", [addr]);
+  const entries = (Number(tiers[0]) + Number(tiers[1]) * 1.5 + Number(tiers[2]) * 2 + Number(tiers[3]) * 3) / 1e6;
+  const dollars = tiers.reduce((a, b) => a + b, 0n);
+  const avg = dollars > 0n ? entries / (Number(dollars) / 1e6) : 1;
+  return { tiers, nextIn: Number(nextIn), nextAmount, next: BOOST_TIERS[Number(nextTier)], entries, avg };
+}
+
+/** Entries in dollars from a weight, for a round `length` seconds long. */
+export const entriesOf = (weight, length) => (length > 0n ? Number(weight / (state.entryScale * length)) / 1e6 : 0);
+
+/** The boost as a short label: 1x, 1.5x, 2.3x. */
+export const boostLabel = (x) => `${Number(x.toFixed(x >= 10 ? 0 : 1))}x`;
+
+/**
+ * Contract events over a block range, read in pieces the public node accepts (Base's public node
+ * allows 200 blocks per request and 25 requests a second). Newest first; stops after `max` events.
+ */
+export async function eventsBack({ eventName, args, fromBlock, toBlock, max = Infinity }) {
+  const step = state.cfg.chainId === 84532 ? 200n : 5000n;
+  const out = [];
+  let to = toBlock ?? (await state.pub.getBlockNumber());
+  const floor = fromBlock ?? 0n;
+  while (to >= floor && out.length < max) {
+    const batch = [];
+    for (let i = 0; i < 10 && to >= floor; i++) {
+      const from = to - step + 1n > floor ? to - step + 1n : floor;
+      const q = { ...state.contracts.vault, eventName, args, fromBlock: from, toBlock: to };
+      // one retry, a moment later, if the node says we're going too fast
+      batch.push(state.pub.getContractEvents(q).catch(() => sleep(1200).then(() => state.pub.getContractEvents(q))));
+      to = from - 1n;
+    }
+    const chunks = await Promise.all(batch);
+    for (const c of chunks) out.push(...c.reverse());
+    if (to >= floor && out.length < max && state.cfg.chainId === 84532) await sleep(450); // stay under the rate limit
+  }
+  return out;
 }
 
 /** True when draws use Chainlink VRF (Chainlink calls back with the random number by itself). */
@@ -393,7 +445,7 @@ export function humanDuration(s) {
 
 // ------------------------------------------------------------------ the draw line, a page at a time
 
-const PAGE = 500n;
+const PAGE = 200n; // each saver's entries read the boost ring, so keep each read small
 
 /** Savers in order and running totals, from pages of [savers, entries] (people with no entries left out). */
 export function lineFromPages(pages) {

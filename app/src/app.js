@@ -5,7 +5,7 @@ import abis from "./abis.json";
 import {
   $, state, fmt, sleep, setup, read, act, friendlyError, toast, toastError, txLink,
   emailAvailable, mockSignIn, resumeEmailSession, startEmailSignIn, finishEmailSignIn,
-  connectBrowserWallet, connectDevKey, canRunDraws, isBeta,
+  connectBrowserWallet, connectDevKey, canRunDraws, isBeta, boostFor, entriesOf, boostLabel,
 } from "./core.js";
 import { groupWinners } from "./winners-ui.js";
 import { showAccount, wireAccount } from "./appbar.js";
@@ -439,20 +439,23 @@ async function refresh() {
     $("getDollars").hidden = isBeta || wal > 0n || bal > 0n;
     $("faucetMore").hidden = isBeta || !$("getDollars").hidden;
     beta?.renderWallet(wal, bal);
+    renderSplit(bal, wal);
     $("winnersN").textContent = splits.length.toLocaleString();
 
-    // Entries: one per dollar. Time matters (balance x time), so someone who joins mid-round
-    // only gets part of their entries in this draw. No exact odds are shown.
-    const full = dollars(bal);
+    // Entries: one per dollar, times the loyalty boost. Time matters (balance x time), so someone who
+    // joins mid-round only gets part of their entries in this draw. No exact odds are shown.
+    const boost = await boostFor(state.address).catch(() => null);
+    const full = boost ? Math.floor(boost.entries) : dollars(bal);
     $("entries").textContent = full.toLocaleString("en-US");
     const nowChain = BigInt(Math.floor(Date.now() / 1000) + s.chainOffset);
     const span = nowChain > ps + per ? nowChain - ps : per;
-    const thisRound = span > 0n ? Math.floor(Number(odds[0] / span) / 1e6) : 0;
+    const thisRound = Math.floor(entriesOf(odds[0], span));
     const note = $("entriesNote");
     if (full > 0 && thisRound < full - 1) {
       note.hidden = false;
       note.textContent = `You joined partway through this round, so ${thisRound.toLocaleString("en-US")} of your entries count in this draw. All ${full.toLocaleString("en-US")} count in the next one.`;
     } else note.hidden = true;
+    renderBoost(boost, bal);
 
     renderStarter();
     updateHint();
@@ -461,6 +464,38 @@ async function refresh() {
     tick();
   } catch (e) {
     console.error(e);
+  }
+}
+
+/** Saved (in the draw, as savings tokens) next to cash (in the wallet, not in the draw). */
+function renderSplit(saved, cash) {
+  const box = $("moneySplit");
+  box.hidden = saved === 0n && cash === 0n;
+  if (box.hidden) return;
+  $("msSaved").textContent = fmt(saved);
+  $("msCash").textContent = fmt(cash);
+  const tokens = Number(saved) / 1e6;
+  $("msSavedNote").textContent = saved > 0n
+    ? `${tokens.toLocaleString("en-US", { maximumFractionDigits: 2 })} savings tokens, $1 each. These count in the draw.`
+    : "Held as savings tokens, $1 each. These count in the draw.";
+  const total = Number(saved + cash) || 1;
+  $("msBarIn").style.flexGrow = String(Number(saved) / total);
+  $("msBarOut").style.flexGrow = String(Number(cash) / total);
+  $("msBarOut").hidden = cash === 0n;
+}
+
+/** The loyalty boost: dollars that stay in longer get more entries each. */
+function renderBoost(boost, bal) {
+  const stat = $("boostStat");
+  const note = $("boostNote");
+  stat.hidden = !boost || bal === 0n;
+  if (stat.hidden) return (note.hidden = true);
+  $("boost").textContent = boostLabel(boost.avg);
+  note.hidden = false;
+  if (boost.nextIn > 0 && boost.next) {
+    note.textContent = `Stay saved and your entries grow: ${fmt(boost.nextAmount)} steps up to ${boost.next.label} in ${boost.nextIn} draw${boost.nextIn === 1 ? "" : "s"}. Every dollar gets 1.5x after 3 draws, 2x after 6 and 3x after 12.`;
+  } else {
+    note.textContent = "All your savings are at the top boost, 3x. Taking money out takes the newest dollars first.";
   }
 }
 

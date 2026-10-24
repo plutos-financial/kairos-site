@@ -46,7 +46,7 @@
 .rule .dot { flex: 0 0 10px; height: 10px; border-radius: 50%; margin-top: 6px; }
 .dot.low { background: var(--amber); } .dot.healthy { background: var(--green); } .dot.excess { background: var(--blue); }
 .zone.excess { background: var(--blue); }
-.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 14px 0 8px; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 14px 0 8px; }
 .kpi { background: var(--bg-2); border-radius: 14px; padding: 14px 16px; min-width: 0; }
 .kpi-num { font-family: var(--display); font-stretch: 104%; font-size: 22px; font-weight: 540; letter-spacing: -0.02em; margin: 4px 0 0; white-space: nowrap; font-variant-numeric: proportional-nums; }
 
