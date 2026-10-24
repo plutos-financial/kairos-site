@@ -545,18 +545,22 @@ contract DrawGasTest is Test {
         uint256[5] memory sizes = [uint256(10), 100, 500, 1_000, 2_000];
         uint256 firstAward;
         uint256 lastAward;
+        uint256 firstClose;
         uint256 lastClose;
         console2.log("savers | deposit (new) | closeDraw (new) | awardDraw 3 prizes (new) | closeDraw (original)");
         for (uint256 i = 0; i < sizes.length; i++) {
             (uint256 dep, uint256 close, uint256 award) = _measureNew(sizes[i]);
             uint256 old = _measureOld(sizes[i]);
             console2.log(string.concat(vm.toString(sizes[i]), " | ", vm.toString(dep), " | ", vm.toString(close), " | ", vm.toString(award), " | ", vm.toString(old)));
-            if (i == 0) firstAward = award;
+            if (i == 0) (firstAward, firstClose) = (award, close);
             lastAward = award;
             lastClose = close;
             if (sizes[i] == 2_000) assertGt(old, 20 * close, "original close grows with savers");
         }
-        assertLt(lastClose, 300_000, "close stays flat");
+        // Flat: closing for 2,000 savers costs the same as for 10 (gas numbers differ a little between
+        // Foundry versions, so this compares sizes rather than using a fixed number).
+        assertLe(lastClose, firstClose + firstClose / 20, "close stays flat");
+        assertLt(lastClose, 500_000, "close stays cheap");
         assertLt(lastAward, firstAward * 3, "award grows only with log(savers)");
     }
 }
