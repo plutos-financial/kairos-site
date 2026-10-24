@@ -25,4 +25,12 @@ jobs:
       - name: Build
         run: forge build --sizes
       - name: Test
-        run: forge test
+        run: |
+          set -o pipefail
+          forge test 2>&1 | tee forge-test.txt
+      - name: Show failing tests
+        if: failure()
+        run: |
+          # each failing test (and its reason) as an annotation, readable without the full log
+          grep -E "^\[FAIL|Error:|reverted|panicked|counterexample" forge-test.txt | head -20 | while IFS= read -r line; do echo "::error title=forge test::${line}"; done
+          forge --version | head -1 | sed 's/^/::notice title=forge::/'
