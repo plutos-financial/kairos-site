@@ -13,7 +13,7 @@
 // Three ways in: watchDraw(id) as Chainlink answers, replayDraw(id) for a finished draw, and
 // playPretend(...) for a pretend draw (pretend.js).
 import { keccak256, encodeAbiParameters, hexToBigInt, getAddress } from "viem";
-import { $, state, fmt, read, act, sleep, usesChainlink, lineFromPages, readPages, eventsBack } from "./core.js";
+import { $, state, fmt, read, act, sleep, usesChainlink, lineFromPages, readPages, eventsBack, network } from "./core.js";
 import { podiumHTML, groupWinners, myWin, saverName, hueOf } from "./winners-ui.js";
 import "./drawshow.css";
 
@@ -385,14 +385,15 @@ function sameWinners(a, b) {
 
 function chainlinkLink() {
   const sub = state.cfg?.subscriptionId;
-  return state.cfg?.chainId === 84532 && sub ? `https://vrf.chain.link/base-sepolia/${sub}` : "";
+  const net = network();
+  return net && sub ? `https://vrf.chain.link/${net.vrfSlug}/${sub}` : "";
 }
 
 /** The transaction where the random number arrived: searched from the draw's close, a few minutes' worth of blocks. */
 async function awardTx(drawId, closeTime) {
   try {
     const latest = await state.pub.getBlock();
-    const perBlock = state.cfg.chainId === 84532 ? 2n : 1n;
+    const perBlock = network() ? 2n : 1n;
     const ago = closeTime && latest.timestamp > BigInt(closeTime) ? (latest.timestamp - BigInt(closeTime)) / perBlock : 0n;
     const from = latest.number > ago + 20n ? latest.number - ago - 20n : 0n; // a little before the close
     const to = from + 1200n < latest.number ? from + 1200n : latest.number; // Chainlink answers within a few minutes

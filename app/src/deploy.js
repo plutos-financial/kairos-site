@@ -15,7 +15,9 @@ const VRF = {
   coordinator: "0x5C210eF41CD1a72de73bF76eC39637bB0d3d7BEE",
   keyHash: "0x9e1344a1247c8a1785d0a4681a27152bffdb43666ae5bf7d14d24a5efd44bf71",
 };
-const VRF_FUNDING = "0.002"; // test ETH sent to the Chainlink subscription; each draw costs a tiny fraction of this
+// Chainlink answers only while the subscription holds the most one request could cost (about 0.03 ETH with the
+// setup's 500,000-gas callback), so send enough to cover that with room to spare. Each draw spends far less.
+const VRF_FUNDING = "0.05";
 const GAS_ALLOWANCE = "0.0004"; // the setup transaction itself costs far less than this on Base Sepolia
 const DRAW_PERIOD = 86_400n; // a draw every day
 const SPEED = 30n; // a month of interest every day, so the prize pool visibly grows
@@ -71,7 +73,7 @@ if (isBeta) {
   $("dTitle").textContent = "Set up the Plutos beta";
   $("dIntro").innerHTML = `One transaction sets up everything: test USDC, the T-bill fund, the vault, a Chainlink VRF subscription for fair draws, and $100,000 of house money that earns for the prize pool and can never win. It sends ${VRF_FUNDING} test ETH to Chainlink to pay for random numbers. The wallet you use becomes the owner.`;
   $("dSteps").innerHTML = `<li>Use your Plutos test wallet in MetaMask (never one with real money).</li>
-    <li>Make sure it has about 0.003 Base Sepolia ETH (free from a faucet).</li>
+    <li>Make sure it has about 0.06 Base Sepolia ETH (free from a faucet; some give 0.1 a day).</li>
     <li>Click the button and approve the one transaction.</li>`;
   $("go").textContent = "Connect and set up the beta";
 }
@@ -81,7 +83,7 @@ async function setUpBeta() {
   const bal = await pub.getBalance({ address: addr });
   log(`Connected ${addr} · ${(Number(bal) / 1e18).toFixed(4)} test ETH`);
   if (bal < parseEther(VRF_FUNDING) + parseEther(GAS_ALLOWANCE))
-    throw new Error(`This wallet needs about 0.003 Base Sepolia ETH. Get some from a faucet, then try again.`);
+    throw new Error(`This wallet needs about 0.06 Base Sepolia ETH: ${VRF_FUNDING} for Chainlink plus gas. Get some from a faucet, then try again.`);
   const li = log("Setting up everything in one transaction… confirm in your wallet");
   const hash = await wallet.deployContract({
     abi: setup.abi,

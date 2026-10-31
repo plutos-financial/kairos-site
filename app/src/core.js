@@ -14,7 +14,15 @@ import {
   getAddress,
 } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { baseSepolia, foundry } from "viem/chains";
+import { base, baseSepolia, foundry } from "viem/chains";
+
+/** The Base networks Plutos runs on. Base Sepolia is the test network; Base is real money (not live yet). */
+export const NETWORKS = {
+  84532: { chain: baseSepolia, name: "Base Sepolia", explorer: "https://sepolia.basescan.org", rpc: "https://sepolia.base.org", cdp: "base-sepolia", vrfSlug: "base-sepolia", test: true },
+  8453: { chain: base, name: "Base", explorer: "https://basescan.org", rpc: "https://mainnet.base.org", cdp: "base", vrfSlug: "base", test: false },
+};
+/** The network the site is pointed at, or undefined on a local test chain. */
+export const network = () => NETWORKS[state.cfg?.chainId];
 import abis from "./abis.json";
 import built from "./site-config.json"; // addresses + settings baked in at build time (see sync.mjs)
 import "./fresh.js"; // reloads a stale cached page after a site update
@@ -85,14 +93,15 @@ export async function setup() {
   state.appCfg = { ...built.settings, ...((await fetchJson("./kairos-settings.json")) || {}) };
   if (!cfg) return false;
   state.cfg = cfg;
-  if (cfg.chainId === 84532) {
-    state.chain = baseSepolia;
-    state.explorer = "https://sepolia.basescan.org";
+  const net = NETWORKS[cfg.chainId];
+  if (net) {
+    state.chain = net.chain;
+    state.explorer = net.explorer;
   } else {
     state.chain = { ...foundry, id: cfg.chainId };
     state.explorer = null;
   }
-  const rpc = cfg.rpcUrl || (cfg.chainId === 84532 ? "https://sepolia.base.org" : "http://127.0.0.1:8545");
+  const rpc = cfg.rpcUrl || net?.rpc || "http://127.0.0.1:8545";
   // batch: many reads go out as one HTTP request, which keeps the public RPC from rate-limiting us
   state.pub = createPublicClient({ chain: state.chain, transport: http(rpc, { batch: { wait: 16 } }) });
   state.contracts = {
@@ -137,7 +146,7 @@ export const boostLabel = (x) => `${Number(x.toFixed(x >= 10 ? 0 : 1))}x`;
  * allows 200 blocks per request and 25 requests a second). Newest first; stops after `max` events.
  */
 export async function eventsBack({ eventName, args, fromBlock, toBlock, max = Infinity }) {
-  const step = state.cfg.chainId === 84532 ? 200n : 5000n;
+  const step = network() ? 200n : 5000n;
   const out = [];
   let to = toBlock ?? (await state.pub.getBlockNumber());
   const floor = fromBlock ?? 0n;
@@ -152,7 +161,7 @@ export async function eventsBack({ eventName, args, fromBlock, toBlock, max = In
     }
     const chunks = await Promise.all(batch);
     for (const c of chunks) out.push(...c.reverse());
-    if (to >= floor && out.length < max && state.cfg.chainId === 84532) await sleep(450); // stay under the rate limit
+    if (to >= floor && out.length < max && network()) await sleep(450); // stay under the rate limit
   }
   return out;
 }
@@ -184,7 +193,7 @@ export async function canRunDraws(owner) {
   return admins.includes(hash);
 }
 
-export const emailAvailable = () => Boolean(state.appCfg.cdpProjectId) && state.cfg?.chainId === 84532;
+export const emailAvailable = () => Boolean(state.appCfg.cdpProjectId) && Boolean(network());
 /** Local testing only: ?mock signs in with Coinbase's mock wallet on a local chain. */
 export const mockSignIn = () => LOCAL(state.cfg) && new URLSearchParams(location.search).has("mock");
 
@@ -265,16 +274,17 @@ export async function connectBrowserWallet() {
   try {
     await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: hexId }] });
   } catch (e) {
-    if (e.code === 4902 && state.chain.id === 84532) {
+    const net = network();
+    if (e.code === 4902 && net) {
       await window.ethereum.request({
         method: "wallet_addEthereumChain",
         params: [
           {
             chainId: hexId,
-            chainName: "Base Sepolia",
-            nativeCurrency: { name: "Sepolia Ether", symbol: "ETH", decimals: 18 },
-            rpcUrls: ["https://sepolia.base.org"],
-            blockExplorerUrls: ["https://sepolia.basescan.org"],
+            chainName: net.name,
+            nativeCurrency: { name: net.test ? "Sepolia Ether" : "Ether", symbol: "ETH", decimals: 18 },
+            rpcUrls: [net.rpc],
+            blockExplorerUrls: [net.explorer],
           },
         ],
       });
@@ -330,7 +340,7 @@ export async function act(calls, onStatus = () => {}) {
     onStatus("Sending…");
     const { userOperationHash } = await cdp.sendUserOperation({
       evmSmartAccount: state.address,
-      network: "base-sepolia",
+      network: network().cdp,
       useCdpPaymaster: true,
       calls: calls.map((x) => ({
         to: state.contracts[x.c].address,
@@ -341,7 +351,7 @@ export async function act(calls, onStatus = () => {}) {
     onStatus("Confirming on Base…");
     for (let i = 0; i < 90; i++) {
       await sleep(1000);
-      const op = await cdp.getUserOperation({ userOperationHash, evmSmartAccount: state.address, network: "base-sepolia" });
+      const op = await cdp.getUserOperation({ userOperationHash, evmSmartAccount: state.address, network: network().cdp });
       if (op.status === "complete") {
         state.lastHashes = [op.transactionHash];
         await sleep(1500); // let the public RPC catch up before we re-read balances

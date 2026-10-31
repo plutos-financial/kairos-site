@@ -4,7 +4,7 @@
 //   The Plutos team (the on-chain owner, or an email on the drawAdmins list): real draws, settings,
 //   auto-pilot. Ending a round early and the settings also need on-chain owner rights, which the
 //   team's email account gets through the one-time MetaMask handover below.
-import { createWalletClient, custom, parseEventLogs } from "viem";
+import { createWalletClient, custom, parseEventLogs, parseAbi, parseEther, formatEther } from "viem";
 import abis from "./abis.json";
 import {
   $, PRIZE_PRESETS, state, fmt, short, sleep, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration,
@@ -21,6 +21,7 @@ let periodStart = 0n;
 let period = 0n;
 let currentId = 0n;
 let pendingId = 0n; // a round that closed but hasn't had winners picked yet
+let pendingClose = 0n; // when that round closed
 let paused = false;
 let chainOffset = 0;
 let busy = false;
@@ -53,6 +54,10 @@ function wire() {
     }
   };
   $("handover").onclick = handover;
+  $("clFund").onclick = fundChainlink;
+  $("clRetry").onclick = () => pendingId && go($("clRetry"), [{ c: "vault", fn: "retryRandomness", args: [pendingId] }], "Asked Chainlink for a new random number.");
+  $("clAccept").onclick = () => go($("clAccept"), [{ c: "rng", fn: "acceptOwnership" }], "You now control the Chainlink settings.");
+  $("clLower").onclick = lowerReserve;
 
   document.querySelectorAll("[data-ff]").forEach((b) => {
     // Invest the cash drawer's excess first, so the skipped time actually earns interest.
@@ -107,6 +112,102 @@ async function go(btn, calls, msg) {
     btn.textContent = label;
     busy = false;
   }
+}
+
+// ------------------------------------------------------------------ Chainlink: the account that pays for random numbers
+
+const COORDINATOR_ABI = parseAbi([
+  "function getSubscription(uint256 subId) view returns (uint96 balance, uint96 nativeBalance, uint64 reqCount, address subOwner, address[] consumers)",
+  "function pendingRequestExists(uint256 subId) view returns (bool)",
+  "function fundSubscriptionWithNative(uint256 subId) payable",
+]);
+const FUND_AMOUNT = "0.05";
+const SMALL_CALLBACK_GAS = 500_000n; // enough to store the number; the keeper pays the winners straight after
+// Chainlink only answers when the account holds the most a request could cost: the callback's gas at this
+// key's 30 gwei ceiling, plus its own overhead, plus a 60% premium for paying in ETH. An estimate, so round up.
+const reserveFor = (gas) => ((BigInt(gas) + 115_000n) * 30_000_000_000n * 16n) / 10n;
+const ethText = (wei) => `${Number(formatEther(wei)).toLocaleString(undefined, { maximumFractionDigits: 4 })} ETH`;
+let vrfOwner = "";
+let vrfGas = 0n;
+
+async function refreshChainlink() {
+  const cfg = state.cfg || {};
+  const on = usesChainlink() && admin && cfg.coordinator && cfg.subscriptionId;
+  $("clRow").hidden = !on;
+  $("clSettings").hidden = !(on && isOwner());
+  if (!on) return;
+  try {
+    const sub = BigInt(cfg.subscriptionId);
+    const [info, waiting, o, gas] = await Promise.all([
+      state.pub.readContract({ address: cfg.coordinator, abi: COORDINATOR_ABI, functionName: "getSubscription", args: [sub] }),
+      state.pub.readContract({ address: cfg.coordinator, abi: COORDINATOR_ABI, functionName: "pendingRequestExists", args: [sub] }).catch(() => false), // not on the local mock
+      read("rng", "owner"),
+      read("rng", "callbackGasLimit"),
+    ]);
+    vrfOwner = o;
+    vrfGas = BigInt(gas);
+    const have = info[1];
+    const need = reserveFor(vrfGas);
+    const low = have < need;
+    $("clStatus").textContent =
+      `Holds ${ethText(have)}. Chainlink needs about ${ethText(need)} on hand before it answers.` +
+      (low ? (waiting ? " A draw is waiting, so top it up." : " Top it up before the next draw.") : " That's enough.");
+    $("clStatus").classList.toggle("warn", low);
+    $("clFund").disabled = busy;
+    const stale = pendingId && chainNow() - pendingClose > 1800n; // Chainlink drops a request it can't pay for after a day
+    $("clRetry").hidden = !(isOwner() && stale && !low);
+    const mine = state.address && vrfOwner.toLowerCase() === state.address.toLowerCase();
+    $("clCfg").textContent = `Chainlink may use ${Number(vrfGas).toLocaleString()} gas to deliver each number. ` +
+      (mine ? "You control these settings." : `These settings are held by ${short(vrfOwner)} until you take them over.`);
+    $("clAccept").hidden = mine;
+    $("clLower").hidden = !(mine && vrfGas > SMALL_CALLBACK_GAS);
+  } catch (e) {
+    console.error(e);
+    $("clStatus").textContent = "Couldn't read the Chainlink account just now.";
+  }
+}
+
+/** Anyone can add test ETH to the subscription. It goes from MetaMask, since email accounts hold no ETH. */
+async function fundChainlink() {
+  if (busy) return;
+  const btn = $("clFund");
+  const label = btn.textContent;
+  busy = true;
+  btn.disabled = true;
+  btn.innerHTML = `<span class="spinner"></span> Confirm in MetaMask…`;
+  try {
+    if (state.mode !== "wallet") await connectBrowserWallet();
+    const hash = await state.walletClient.writeContract({
+      address: state.cfg.coordinator,
+      abi: COORDINATOR_ABI,
+      functionName: "fundSubscriptionWithNative",
+      args: [BigInt(state.cfg.subscriptionId)],
+      value: parseEther(FUND_AMOUNT),
+    });
+    btn.innerHTML = `<span class="spinner"></span> Confirming on Base…`;
+    await state.pub.waitForTransactionReceipt({ hash });
+    toast(`Added ${FUND_AMOUNT} test ETH to Chainlink. ${txLink(hash)}`, false, 7000);
+    await refresh();
+  } catch (e) {
+    console.error(e);
+    toastError(e);
+  } finally {
+    busy = false;
+    btn.disabled = false;
+    btn.textContent = label;
+  }
+}
+
+/** Keeps the callback small: it stores the number, and the keeper pays the winners a few minutes later. */
+async function lowerReserve() {
+  const [sub, keyHash, confirmations, native] = await Promise.all([
+    read("rng", "subscriptionId"),
+    read("rng", "keyHash"),
+    read("rng", "requestConfirmations"),
+    read("rng", "payInNative"),
+  ]);
+  return go($("clLower"), [{ c: "rng", fn: "setConfig", args: [sub, keyHash, Number(SMALL_CALLBACK_GAS), confirmations, native] }],
+    "Chainlink now needs a smaller reserve.");
 }
 
 // ------------------------------------------------------------------ the draw
@@ -389,7 +490,8 @@ async function refresh() {
     paused = isPaused;
     const { draws } = await loadDraws(15);
     pendingId = 0n;
-    draws.forEach((x) => x.d.prize > 0n && !x.d.awarded && (pendingId = x.id)); // oldest stuck round
+    pendingClose = 0n;
+    draws.forEach((x) => x.d.prize > 0n && !x.d.awarded && ((pendingId = x.id), (pendingClose = x.d.closeTime))); // oldest stuck round
     renderLatest(draws);
     renderHistory(draws);
 
@@ -421,6 +523,7 @@ async function refresh() {
       if (!busy) el.disabled = !isOwner();
     });
     $("autopilot").disabled = !admin;
+    await refreshChainlink();
     if (!admin && autoTimer) stopAutopilot();
     tick();
   } catch (e) {

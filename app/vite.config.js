@@ -26,7 +26,7 @@ function securityPolicy() {
   const settings = cfg.settings || {};
   const dep = cfg.deployment || {};
   const local = dep.chainId === 31337;
-  const rpc = origin(dep.rpcUrl || (local ? "http://127.0.0.1:8545" : "https://sepolia.base.org"));
+  const rpc = origin(dep.rpcUrl || (local ? "http://127.0.0.1:8545" : dep.chainId === 8453 ? "https://mainnet.base.org" : "https://sepolia.base.org"));
   const connect = [
     "'self'",
     rpc,

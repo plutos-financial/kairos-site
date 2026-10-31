@@ -6,6 +6,9 @@
 //   2. Close the round once it's over (the vault then asks Chainlink for a random number).
 //   3. Pay the winners if the random number has arrived but they weren't paid in the same step.
 //   4. For the local demo randomness source only: finish the pending draw.
+// It also checks, every tick, that the vault holds at least what it owes and that Chainlink can pay for the
+// next random number, and flags a draw that has waited too long. Those show as warnings on the run, except a
+// shortfall in the vault, which fails the run so GitHub emails the team.
 //
 //   KEEPER_PRIVATE_KEY=0x... node keeper.mjs --once     # one tick, then exit (what GitHub runs)
 //   KEEPER_PRIVATE_KEY=0x... node keeper.mjs            # keep ticking every TICK_SECONDS
@@ -13,7 +16,7 @@
 // Environment: KEEPER_PRIVATE_KEY (a throwaway test wallet with a little Base Sepolia ETH),
 // RPC_URL (default https://sepolia.base.org), CHAIN_ID (84532), EDITION (beta), TICK_SECONDS (60).
 import { readFileSync, existsSync } from "node:fs";
-import { createPublicClient, createWalletClient, http, fallback, formatUnits, formatEther } from "viem";
+import { createPublicClient, createWalletClient, http, fallback, formatUnits, formatEther, parseAbi } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { baseSepolia, foundry } from "viem/chains";
 
@@ -68,6 +71,38 @@ const vault = { address: deployment.vault, abi: abis.KairosVault };
 const usd = (x) => "$" + Number(formatUnits(x, 6)).toLocaleString("en-US", { maximumFractionDigits: 2 });
 const read = (functionName, args = []) => pub.readContract({ ...vault, functionName, args });
 
+const COORDINATOR_ABI = parseAbi([
+  "function getSubscription(uint256 subId) view returns (uint96 balance, uint96 nativeBalance, uint64 reqCount, address subOwner, address[] consumers)",
+]);
+// The most one request can cost: callback gas at the key's 30 gwei ceiling, Chainlink's overhead, 60% premium.
+const chainlinkReserve = (gas) => ((BigInt(gas) + 115_000n) * 30_000_000_000n * 16n) / 10n;
+const eth5 = (wei) => Number(formatEther(wei)).toFixed(5);
+
+/** The vault must always hold at least what it owes savers, sponsors, winners and fees. */
+async function checkSolvency() {
+  const [assets, owed] = await Promise.all([read("totalAssets"), read("totalLiabilities")]);
+  if (assets < owed) {
+    note("error", `The vault holds ${usd(assets)} but owes ${usd(owed)}: a shortfall of ${usd(owed - assets)}. Pause deposits from the Draws page and follow docs/incident-plan.md.`);
+    process.exitCode = 1;
+  } else console.log(`  vault holds ${usd(assets)}, owes ${usd(owed)} (cushion ${usd(assets - owed)})`);
+}
+
+/** Chainlink answers only while the subscription holds the most one request could cost. */
+async function checkChainlink() {
+  if (!deployment.vrf || !deployment.coordinator || !deployment.subscriptionId) return true;
+  const [[, nativeBalance], gas] = await Promise.all([
+    pub.readContract({ address: deployment.coordinator, abi: COORDINATOR_ABI, functionName: "getSubscription", args: [BigInt(deployment.subscriptionId)] }),
+    pub.readContract({ address: deployment.vrf, abi: abis.ChainlinkVRFSource, functionName: "callbackGasLimit" }),
+  ]);
+  const need = chainlinkReserve(gas);
+  if (nativeBalance < need) {
+    note("warning", `Chainlink's subscription holds ${eth5(nativeBalance)} test ETH but needs about ${eth5(need)} before it will answer, so draws will stall. Top it up with "Add 0.05 test ETH" on the Draws page.`);
+    return false;
+  }
+  console.log(`  Chainlink holds ${eth5(nativeBalance)} ETH (needs ~${eth5(need)})`);
+  return true;
+}
+
 async function send(contract, functionName, args = [], gas) {
   const { request } = await pub.simulateContract({ ...contract, functionName, args, account, ...(gas ? { gas } : {}) });
   const hash = await wallet.writeContract(request);
@@ -98,6 +133,9 @@ async function tick() {
   }
   if (eth < 200_000_000_000_000n) note("warning", `The keeper wallet ${account.address} is low on test ETH (${Number(formatEther(eth)).toFixed(5)}). Top it up from a faucet soon.`);
 
+  await checkSolvency();
+  const chainlinkOk = await checkChainlink().catch((e) => (console.log("  Chainlink check skipped:", e.shortMessage || e.message), true));
+
   // 1. Rebalance only when it would do something.
   if (queued > 0n || pending > 0n || cash < low || cash > high) {
     try {
@@ -122,7 +160,12 @@ async function tick() {
       }
     } else if (!d.awarded && d.prize > 0n) {
       const waited = Number(now - d.closeTime);
-      console.log(`  draw ${last} is waiting for its random number (${Math.round(waited / 60)} min).${waited > 3600 ? " If Chainlink never answers, the owner can press retry (retryRandomness)." : ""}`);
+      const hours = Math.round(waited / 360) / 10;
+      if (waited > 23 * 3600)
+        note("warning", `Draw ${last} has waited ${hours} hours for Chainlink. Chainlink drops a request after a day, so ${chainlinkOk ? "" : "top up the subscription, then "}the owner should press "Ask Chainlink again" on the Draws page.`);
+      else if (waited > 3600)
+        note("warning", `Draw ${last} has waited ${hours} hours for its random number.${chainlinkOk ? " Chainlink may be slow; if it hasn't answered within a day, the owner can press \"Ask Chainlink again\" on the Draws page." : " Chainlink's subscription is too low to answer; top it up on the Draws page."}`);
+      else console.log(`  draw ${last} is waiting for its random number (${Math.round(waited / 60)} min).`);
       // 4. The local demo randomness source needs someone to finish it.
       await finishDemoDraw(last);
     }
@@ -133,7 +176,10 @@ async function tick() {
     try {
       await send(vault, "closeDraw");
     } catch (e) {
-      console.log("  closeDraw skipped:", e.shortMessage || e.message);
+      const late = Number(now - nextDraw);
+      const msg = e.shortMessage || e.message;
+      if (late > 7200) note("warning", `The round was due ${Math.round(late / 360) / 10} hours ago but closing it failed: ${msg.split("\n")[0]}`);
+      else console.log("  closeDraw skipped:", msg);
     }
   }
 }

@@ -1,6 +1,6 @@
 // Control room: live Rebalancer view, draw simulator, activity feed.
 import { keccak256, encodeAbiParameters, formatUnits, parseUnits } from "viem";
-import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey, readPages, eventsBack, entriesOf } from "./core.js";
+import { $, PRIZE_PRESETS, state, fmt, short, setup, read, act, friendlyError, toast, toastError, txLink, humanDuration, resumeEmailSession, connectDevKey, readPages, eventsBack, entriesOf, network } from "./core.js";
 import { saverName } from "./winners-ui.js";
 
 const YEAR = 365n * 24n * 3600n;
@@ -148,12 +148,12 @@ async function loadFeed() {
     const latest = await state.pub.getBlockNumber();
     const latestBlock = await state.pub.getBlock({ blockNumber: latest });
     // The last few hours (Base makes a block every 2 seconds; its public node hands out 200 at a time).
-    const span = state.cfg.chainId === 84532 ? 7200n : 40000n;
+    const span = network() ? 7200n : 40000n;
     const found = await eventsBack({ fromBlock: latest > span ? latest - span : 0n, toBlock: latest, max: 60 });
     // (the keeper's routine "nothing to do" checks are left out)
     const recent = found.filter((e) => ICON[e.eventName] && !(e.eventName === "Rebalanced" && e.args.action === "hold")).slice(0, 40);
     if (!recent.length) return ($("feed").innerHTML = `<p class="sub">Nothing in the last few hours. Deposit in the app to get things moving.</p>`);
-    const secs = state.cfg.chainId === 84532 ? 2 : 1;
+    const secs = network() ? 2 : 1;
     $("feed").innerHTML = recent
       .map((e) => {
         const ago = Number(latest - e.blockNumber) * secs;

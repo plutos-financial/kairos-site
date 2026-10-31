@@ -136,6 +136,14 @@
           <label class="switch"><input type="checkbox" id="autopilot" aria-label="Draw automatically" /><span></span></label>
         </div>
 
+        <div class="set-row" id="clRow" hidden>
+          <div class="set-label"><b>Chainlink balance</b><span id="clStatus">Loading…</span></div>
+          <div class="row wrap">
+            <button id="clFund" class="btn btn-sm" type="button">Add 0.05 test ETH</button>
+            <button id="clRetry" class="btn btn-ghost btn-sm" type="button" hidden>Ask Chainlink again</button>
+          </div>
+        </div>
+
         <details class="advanced">
           <summary>More controls</summary>
           <div class="adv-grid">
@@ -166,6 +174,14 @@
               <div class="row wrap">
                 <button id="payFees" class="btn btn-ghost btn-sm">Pay fees</button>
                 <button id="pause" class="btn btn-ghost btn-sm">Pause deposits</button>
+              </div>
+            </div>
+            <div id="clSettings" hidden>
+              <p class="adv-h">Chainlink settings</p>
+              <p class="tiny" id="clCfg">—</p>
+              <div class="row wrap">
+                <button id="clAccept" class="btn btn-ghost btn-sm" type="button" hidden>Take over Chainlink settings</button>
+                <button id="clLower" class="btn btn-ghost btn-sm" type="button" hidden>Use a smaller reserve</button>
               </div>
             </div>
           </div>

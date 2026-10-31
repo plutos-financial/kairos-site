@@ -451,3 +451,4 @@
   .how3 p { grid-column: 2; }
   .latest .card-head .btn { width: 100%; }
 }
+.set-label span.warn { color: var(--amber); }
