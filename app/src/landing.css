@@ -100,7 +100,7 @@ html:has(.nav) { scroll-padding-top: 84px; }
 .sb-icons svg { height: 11px; width: auto; fill: currentColor; }
 .app { position: relative; flex: 1; padding: 6px 18px 0; display: flex; flex-direction: column; min-height: 0; }
 .a-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.a-brand { display: inline-flex; align-items: center; font-family: var(--display); font-weight: 700; font-stretch: 125%; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+.a-brand { display: inline-flex; align-items: center; gap: 5px; font-family: var(--display); font-weight: 700; font-size: 13px; letter-spacing: -0.01em; text-transform: lowercase; }
 .a-icons { display: inline-flex; align-items: center; gap: 10px; color: #d9d6d0; }
 .a-icons svg { width: 20px; height: 20px; }
 .a-av { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: #24252a; font-size: 11.5px; font-weight: 650; }
@@ -392,6 +392,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
 .site-footer { border-top: 1px solid var(--line); padding: 48px 0 64px; color: var(--dim); font-size: 13.5px; max-width: none; }
 .foot { display: flex; justify-content: space-between; gap: 32px; align-items: flex-start; }
 .foot-brand .brand { margin-bottom: 14px; display: inline-flex; }
+.foot-brand .brand .logo { height: 34px; }
 .foot p { margin: 0; max-width: 58ch; line-height: 1.55; }
 .foot-links { display: flex; flex-wrap: wrap; gap: 10px 22px; flex: 0 1 auto; justify-content: flex-end; }
 .foot-links a { color: var(--muted); text-decoration: none; }
@@ -465,3 +466,5 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
   .notif { display: none; }
 }
 @media (max-width: 640px) { .kept button { font-size: 13px; padding: 10px 2px; } }
+
+.a-brand img { width: 14px; height: 14px; display: block; }
