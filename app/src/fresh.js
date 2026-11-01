@@ -1,5 +1,6 @@
 // GitHub Pages lets browsers keep a page for 10 minutes, so right after an update people can get the
 // old version. If version.json says a newer build is out, load it once (the ?v= makes it a fresh URL).
+import { reveal } from "./motion.js";
 export {};
 if (import.meta.env.VITE_EDITION === "beta") document.documentElement.dataset.edition = "beta";
 
@@ -31,3 +32,6 @@ if (window.top !== window.self) {
       .catch(() => {});
   } catch {}
 })();
+
+// The explainer pages rise into view as you scroll, like the homepage.
+if (document.body?.classList.contains("explain")) reveal();

@@ -43,14 +43,6 @@ html:has(.nav) { scroll-padding-top: 84px; }
 .film-down { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); width: 40px; height: 40px; display: grid; place-items: center; color: rgba(244, 241, 234, 0.7); border-radius: 50%; }
 .film-down:hover { color: var(--text); }
 .film-down svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
-.film-toggle {
-  position: absolute; right: 28px; bottom: 26px; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
-  color: var(--text); background: rgba(7, 10, 20, 0.45); border: 1px solid rgba(244, 241, 234, 0.22); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  transition: background 0.15s, border-color 0.15s;
-}
-.film-toggle:hover { background: rgba(7, 10, 20, 0.7); border-color: rgba(244, 241, 234, 0.4); }
-.film-toggle svg { width: 16px; height: 16px; fill: currentColor; }
-.film-toggle[data-state="playing"] .i-play, .film-toggle[data-state="paused"] .i-pause { display: none; }
 /* the one entrance on the page: the opening words rise in once */
 .film-copy > * { animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .film-copy > :nth-child(2) { animation-delay: 0.12s; }
@@ -357,8 +349,7 @@ input[type="range"]:focus-visible { outline: 2px solid var(--accent); outline-of
   .film-copy .cta-row { flex-wrap: nowrap; gap: 8px; }
   .film-copy .cta-row .btn { flex: 1 1 0; min-width: 0; padding: 0 12px; min-height: 52px; font-size: 15px; }
   .film-down { display: none; }
-  .film-toggle { right: 16px; bottom: 20px; width: 36px; height: 36px; }
-  .hero { padding: 56px 0 48px; }
+    .hero { padding: 56px 0 48px; }
   .hero .hero-title { font-size: clamp(2.8rem, 13.4vw, 4.2rem); }
   .lede { margin-bottom: 28px; }
   .cta-row .btn { flex: 1 1 100%; }

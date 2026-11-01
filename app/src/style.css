@@ -214,3 +214,19 @@ footer p { max-width: 70ch; }
   *, *::before, *::after { transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .live-dot, .pill.ok::before, .rise .pod-step, .rise .pod > *, .rise .pod-rest, .win-card, .toast, .notif { animation: none !important; }
 }
+
+/* ---------------------------------------------------------------- motion
+   Moving between pages: the old page lifts away and the new one rises in (browsers that support
+   cross-page view transitions; others just load the page). Sections rise in as they scroll into view. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: vt-out 0.32s cubic-bezier(0.4, 0, 1, 1) both; }
+::view-transition-new(root) { animation: vt-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes vt-out { to { opacity: 0; transform: translateY(-28px); } }
+@keyframes vt-in { from { opacity: 0; transform: translateY(48px); } }
+.rv { opacity: 0; transform: translateY(56px); transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--rv-d, 0s), transform 1.05s cubic-bezier(0.2, 0.7, 0.2, 1) var(--rv-d, 0s); }
+.rv.rv-in { opacity: 1; transform: none; }
+html:has(body.landing) { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
+  html:has(body.landing) { scroll-behavior: auto; }
+}

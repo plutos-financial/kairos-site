@@ -2,6 +2,7 @@
 import { $ } from "./core.js";
 import built from "./site-config.json";
 import { phone } from "./phone.js";
+import { reveal } from "./motion.js";
 
 
 // ------------------------------------------------------------------ odds calculator
@@ -109,36 +110,18 @@ function waitlist() {
 
 // ------------------------------------------------------------------ the brand film
 // Muted and looping, and it only plays while it's on screen (and never downloads before that).
-// Paused for people who ask for less motion or to save data; the corner button plays or pauses it.
+// People who ask for less motion or to save data get the still poster instead.
 function film() {
   const v = $("film");
-  const btn = $("filmToggle");
-  if (!v || !btn) return;
-  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData === true;
-  let wanted = !calm; // what the visitor wants: playing or not
-  let inView = false;
-  const show = () => {
-    const playing = !v.paused;
-    btn.dataset.state = playing ? "playing" : "paused";
-    btn.setAttribute("aria-label", playing ? "Pause the video" : "Play the video");
-  };
-  const play = () => v.play().catch(() => {}).finally(show); // blocked (e.g. Low Power Mode) = the poster stays
+  if (!v) return;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || navigator.connection?.saveData === true) return;
   new IntersectionObserver(
     ([e]) => {
-      inView = e.isIntersecting;
-      if (inView && wanted) play();
-      else if (!inView && !v.paused) v.pause();
+      if (e.isIntersecting) v.play().catch(() => {}); // blocked (e.g. Low Power Mode) = the poster stays
+      else if (!v.paused) v.pause();
     },
     { threshold: 0.2 }
   ).observe(v.closest(".film"));
-  btn.onclick = () => {
-    wanted = v.paused;
-    if (wanted) play();
-    else v.pause();
-  };
-  v.addEventListener("play", show);
-  v.addEventListener("pause", show);
-  show();
 }
 
 // The homepage nav floats over the film, and turns solid once the film has scrolled away.
@@ -157,6 +140,7 @@ phone();
 waitlist();
 film();
 navOverFilm();
+reveal();
 
 // With reduced motion on, the moon on the orbit behind the phone holds still.
 if (matchMedia("(prefers-reduced-motion: reduce)").matches) document.querySelector(".orbit")?.pauseAnimations?.();
