@@ -19,7 +19,7 @@ contract DeployBeta is Script {
         address me = msg.sender;
         address coordinator = BASE_SEPOLIA_COORDINATOR;
         bytes32 keyHash = BASE_SEPOLIA_KEY_HASH;
-        uint256 funding = 0.05 ether; // Chainlink needs ~0.03 on hand before it answers (500k-gas callback)
+        uint256 funding = 0.02 ether; // Chainlink needs ~0.01 on hand before it answers (100k-gas callback)
         uint256 period = 1 days;
         uint256 speed = 30; // a month of interest every day
         if (block.chainid == 31337) {

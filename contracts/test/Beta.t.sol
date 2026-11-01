@@ -6,6 +6,7 @@ import {VRFCoordinatorV2_5Mock} from "@chainlink/src/v0.8/vrf/mocks/VRFCoordinat
 import {KairosBetaSetup} from "../src/KairosBetaSetup.sol";
 import {MockUSDC} from "../src/MockUSDC.sol";
 import {KairosVault} from "../src/KairosVault.sol";
+import {ChainlinkVRFSource} from "../src/ChainlinkVRFSource.sol";
 
 contract BetaTest is Test {
     VRFCoordinatorV2_5Mock coord;
@@ -52,6 +53,8 @@ contract BetaTest is Test {
         uint256 requestId = 1;
         assertEq(setup.vrf().drawOfRequest(requestId), drawId);
         coord.fulfillRandomWords(requestId, address(setup.vrf()));
+        // The 100k-gas callback stores the number; the keeper pays the winners on its next tick.
+        setup.vault().awardDraw(drawId);
         (KairosVault.Draw memory d, address[] memory winners,,) = setup.vault().getDraw(drawId);
         assertTrue(d.awarded);
         assertEq(winners.length, setup.vault().prizeSplits().length);
@@ -71,6 +74,8 @@ contract BetaTest is Test {
         vm.warp(block.timestamp + 1 days);
         uint256 drawId = vault.closeDraw();
         coord.fulfillRandomWords(1, address(setup.vrf()));
+        (KairosVault.Draw memory d0,,,) = vault.getDraw(drawId);
+        if (!d0.awarded) vault.awardDraw(drawId);
         (, address[] memory winners,,) = vault.getDraw(drawId);
         for (uint256 i = 0; i < winners.length; i++) assertEq(winners[i], alice, "only savers win");
     }
@@ -83,5 +88,30 @@ contract BetaTest is Test {
         usdc.topUp(1_000_000e6 + 1);
         vm.stopPrank();
         assertEq(usdc.balanceOf(alice), 5_000_000e6);
+    }
+
+    /// The smallest Chainlink callback still delivers the number; the keeper (anyone) pays the winners after.
+    function test_smallCallbackStillDeliversTheNumber() public {
+        ChainlinkVRFSource vrf = setup.vrf();
+        vm.prank(ramy);
+        vrf.acceptOwnership();
+        uint256 subId = setup.subscriptionId();
+        vm.prank(ramy);
+        vrf.setConfig(subId, bytes32(uint256(1)), 100_000, 3, true);
+        uint16[] memory splits = new uint16[](20);
+        for (uint256 i = 0; i < 20; i++) splits[i] = 500;
+        KairosVault v = setup.vault();
+        vm.prank(ramy);
+        v.setPrizeSplits(splits);
+        for (uint256 i = 0; i < 30; i++) save(address(uint160(0x1000 + i)), (i + 1) * 10e6);
+        setup.vault().rebalance();
+        vm.warp(block.timestamp + 1 days + 1);
+        uint256 drawId = setup.vault().closeDraw();
+        coord.fulfillRandomWords(1, address(vrf));
+        (KairosVault.Draw memory d,,,) = setup.vault().getDraw(drawId);
+        assertTrue(d.randomReady, "the number arrived");
+        setup.vault().awardDraw(drawId);
+        (d,,,) = setup.vault().getDraw(drawId);
+        assertTrue(d.awarded, "winners paid by the next caller");
     }
 }

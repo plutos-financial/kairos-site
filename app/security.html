@@ -9,7 +9,7 @@
   <link rel="icon" type="image/png" href="/src/media/plutos-icon.png" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
   <meta property="og:title" content="How Plutos keeps savings safe" />
-  <meta property="og:description" content="37 automated tests, 38,400 random actions per safety check, and an independent scanner, on every change." />
+  <meta property="og:description" content="38 automated tests, 38,400 random actions per safety check, and an independent scanner, on every change." />
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/landing.css" />
   <link rel="stylesheet" href="/src/explain.css" />
@@ -37,7 +37,7 @@
       <h1>How Plutos keeps savings safe</h1>
       <p class="ex-lede">Plutos makes four promises about your money. Each one is written down as a test that a computer tries to break, thousands of times, every time the code changes.</p>
       <div class="stat-strip">
-        <div><b>37</b><span>automated tests</span></div>
+        <div><b>38</b><span>automated tests</span></div>
         <div><b>38,400</b><span>random actions per safety check</span></div>
         <div><b>2,000</b><span>randomized draw histories checked against a brute-force model</span></div>
         <div><b>0</b><span>high-severity scanner findings</span></div>
@@ -128,7 +128,7 @@
       <p>The contracts and tests are public. With <a href="https://getfoundry.sh" target="_blank" rel="noopener noreferrer">Foundry</a> installed:</p>
       <pre class="code"><code>cd contracts
 ./install-deps.sh
-forge test        # all 37 tests, including the invariants
+forge test        # all 38 tests, including the invariants
 forge test --match-test test_DrawCostStaysFlat -vv   # the gas table</code></pre>
       <p>On the test network, every deposit, draw and prize is public on <a href="https://sepolia.basescan.org" target="_blank" rel="noopener noreferrer">Basescan</a>, and the <a href="./draws.html">Draws page</a> re-does each draw's math in your browser and checks it against what the blockchain recorded.</p>
     </section>

@@ -96,7 +96,7 @@ async function checkChainlink() {
   ]);
   const need = chainlinkReserve(gas);
   if (nativeBalance < need) {
-    note("warning", `Chainlink's subscription holds ${eth5(nativeBalance)} test ETH but needs about ${eth5(need)} before it will answer, so draws will stall. Top it up with "Add 0.05 test ETH" on the Draws page.`);
+    note("warning", `Chainlink's subscription holds ${eth5(nativeBalance)} test ETH but needs about ${eth5(need)} before it will answer, so draws will stall. Top it up with "Add 0.02 test ETH" on the Draws page.`);
     return false;
   }
   console.log(`  Chainlink holds ${eth5(nativeBalance)} ETH (needs ~${eth5(need)})`);

@@ -48,9 +48,9 @@ contract KairosBetaSetup {
         if (msg.value > 0) c.fundSubscriptionWithNative{value: msg.value}(subscriptionId);
         vrf = new ChainlinkVRFSource(coordinator_, address(vault), subscriptionId, keyHash);
         // Room for up to 20 prizes in one callback; 3 confirmations; pay in native ETH.
-        // A small callback keeps the reserve Chainlink demands low (~0.03 ETH at the 30 gwei lane, vs ~0.12 at
-        // 2.4M gas). It stores the number and tries to pay winners; if that runs out of gas the keeper pays them.
-        vrf.setConfig(subscriptionId, keyHash, 500_000, 3, true);
+        // A small callback keeps the reserve Chainlink demands low (~0.01 ETH at the 30 gwei lane, vs ~0.12 at
+        // 2.4M gas). It stores the number; the keeper (or anyone) pays the winners a few minutes later.
+        vrf.setConfig(subscriptionId, keyHash, 100_000, 3, true);
         c.addConsumer(subscriptionId, address(vrf));
         vault.setRandomSource(vrf);
 

@@ -121,8 +121,8 @@ const COORDINATOR_ABI = parseAbi([
   "function pendingRequestExists(uint256 subId) view returns (bool)",
   "function fundSubscriptionWithNative(uint256 subId) payable",
 ]);
-const FUND_AMOUNT = "0.05";
-const SMALL_CALLBACK_GAS = 500_000n; // enough to store the number; the keeper pays the winners straight after
+const FUND_AMOUNT = "0.02";
+const SMALL_CALLBACK_GAS = 100_000n; // enough to store the number (tested down to 90k); the keeper pays the winners after
 // Chainlink only answers when the account holds the most a request could cost: the callback's gas at this
 // key's 30 gwei ceiling, plus its own overhead, plus a 60% premium for paying in ETH. An estimate, so round up.
 const reserveFor = (gas) => ((BigInt(gas) + 115_000n) * 30_000_000_000n * 16n) / 10n;

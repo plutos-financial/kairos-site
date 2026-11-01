@@ -56,7 +56,7 @@ Closing a draw costs about 215k gas at any size (the first version needed 94 mil
 
 ### Tests
 
-`forge test` runs 37 tests: scenario tests, brute-force checks against slow reference models (1,000 randomized four-round draws, and 1,000 randomized 16-round histories for the loyalty boost), and invariant tests (256 runs x 150 random actions) that check solvency, "prizes only from interest", every saver's ledger, the house-money ledger and the entries tree after every action, then withdraw everyone and the house and check each gets every cent back. `.github/workflows/contracts.yml` runs them on every contract change. Slither reports no high-severity findings. Details for everyone: `app/security.html`.
+`forge test` runs 38 tests: scenario tests, brute-force checks against slow reference models (1,000 randomized four-round draws, and 1,000 randomized 16-round histories for the loyalty boost), and invariant tests (256 runs x 150 random actions) that check solvency, "prizes only from interest", every saver's ledger, the house-money ledger and the entries tree after every action, then withdraw everyone and the house and check each gets every cent back. `.github/workflows/contracts.yml` runs them on every contract change. Slither reports no high-severity findings. Details for everyone: `app/security.html`.
 
 ---
 
