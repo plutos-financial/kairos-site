@@ -1,0 +1,268 @@
+/* Plutos marketing pages: white paper, navy ink, a soft heavy serif for headlines.
+   Layout idea: one deep-navy film up top and one navy band for the "why", everything else open white,
+   headings centred, sections divided by thin rules. The app screens keep their own dark theme. */
+@import "@fontsource-variable/fraunces/full.css";
+
+body.landing {
+  --paper: #FFFFFF;
+  --paper-2: #F3F5F9;   /* quiet fills: inputs, the segmented control */
+  --ink: #0F1729;       /* body text, near-black with navy in it */
+  --navy: #18294A;      /* the logo's navy: buttons, bands, links */
+  --navy-2: #22365F;
+  --prize: #A97A1E;     /* gold, darkened to read on white: money you can win */
+
+  --bg: var(--paper);
+  --bg-1: var(--paper-2);
+  --bg-2: var(--paper-2);
+  --bg-3: #E4E8F0;
+  --line: rgba(15, 23, 41, 0.10);
+  --line-2: rgba(15, 23, 41, 0.18);
+  --edge: none;
+  --text: var(--ink);
+  --muted: #4A5368;
+  --dim: #6F778A;
+  --accent: var(--navy);
+  --accent-2: var(--navy-2);
+  --accent-ink: #FFFFFF;
+  --accent-soft: rgba(24, 41, 74, 0.08);
+  --gold: var(--prize);
+  --gold-2: var(--prize);
+  --serif: "Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
+  color-scheme: light;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* the dark places keep the dark palette: the film, the phone and its notification, the navy bands */
+body.landing .film,
+body.landing .phone,
+body.landing .float,
+body.landing .why,
+body.landing .site-footer {
+  --bg: #070A14;
+  --bg-1: #0C1120;
+  --bg-2: #121829;
+  --bg-3: #1A2136;
+  --line: rgba(255, 255, 255, 0.12);
+  --line-2: rgba(255, 255, 255, 0.2);
+  --text: #F4F1EA;
+  --muted: #B7BCC9;
+  --dim: #8A90A2;
+  --accent: #E6CE97;
+  --accent-ink: #17130B;
+  --accent-soft: rgba(230, 206, 151, 0.11);
+  --gold: #D9BA78;
+  --gold-2: #E6CE97;
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- type */
+body.landing .film-title,
+body.landing .hero .hero-title,
+body.landing .sec-head h2,
+body.landing .why-copy h2,
+body.landing .wl-copy h2,
+body.landing .why-num,
+body.landing .calc-amt,
+body.landing .ex-head h1,
+body.landing .ex-sec h2,
+body.landing .ex-end h2,
+body.landing .wl-done h3 {
+  font-family: var(--serif);
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  font-stretch: normal;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+body.landing .step h3,
+body.landing .tile h3,
+body.landing .calc-out b,
+body.landing .rails-grid b,
+body.landing .stat-strip b,
+body.landing .promise b,
+body.landing .om-row b,
+body.landing .r-row.total b {
+  font-family: var(--serif);
+  font-variation-settings: "SOFT" 100, "WONK" 0;
+  font-stretch: normal;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+body.landing h1, body.landing h2, body.landing h3 { text-wrap: balance; }
+
+/* ---------------------------------------------------------------- buttons: pills, filled navy or outlined */
+body.landing .btn { border-radius: 999px; font-weight: 600; box-shadow: none; }
+body.landing .btn-primary { background: var(--navy); border-color: var(--navy); color: #fff; }
+body.landing .btn-primary:hover { background: var(--navy-2); border-color: var(--navy-2); }
+body.landing .btn-ghost,
+body.landing .btn-outline { background: transparent; color: var(--ink); border: 1.5px solid var(--ink); }
+body.landing .btn-ghost:hover,
+body.landing .btn-outline:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+body.landing .btn-light { background: var(--navy); color: #fff; border-color: var(--navy); }
+body.landing .btn-light:hover { background: var(--navy-2); border-color: var(--navy-2); }
+/* on the film the buttons are light */
+body.landing .film .btn-primary { background: #fff; border-color: #fff; color: var(--navy); }
+body.landing .film .btn-primary:hover { background: #E9ECF3; border-color: #E9ECF3; }
+body.landing .film .btn-outline { color: #fff; border-color: rgba(255, 255, 255, 0.85); }
+body.landing .film .btn-outline:hover { background: #fff; color: var(--navy); border-color: #fff; }
+body.landing .text-link { color: var(--navy); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1.5px; }
+
+/* ---------------------------------------------------------------- nav: white bar, small capitals */
+body.landing .logo-navy { display: none; }
+body.landing .nav { background: rgba(255, 255, 255, 0.94); border-bottom: 1px solid var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+body.landing .nav .logo-white { display: none; }
+body.landing .nav .logo-navy { display: block; }
+body.landing .nav-links a { color: var(--ink); font-size: 12.5px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; }
+body.landing .nav-links a:hover { color: var(--navy-2); text-decoration: underline; text-underline-offset: 6px; }
+body.landing .nav-cta .btn { min-height: 38px; padding: 0 18px; font-size: 14px; }
+/* over the film: no bar, white words */
+body.landing .nav.nav-over:not(.solid) { background: transparent; border-bottom-color: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+body.landing .nav.nav-over:not(.solid) .logo-white { display: block; }
+body.landing .nav.nav-over:not(.solid) .logo-navy { display: none; }
+body.landing .nav.nav-over:not(.solid) .nav-links a { color: #fff; }
+body.landing .nav.nav-over:not(.solid) .btn-ghost { color: #fff; border-color: rgba(255, 255, 255, 0.85); }
+body.landing .nav.nav-over:not(.solid) .btn-ghost:hover { background: #fff; color: var(--navy); }
+body.landing .nav.nav-over:not(.solid) .btn-light { background: #fff; color: var(--navy); border-color: #fff; }
+body.landing .nav.nav-over.solid { background: rgba(255, 255, 255, 0.94); border-bottom-color: var(--line); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+
+/* ---------------------------------------------------------------- the film: centred words, a point into the page */
+body.landing .film { align-items: center; justify-content: center; text-align: center; }
+body.landing .film-shade { background: linear-gradient(180deg, rgba(7, 10, 20, 0.55) 0%, rgba(7, 10, 20, 0.38) 40%, rgba(7, 10, 20, 0.62) 100%); }
+body.landing .film .film-copy { padding-bottom: 0; display: flex; flex-direction: column; align-items: center; }
+body.landing .film-title { font-size: clamp(2.8rem, 6.6vw, 6.4rem); line-height: 1.02; max-width: 12em; margin: 0 auto 26px; color: #fff; text-shadow: 0 2px 40px rgba(7, 10, 20, 0.45); }
+body.landing .film-text { margin: 0 auto 34px; color: rgba(255, 255, 255, 0.88); max-width: 36rem; }
+body.landing .film .cta-row { justify-content: center; }
+body.landing .film::after {
+  content: ""; position: absolute; left: 50%; bottom: -1px; width: 56px; height: 22px; transform: translateX(-50%);
+  background: var(--paper); clip-path: polygon(0 100%, 50% 0, 100% 100%); z-index: 2;
+}
+body.landing .film-down { bottom: 34px; color: rgba(255, 255, 255, 0.75); }
+
+/* ---------------------------------------------------------------- save money, win prizes */
+body.landing .hero { padding: 104px 0 96px; }
+body.landing .hero .hero-title { font-size: clamp(3rem, 6vw, 6rem); line-height: 0.98; letter-spacing: -0.025em; color: var(--ink); }
+body.landing .hero-visual::before { background: radial-gradient(circle, rgba(24, 41, 74, 0.10), rgba(24, 41, 74, 0.04) 45%, transparent 68%); }
+body.landing .orbit path { stroke: rgba(24, 41, 74, 0.22); }
+body.landing .orbit .moon { fill: var(--navy); filter: none; }
+body.landing .phone { box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.14), inset 0 0 0 5px #0c0c0e, 0 60px 110px -40px rgba(15, 23, 41, 0.55); }
+body.landing .proof li::before { background: var(--navy); }
+body.landing .phone-cap { color: var(--dim); }
+
+/* ---------------------------------------------------------------- what it runs on: four facts in a row */
+body.landing .rails { border-color: var(--line); background: var(--paper); }
+body.landing .rails-grid > div { align-items: center; text-align: center; padding: 34px 16px; }
+body.landing .rails-grid > div + div { padding-left: 16px; border-left-color: var(--line); }
+body.landing .rails-grid span { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; font-weight: 650; color: var(--dim); }
+body.landing .rails-grid b { font-size: 22px; color: var(--navy); }
+
+/* ---------------------------------------------------------------- sections: centred heads */
+body.landing .section { padding-top: 128px; }
+body.landing .sec-head:not(.left) { display: block; text-align: center; max-width: 46rem; margin: 0 auto 56px; }
+body.landing .sec-head:not(.left) h2 { margin-bottom: 14px; }
+body.landing .sec-head h2, body.landing .why-copy h2, body.landing .wl-copy h2 { font-size: clamp(2.3rem, 4.6vw, 3.9rem); line-height: 1.02; color: var(--ink); }
+body.landing .sec-head p { font-size: 18px; color: var(--muted); }
+body.landing .sec-head p a { color: var(--navy); }
+
+/* how it works: three columns split by vertical rules, centred */
+body.landing .steps { border-top: 0; gap: 0; }
+body.landing .step { padding: 8px 40px 0; text-align: center; }
+body.landing .step + .step { border-left: 1px solid var(--line-2); }
+body.landing .step-n { margin: 0 0 18px; color: var(--prize); font-size: 13px; letter-spacing: 0.12em; }
+body.landing .step h3 { font-size: 30px; color: var(--navy); margin-bottom: 12px; }
+body.landing .step > p:last-child { margin: 0 auto; font-size: 16.5px; }
+
+/* comparison */
+body.landing .table-wrap { border-top: 1.5px solid var(--ink); max-width: 980px; margin: 0 auto; }
+body.landing .compare thead th { color: var(--muted); font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
+body.landing .compare thead th.k { color: var(--navy); }
+body.landing .compare .k { background: var(--accent-soft); }
+body.landing .compare .k .yes { color: var(--navy); }
+body.landing .no { color: #A3AAB9; }
+
+/* fairness */
+body.landing .bento { max-width: 1080px; margin: 0 auto; }
+body.landing .tile h3 { font-size: 26px; color: var(--navy); }
+
+/* odds calculator */
+body.landing input[type="range"] { background: linear-gradient(var(--navy), var(--navy)) 0 / var(--fill, 50%) 100% no-repeat, var(--bg-3); }
+body.landing input[type="range"]:focus { background-color: var(--bg-3); }
+body.landing input[type="range"]::-webkit-slider-thumb { background: #fff; border: 2px solid var(--navy); box-shadow: 0 2px 8px rgba(15, 23, 41, 0.18); }
+body.landing input[type="range"]::-moz-range-thumb { background: #fff; border: 2px solid var(--navy); box-shadow: 0 2px 8px rgba(15, 23, 41, 0.18); }
+body.landing .calc-amt { color: var(--ink); }
+body.landing .calc-out p:last-child b { color: var(--prize); }
+body.landing .rung { color: var(--muted); border: 1.5px solid var(--line-2); }
+body.landing .rung b { color: var(--ink); }
+body.landing .rung:hover { border-color: var(--ink); }
+body.landing .rung.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+body.landing .rung.on b { color: #fff; }
+body.landing .kept { background: var(--paper-2); border-color: var(--line); border-radius: 999px; }
+body.landing .kept button { border-radius: 999px; }
+body.landing .kept button[aria-checked="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 4px rgba(15, 23, 41, 0.14), 0 0 0 1px var(--line-2); }
+
+/* why: a full-width navy band */
+body.landing .why { background: var(--navy); color: #F4F1EA; padding: 120px 0; margin-top: 128px; }
+body.landing .why .why-grid { background: none; padding-top: 0; align-items: center; }
+body.landing .why .why-copy h2 { color: #fff; }
+body.landing .why-num { font-size: clamp(4.6rem, 11vw, 9.6rem); line-height: 0.9; color: #E6CE97; letter-spacing: -0.03em; }
+body.landing .why .text-link { color: #fff; }
+
+/* faq */
+body.landing .faq summary { font-size: 18.5px; font-weight: 600; }
+body.landing .faq summary:hover { color: var(--navy-2); }
+body.landing .faq details[open] summary::after { color: var(--navy); }
+
+/* waitlist */
+body.landing .wl-grid { background: none; padding-top: 0; }
+body.landing .wl-form input:not([type="checkbox"]),
+body.landing .wl-form select { background-color: var(--paper-2); border: 1.5px solid transparent; color: var(--ink); border-radius: 12px; }
+body.landing .wl-form input::placeholder { color: #8B92A3; }
+body.landing .wl-form input:not([type="checkbox"]):focus,
+body.landing .wl-form select:focus { background-color: #fff; border-color: var(--navy); box-shadow: 0 0 0 4px rgba(24, 41, 74, 0.12); }
+body.landing .wl-form .btn-primary { min-height: 54px; }
+body.landing .check input { accent-color: var(--navy); }
+
+/* footer: navy, like the why band */
+body.landing .site-footer { background: #0F1A30; border-top: 0; color: #9AA1B2; }
+body.landing .site-footer .logo-white { display: block; }
+body.landing .site-footer .logo-navy { display: none; }
+body.landing .foot-links a { color: #C9CEDA; }
+body.landing .foot-links a:hover { color: #fff; }
+
+/* ---------------------------------------------------------------- explainer pages */
+body.explain .ex-head h1 { font-size: clamp(2.8rem, 6vw, 4.6rem); line-height: 1.02; color: var(--ink); }
+body.explain .ex-sec h2 { font-size: clamp(2rem, 4vw, 2.8rem); line-height: 1.05; color: var(--ink); }
+body.explain .ex-sec .sec-n, body.explain .ex-kicker { color: var(--prize); }
+body.explain .ex-sec > p, body.explain .qa p, body.explain .honest li, body.explain .odds-mini p, body.explain details p { color: #2E3648; }
+body.explain .ex-sec a:not(.btn):not(.text-link) { color: var(--navy); text-decoration: underline; text-underline-offset: 3px; }
+body.explain .toc a { color: var(--navy); }
+body.explain .flow li::before { background: var(--paper); color: var(--prize); }
+body.explain .stat-strip b, body.explain .om-row b { color: var(--navy) !important; }
+body.explain .receipt { background: var(--paper-2); box-shadow: none; }
+body.explain .arch-box { background: var(--paper-2); }
+body.explain .arch-box.core { background: var(--accent-soft); border-color: var(--navy); }
+body.explain .arch-box.core b { color: var(--navy); }
+body.explain .finding { border-left-color: var(--navy); }
+body.explain .finding .f-tag { color: var(--navy); }
+body.explain .g-bars i.new, body.explain .g-key i.new { background: var(--navy); }
+body.explain .g-bars i.old, body.explain .g-key i.old { background: #B9C0CE; }
+body.explain .code { background: #0F1729; color: #E8E3D8; border-color: transparent; }
+
+/* ---------------------------------------------------------------- smaller screens */
+@media (max-width: 960px) {
+  body.landing .step { padding: 28px 0; border-left: 0 !important; }
+  body.landing .step + .step { border-top: 1px solid var(--line-2); }
+  body.landing .rails-grid > div:nth-child(3) { padding-left: 16px; }
+  body.landing .why { padding: 84px 0; margin-top: 88px; }
+}
+@media (max-width: 640px) {
+  body.landing .film-title { font-size: clamp(2.5rem, 11vw, 3.4rem); }
+  body.landing .film-shade { background: linear-gradient(180deg, rgba(7, 10, 20, 0.6) 0%, rgba(7, 10, 20, 0.45) 45%, rgba(7, 10, 20, 0.7) 100%); }
+  body.landing .hero { padding: 72px 0 48px; }
+  body.landing .section { padding-top: 88px; }
+  body.landing .sec-head:not(.left) { margin-bottom: 32px; }
+  body.landing .rails-grid > div { padding: 22px 8px; }
+  body.landing .rails-grid b { font-size: 18px; }
+  body.landing .step h3 { font-size: 26px; }
+  body.landing .nav-cta .btn { padding: 0 14px; }
+  body.landing .compare thead th { text-transform: none; letter-spacing: 0; font-size: 12px; }
+}
