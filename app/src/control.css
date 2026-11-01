@@ -99,3 +99,6 @@ table.sim tr.pretend td { background: var(--accent-soft); }
   .ev { grid-template-columns: 30px 1fr; }
   .ev .when { grid-column: 2; }
 }
+
+.page-title, .next-action { font-weight: 740; letter-spacing: -0.02em; }
+.m-num, .kpi-num, .boostcell { font-weight: 650; letter-spacing: -0.015em; }

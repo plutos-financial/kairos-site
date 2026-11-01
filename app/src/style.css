@@ -1,5 +1,6 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/mona-sans/wdth.css";
+@import "@fontsource-variable/fraunces/full.css";
 
 [hidden] { display: none !important; }
 .beta-only { display: none !important; }
@@ -35,7 +36,8 @@
   --green: var(--accent);
   --cyan: var(--blue);
   --radius: 22px;
-  --display: "Mona Sans Variable", "Mona Sans", "Geist Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* headlines and big numbers: a soft, heavy serif (Fraunces with its SOFT axis turned up) */
+  --display: "Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
   --sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: var(--sans);
   color-scheme: dark;
@@ -51,6 +53,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  font-variation-settings: "SOFT" 100, "WONK" 0; /* rounds the serif's corners; other faces ignore it */
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
@@ -101,7 +104,7 @@ img, svg { max-width: 100%; }
 
 main { max-width: 1160px; margin: 0 auto; padding: 8px 20px 48px; display: flex; flex-direction: column; gap: 16px; }
 
-h1, h2, h3 { font-family: var(--display); font-weight: 580; font-stretch: 112%; letter-spacing: -0.025em; }
+h1, h2, h3 { font-family: var(--display); font-weight: 700; font-stretch: 112%; letter-spacing: -0.015em; }
 h2 { font-size: 20px; margin: 0; }
 
 .card {
@@ -132,7 +135,7 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   font: 600 15px var(--sans); letter-spacing: -0.005em;
-  min-height: 46px; padding: 0 20px; border-radius: 10px;
+  min-height: 46px; padding: 0 20px; border-radius: 999px;
   border: 1px solid var(--line-2); background: var(--bg-3); color: var(--text);
   cursor: pointer; white-space: nowrap; text-decoration: none;
   transition: transform 0.12s ease, background 0.15s, border-color 0.15s, opacity 0.15s;
