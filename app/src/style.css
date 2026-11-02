@@ -1,6 +1,5 @@
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/mona-sans/wdth.css";
-@import "@fontsource-variable/fraunces/full.css";
 
 [hidden] { display: none !important; }
 .beta-only { display: none !important; }
@@ -36,8 +35,8 @@
   --green: var(--accent);
   --cyan: var(--blue);
   --radius: 22px;
-  /* headlines and big numbers: a soft, heavy serif (Fraunces with its SOFT axis turned up) */
-  --display: "Fraunces Variable", "Fraunces", Georgia, "Times New Roman", serif;
+  /* headlines and big numbers: Geist, set tight, the same family as the body text */
+  --display: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: var(--sans);
   color-scheme: dark;
@@ -53,7 +52,6 @@ body {
   font-size: 16px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  font-variation-settings: "SOFT" 100, "WONK" 0; /* rounds the serif's corners; other faces ignore it */
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
 }
@@ -104,7 +102,7 @@ img, svg { max-width: 100%; }
 
 main { max-width: 1160px; margin: 0 auto; padding: 8px 20px 48px; display: flex; flex-direction: column; gap: 16px; }
 
-h1, h2, h3 { font-family: var(--display); font-weight: 700; font-stretch: 112%; letter-spacing: -0.015em; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.035em; }
 h2 { font-size: 20px; margin: 0; }
 
 .card {

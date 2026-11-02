@@ -453,8 +453,8 @@
 }
 .set-label span.warn { color: var(--amber); }
 
-/* the serif headlines and numbers, heavier like the homepage */
-.dc-title, .win-title, .reveal-title, .sheet-card h2 { font-weight: 740; letter-spacing: -0.02em; }
+/* headlines and numbers in tight Geist, like the homepage */
+.dc-title, .win-title, .reveal-title, .sheet-card h2 { font-weight: 600; letter-spacing: -0.045em; }
 .balance-num, .amount-wrap input, .amount-wrap .dollar, .win-amount, .w-count, .w-pool, .wallet-bal, .next-count, .pool-num, .stat-num,
-.ms-amt, .pod-amt, .pod-step span, .h-id, .h-amt, .ld-amt, .ld-ico, .mid { font-weight: 650; letter-spacing: -0.015em; }
+.ms-amt, .pod-amt, .pod-step span, .h-id, .h-amt, .ld-amt, .ld-ico, .mid { font-weight: 560; letter-spacing: -0.035em; }
 .appbar .apptabs a { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 650; }

@@ -1,6 +1,6 @@
-/* Plutos marketing pages: the night-sky palette, a soft heavy serif for headlines, centred section
+/* Plutos marketing pages: the night-sky palette, tight Geist headlines, centred section
    heads, pill buttons and thin rules. Layout idea: the film up top, open dark sections divided by rules,
-   and one lifted navy band for the "why" and the footer. The serif and pills are shared with the app
+   and one lifted navy band for the "why" and the footer. The type and pills are shared with the app
    (style.css); this file holds the homepage and explainer layout. */
 
 body.landing {
@@ -30,7 +30,7 @@ body.landing .calc-amt,
 body.landing .ex-head h1,
 body.landing .ex-sec h2,
 body.landing .ex-end h2,
-body.landing .wl-done h3 { font-weight: 760; letter-spacing: -0.02em; }
+body.landing .wl-done h3 { font-weight: 600; letter-spacing: -0.045em; }
 body.landing .step h3,
 body.landing .tile h3,
 body.landing .calc-out b,
@@ -38,7 +38,7 @@ body.landing .rails-grid b,
 body.landing .stat-strip b,
 body.landing .promise b,
 body.landing .om-row b,
-body.landing .r-row.total b { font-family: var(--display); font-weight: 700; letter-spacing: -0.01em; }
+body.landing .r-row.total b { font-family: var(--display); font-weight: 600; letter-spacing: -0.03em; }
 body.landing h1, body.landing h2, body.landing h3 { text-wrap: balance; }
 
 /* ---------------------------------------------------------------- buttons */
@@ -108,7 +108,7 @@ body.landing .kept button { border-radius: 999px; }
 /* why: a full-width navy band */
 body.landing .why { background: var(--band); padding: 120px 0; margin-top: 128px; }
 body.landing .why .why-grid { background: none; padding-top: 0; align-items: center; }
-body.landing .why-num { font-size: clamp(4.6rem, 11vw, 9.6rem); line-height: 0.9; color: var(--champagne); letter-spacing: -0.03em; }
+body.landing .why-num { font-size: clamp(4.6rem, 11vw, 9.6rem); line-height: 0.9; color: var(--champagne); letter-spacing: -0.05em; }
 
 /* faq */
 body.landing .faq summary { font-size: 18.5px; font-weight: 600; }
