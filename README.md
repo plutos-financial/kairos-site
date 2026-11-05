@@ -1,6 +1,6 @@
 # Plutos
 
-Pluto's Financial · prize-linked savings · **test money only**
+Pluto's Financial, Inc. · prize-linked savings · **test money only**
 
 Plutos is a savings account with a prize draw: savers keep every dollar they put in, and the interest is handed out as prizes. This repo holds everything: the website, the smart contracts, and a small money server.
 
