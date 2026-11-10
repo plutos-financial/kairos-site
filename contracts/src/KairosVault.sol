@@ -52,9 +52,10 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     uint256 public constant ENTRY_SCALE = 2;
     /// @dev Deposits are remembered by round for this many rounds (12 for the top tier + 1 for the closed draw).
     uint256 internal constant RING = 13;
-    /// @notice A draw's random number can be asked for again only after this long with no answer
-    ///         (Chainlink drops unanswered requests after a day), and only the newest request counts.
-    uint256 public constant RETRY_AFTER = 1 days;
+    /// @notice Each draw asks for exactly one random number, once. If it hasn't arrived after this long,
+    ///         anyone can cancel the draw: no winners, and the prize goes back for the next draw. There is
+    ///         never a second request, so nobody can throw away a number they don't like and ask again.
+    uint256 public constant STALL_AFTER = 3 days;
 
     IERC20 public immutable usdc;
     ITBillFund public immutable tbill;
@@ -168,7 +169,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     // Fixed when a draw closes, so changing settings later can't touch a draw that's waiting:
     mapping(uint256 => address) public drawSource; // the only source that may answer this draw
     mapping(uint256 => uint16[]) internal drawSplits; // this draw's prize shares
-    mapping(uint256 => uint64) public drawRequestedAt; // when its random number was last asked for
+    mapping(uint256 => uint64) public drawRequestedAt; // when its one random number was asked for
 
     // Running totals, so anyone can check the golden rule from the outside.
     uint256 public totalHarvestedToPrizes; // every dollar of interest that went to the prize pool
@@ -185,6 +186,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     event DrawClosed(uint256 indexed drawId, uint256 prize, uint256 totalWeight, uint256 entrants);
     event DrawAwarded(uint256 indexed drawId, address[] winners, uint256[] amounts);
     event RandomnessReceived(uint256 indexed drawId, uint256 randomWord);
+    event DrawCancelled(uint256 indexed drawId, uint256 prizeReturned);
     event SaverJoined(address indexed saver, uint256 leaf);
     event FeesPaid(address indexed to, uint256 amount);
     event RandomSourceSet(address indexed source);
@@ -696,16 +698,17 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         emit DrawAwarded(drawId, winners, amounts);
     }
 
-    /// @notice If the random number never arrives (for example the subscription ran out), ask again,
-    ///         but only after RETRY_AFTER with no answer, from the same source. The source counts only
-    ///         its newest request for the draw, and the first number delivered is final, so a retry can't
-    ///         be used to choose between two numbers.
-    function retryRandomness(uint256 drawId) external onlyOwner {
+    /// @notice If a draw's random number never arrives, anyone can cancel the draw after STALL_AFTER.
+    ///         No winners are picked and the prize returns to the reserve for the next draw. The draw's
+    ///         one request is never repeated, and a number that arrives after the cancel is refused.
+    function cancelStalledDraw(uint256 drawId) external nonReentrant {
         Draw storage d = draws[drawId];
         require(d.prize > 0 && !d.randomReady && !d.awarded, "kairos: nothing waiting");
-        require(block.timestamp >= drawRequestedAt[drawId] + RETRY_AFTER, "kairos: too soon to ask again");
-        drawRequestedAt[drawId] = uint64(block.timestamp);
-        IRandomSource(drawSource[drawId]).requestRandomness(drawId);
+        require(block.timestamp >= drawRequestedAt[drawId] + STALL_AFTER, "kairos: too soon to cancel");
+        d.awarded = true;
+        prizesPending -= d.prize;
+        prizeReserve += d.prize;
+        emit DrawCancelled(drawId, d.prize);
     }
 
     // ================================================================== views for the app

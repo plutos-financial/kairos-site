@@ -322,23 +322,26 @@ contract DrawsTest is Test {
         vault.awardDraw(id);
     }
 
-    function test_RetryRandomness() public {
+    function test_StalledDrawIsCancelledNotRetried() public {
         _deposit(0, 1_000e6);
         vault.rebalance();
         uint256 id = _close();
+        (KairosVault.Draw memory d,,,) = vault.getDraw(id);
+        uint256 reserveBefore = vault.prizeReserve();
         assertEq(rng.requests(), 1);
-        vm.expectRevert("kairos: too soon to ask again");
-        vault.retryRandomness(id);
-        vm.warp(block.timestamp + 1 days);
-        vault.retryRandomness(id);
-        assertEq(rng.requests(), 2);
-        vm.prank(address(0xBAD));
-        vm.expectRevert();
-        vault.retryRandomness(id);
-        _answer(id, 9);
-        vm.warp(block.timestamp + 1 days);
-        vm.expectRevert("kairos: nothing waiting");
-        vault.retryRandomness(id);
+        vm.expectRevert("kairos: too soon to cancel");
+        vault.cancelStalledDraw(id);
+        vm.warp(block.timestamp + 3 days);
+        vm.prank(address(0xA11CE)); // anyone can cancel a stalled draw
+        vault.cancelStalledDraw(id);
+        assertEq(rng.requests(), 1, "never asked twice");
+        assertEq(vault.prizeReserve(), reserveBefore + d.prize, "prize carried over");
+        assertEq(vault.prizesPending(), 0);
+        // a number that turns up late is refused
+        vm.expectRevert("kairos: nothing to award");
+        rng.answer(id, 9);
+        // and the next draw can close
+        _close();
     }
 
     function test_DrawKeepsItsSettings() public {

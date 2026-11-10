@@ -19,7 +19,6 @@ contract ChainlinkVRFSource is VRFConsumerBaseV2Plus, IRandomSource {
     bool public payInNative = true;
 
     mapping(uint256 => uint256) public drawOfRequest; // VRF requestId => drawId
-    mapping(uint256 => uint256) public latestRequest; // drawId => its newest requestId (only that one counts)
 
     event Requested(uint256 indexed drawId, uint256 requestId);
 
@@ -45,14 +44,11 @@ contract ChainlinkVRFSource is VRFConsumerBaseV2Plus, IRandomSource {
             })
         );
         drawOfRequest[requestId] = drawId;
-        latestRequest[drawId] = requestId;
         emit Requested(drawId, requestId);
     }
 
     function fulfillRandomWords(uint256 requestId, uint256[] calldata randomWords) internal override {
-        uint256 drawId = drawOfRequest[requestId];
-        if (latestRequest[drawId] != requestId) return; // a superseded request: ignored
-        IRandomConsumer(vault).fulfillRandomness(drawId, randomWords[0]);
+        IRandomConsumer(vault).fulfillRandomness(drawOfRequest[requestId], randomWords[0]);
     }
 
     function setConfig(uint256 subId, bytes32 keyHash_, uint32 gasLimit, uint16 confirmations, bool native)
