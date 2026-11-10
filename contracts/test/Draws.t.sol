@@ -335,6 +335,7 @@ contract DrawsTest is Test {
         vm.prank(address(0xA11CE)); // anyone can cancel a stalled draw
         vault.cancelStalledDraw(id);
         assertEq(rng.requests(), 1, "never asked twice");
+        assertTrue(vault.drawCancelled(id), "recorded as cancelled");
         assertEq(vault.prizeReserve(), reserveBefore + d.prize, "prize carried over");
         assertEq(vault.prizesPending(), 0);
         // a number that turns up late is refused

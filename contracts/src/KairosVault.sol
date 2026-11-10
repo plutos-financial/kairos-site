@@ -170,6 +170,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     mapping(uint256 => address) public drawSource; // the only source that may answer this draw
     mapping(uint256 => uint16[]) internal drawSplits; // this draw's prize shares
     mapping(uint256 => uint64) public drawRequestedAt; // when its one random number was asked for
+    mapping(uint256 => bool) public drawCancelled; // closed with no winners; `awarded` then means "complete"
 
     // Running totals, so anyone can check the golden rule from the outside.
     uint256 public totalHarvestedToPrizes; // every dollar of interest that went to the prize pool
@@ -705,7 +706,8 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         Draw storage d = draws[drawId];
         require(d.prize > 0 && !d.randomReady && !d.awarded, "kairos: nothing waiting");
         require(block.timestamp >= drawRequestedAt[drawId] + STALL_AFTER, "kairos: too soon to cancel");
-        d.awarded = true;
+        d.awarded = true; // complete, so the next draw can close
+        drawCancelled[drawId] = true;
         prizesPending -= d.prize;
         prizeReserve += d.prize;
         emit DrawCancelled(drawId, d.prize);
