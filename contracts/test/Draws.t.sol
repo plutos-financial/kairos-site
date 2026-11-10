@@ -327,14 +327,36 @@ contract DrawsTest is Test {
         vault.rebalance();
         uint256 id = _close();
         assertEq(rng.requests(), 1);
+        vm.expectRevert("kairos: too soon to ask again");
+        vault.retryRandomness(id);
+        vm.warp(block.timestamp + 1 days);
         vault.retryRandomness(id);
         assertEq(rng.requests(), 2);
         vm.prank(address(0xBAD));
         vm.expectRevert();
         vault.retryRandomness(id);
         _answer(id, 9);
+        vm.warp(block.timestamp + 1 days);
         vm.expectRevert("kairos: nothing waiting");
         vault.retryRandomness(id);
+    }
+
+    function test_DrawKeepsItsSettings() public {
+        _deposit(0, 1_000e6);
+        _deposit(1, 1_000e6);
+        vault.rebalance();
+        uint256 id = _close();
+        // Changing the source or the prize shares after the close can't touch the waiting draw.
+        uint16[] memory one = new uint16[](1);
+        one[0] = 10_000;
+        vault.setPrizeSplits(one);
+        vault.setRandomSource(IRandomSource(address(0xBEEF)));
+        vm.prank(address(0xBEEF));
+        vm.expectRevert("kairos: only this draw's random source");
+        IRandomConsumer(address(vault)).fulfillRandomness(id, 7);
+        _answer(id, 7);
+        (, address[] memory winners,,) = vault.getDraw(id);
+        assertEq(winners.length, 3, "the draw kept its three prize shares");
     }
 
     function test_OnlyTheLatestLineIsKept() public {

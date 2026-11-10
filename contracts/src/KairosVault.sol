@@ -52,6 +52,9 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     uint256 public constant ENTRY_SCALE = 2;
     /// @dev Deposits are remembered by round for this many rounds (12 for the top tier + 1 for the closed draw).
     uint256 internal constant RING = 13;
+    /// @notice A draw's random number can be asked for again only after this long with no answer
+    ///         (Chainlink drops unanswered requests after a day), and only the newest request counts.
+    uint256 public constant RETRY_AFTER = 1 days;
 
     IERC20 public immutable usdc;
     ITBillFund public immutable tbill;
@@ -119,7 +122,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     //     joined this round or the last 2: 1x   3-5 rounds ago: 1.5x   6-11: 2x   12 or more: 3x
     // (rounds are months at launch; on the test network they're the draw period). A withdrawal takes
     // the newest dollars first, so the boost is the same as "lowest balance over the last 3, 6 and
-    // 12 rounds": E = A + 0.5 M3 + 0.5 M6 + M12. Taking money out during a round loses that money's
+    // 12 rounds": E = A + L x (0.5 M3 + 0.5 M6 + M12), L the round length. Taking money out during a round loses that money's
     // boost for the whole round; adding money never changes anyone's boost until it has aged.
     // Each node also keeps `dep`: the dollars still in below it, by the round they arrived, for the
     // last 13 rounds (older ones are simply "old": balance minus the ring). A dollar's age is read
@@ -162,6 +165,10 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     mapping(uint256 => Draw) public draws;
     mapping(uint256 => address[]) internal drawWinners;
     mapping(uint256 => uint256[]) internal drawAmounts;
+    // Fixed when a draw closes, so changing settings later can't touch a draw that's waiting:
+    mapping(uint256 => address) public drawSource; // the only source that may answer this draw
+    mapping(uint256 => uint16[]) internal drawSplits; // this draw's prize shares
+    mapping(uint256 => uint64) public drawRequestedAt; // when its random number was last asked for
 
     // Running totals, so anyone can check the golden rule from the outside.
     uint256 public totalHarvestedToPrizes; // every dollar of interest that went to the prize pool
@@ -639,6 +646,9 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         d.prize = prizeReserve;
         prizesPending += prizeReserve;
         prizeReserve = 0;
+        drawSource[drawId] = address(randomSource);
+        drawSplits[drawId] = prizeSplitsBps;
+        drawRequestedAt[drawId] = uint64(block.timestamp);
         emit DrawClosed(drawId, d.prize, total, d.entrants);
         randomSource.requestRandomness(drawId);
     }
@@ -646,7 +656,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     /// @notice The random source delivers the number. Winners are paid in the same transaction when
     ///         it fits in the callback's gas; otherwise anyone can call awardDraw.
     function fulfillRandomness(uint256 drawId, uint256 randomWord) external {
-        require(msg.sender == address(randomSource), "kairos: only random source");
+        require(msg.sender == drawSource[drawId], "kairos: only this draw's random source");
         Draw storage d = draws[drawId];
         require(d.prize > 0 && !d.awarded && !d.randomReady, "kairos: nothing to award");
         d.randomWord = randomWord;
@@ -662,13 +672,14 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         require(d.randomReady && !d.awarded, "kairos: not ready to award");
         d.awarded = true;
 
-        uint256 n = prizeSplitsBps.length;
+        uint16[] storage splits = drawSplits[drawId];
+        uint256 n = splits.length;
         uint256 length = d.closeTime - d.start;
         uint256 remaining = d.prize;
         address[] memory winners = new address[](n);
         uint256[] memory amounts = new uint256[](n);
         for (uint256 i = 0; i < n; i++) {
-            uint256 amt = i == n - 1 ? remaining : (d.prize * prizeSplitsBps[i]) / BPS;
+            uint256 amt = i == n - 1 ? remaining : (d.prize * splits[i]) / BPS;
             remaining -= amt;
             uint256 ticket = uint256(keccak256(abi.encode(d.randomWord, i))) % d.totalWeight;
             winners[i] = _pick(drawId, length, ticket);
@@ -685,11 +696,16 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         emit DrawAwarded(drawId, winners, amounts);
     }
 
-    /// @notice If the random number never arrives (for example the subscription ran out), ask again.
+    /// @notice If the random number never arrives (for example the subscription ran out), ask again,
+    ///         but only after RETRY_AFTER with no answer, from the same source. The source counts only
+    ///         its newest request for the draw, and the first number delivered is final, so a retry can't
+    ///         be used to choose between two numbers.
     function retryRandomness(uint256 drawId) external onlyOwner {
         Draw storage d = draws[drawId];
-        require(d.prize > 0 && !d.randomReady, "kairos: nothing waiting");
-        randomSource.requestRandomness(drawId);
+        require(d.prize > 0 && !d.randomReady && !d.awarded, "kairos: nothing waiting");
+        require(block.timestamp >= drawRequestedAt[drawId] + RETRY_AFTER, "kairos: too soon to ask again");
+        drawRequestedAt[drawId] = uint64(block.timestamp);
+        IRandomSource(drawSource[drawId]).requestRandomness(drawId);
     }
 
     // ================================================================== views for the app
