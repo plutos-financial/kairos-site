@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
 import {VRFConsumerBaseV2Plus} from "@chainlink/src/v0.8/vrf/dev/VRFConsumerBaseV2Plus.sol";
@@ -7,9 +7,8 @@ import {IRandomSource, IRandomConsumer} from "./IRandomSource.sol";
 
 /// @title ChainlinkVRFSource
 /// @notice Provably fair randomness from Chainlink VRF v2.5 (subscription model).
-///         Setup: create a VRF subscription at vrf.chain.link (Base Sepolia), fund it with
-///         test LINK or ETH, deploy this contract, add it as a consumer, then call
-///         vault.setRandomSource(address(this)).
+///         Setup: create a VRF subscription, fund it, deploy this contract, add it as a
+///         consumer, then call vault.setRandomSource(address(this)).
 contract ChainlinkVRFSource is VRFConsumerBaseV2Plus, IRandomSource {
     address public immutable vault;
     uint256 public subscriptionId;

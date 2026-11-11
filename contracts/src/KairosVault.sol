@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.24;
 
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -9,7 +9,7 @@ import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeE
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {IRandomSource, IRandomConsumer} from "./IRandomSource.sol";
 
-/// @notice The parts of a tokenized T-bill fund Kairos uses (matches MockTBill).
+/// @notice The parts of a tokenized T-bill fund the vault uses.
 interface ITBillFund is IERC20 {
     function nav() external view returns (uint256);
     function valueOf(uint256 tokens) external view returns (uint256);
@@ -29,7 +29,7 @@ interface ITBillFund is IERC20 {
 ///         85% to the prize pool and 15% to the platform fee. Each period, winners are drawn
 ///         with odds weighted by balance x time held, boosted for dollars that have stayed in
 ///         a long time (the loyalty boost), and prizes are added to their savings.
-///         Sponsors (the house) can add money that earns interest for the prizes but has no
+///         Sponsors can add money that earns interest for the prizes but has no
 ///         entries, so it can never win. A USDC "cash drawer" pays withdrawals instantly; the
 ///         rest sits in T-bill fund tokens.
 ///
@@ -45,7 +45,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     uint256 public constant BPS = 10_000;
     /// @notice $1 that never counts as interest. Buying and selling fund tokens rounds by a few
     ///         millionths of a cent each time; this keeps that rounding from ever making the vault
-    ///         owe more than it holds. It's put in once at setup (KairosBetaSetup), not by savers.
+    ///         owe more than it holds. It's put in once at setup, not by savers.
     uint256 public constant ROUNDING_RESERVE = 1e6;
     /// @notice Entries are stored in halves (so the 1.5x tier is a whole number): a saver's entries
     ///         in a round are weight / (ENTRY_SCALE x round length) dollars.
@@ -64,10 +64,10 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     address public feeRecipient;
     uint256 public feeBps = 1_500; // 15% of interest
     uint256 public minDeposit = 10e6; // $10
-    bool public requireAllowlist; // turn on once KYC is wired up
+    bool public requireAllowlist; // identity checks
     mapping(address => bool) public allowlisted;
 
-    // Cash drawer bands (see "Kairos Rebalancer"): target R, floor L, ceiling U, emergency E.
+    // Cash drawer bands: target R, floor L, ceiling U, emergency E.
     uint256 public targetCashBps = 750; // R = 7.5% of deposits...
     uint256 public minTargetCash = 100e6; // ...but at least $100
     uint256 public lowBps = 8_000; // L = 0.8 R
@@ -121,7 +121,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
     //
     // The loyalty boost. Each dollar's entries grow with how many rounds it has stayed in:
     //     joined this round or the last 2: 1x   3-5 rounds ago: 1.5x   6-11: 2x   12 or more: 3x
-    // (rounds are months at launch; on the test network they're the draw period). A withdrawal takes
+    // (a round is one draw period, for example a month). A withdrawal takes
     // the newest dollars first, so the boost is the same as "lowest balance over the last 3, 6 and
     // 12 rounds": E = A + L x (0.5 M3 + 0.5 M6 + M12), L the round length. Taking money out during a round loses that money's
     // boost for the whole round; adding money never changes anyone's boost until it has aged.
@@ -736,7 +736,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         return _line(drawId, d.closeTime - d.start, start, count, d.lineSize);
     }
 
-    /// @notice This round's line so far, if it ended at time t (for pretend draws and the odds preview).
+    /// @notice This round's line so far, if it ended at time t (for simulated draws and the odds preview).
     function currentLine(uint256 t, uint256 start, uint256 count)
         external
         view
@@ -839,7 +839,7 @@ contract KairosVault is ERC20, Ownable, Pausable, ReentrancyGuard, IRandomConsum
         return prizeSplitsBps;
     }
 
-    // ================================================================== owner (use a multisig before real money)
+    // ================================================================== owner
 
     function setRandomSource(IRandomSource src) external onlyOwner {
         randomSource = src;
