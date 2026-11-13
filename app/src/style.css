@@ -17,7 +17,7 @@
   --edge: inset 0 1px 0 rgba(255, 255, 255, 0.06);
   --text: #F4F1EA;
   --muted: #A4A7B1;
-  --dim: #6B7085;
+  --dim: #8A90A5;
   /* champagne: actions, odds, brand UI */
   --accent: #E6CE97;
   --accent-2: #D4B67A;
@@ -126,6 +126,7 @@ input, select {
 input::placeholder { color: var(--dim); }
 input:hover, select:hover { border-color: rgba(255, 255, 255, 0.22); }
 input:focus, select:focus { outline: none; border-color: var(--accent); background: var(--bg-3); }
+input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 select { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%); background-position: calc(100% - 20px) 21px, calc(100% - 15px) 21px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 36px; }
 .btn:focus-visible, a:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
@@ -231,3 +232,6 @@ html:has(body.landing) { scroll-behavior: smooth; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
   html:has(body.landing) { scroll-behavior: auto; }
 }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+pre.code:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }

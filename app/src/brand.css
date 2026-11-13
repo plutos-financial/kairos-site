@@ -14,7 +14,7 @@ body.landing {
   --line: rgba(255, 255, 255, 0.09);
   --line-2: rgba(255, 255, 255, 0.16);
   --muted: #A9AEBC;
-  --dim: #767D91;
+  --dim: #8A90A5;
   background: var(--page);
   color: var(--ink);
 }

@@ -106,7 +106,7 @@
 
       <h3 class="ex-h3">The fix: a sum tree</h3>
       <p>Every saver gets one leaf of a binary tree, and every branch stores the totals of the leaves below it. Entries can't be stored directly (they grow every second), but they can be written as two numbers that only change when someone deposits or withdraws:</p>
-      <pre class="code formula"><code>entries = L &times; balance  &minus;  &Sigma; ( change &times; seconds since the round began )
+      <pre class="code formula" tabindex="0"><code>entries = L &times; balance  &minus;  &Sigma; ( change &times; seconds since the round began )
           (L = the round's length)</code></pre>
       <p>So each branch keeps a total of balances and a total of that second term. The root holds everyone's entries; a deposit updates one path from a leaf to the root; and picking a winner is one walk from the root down, choosing left or right at each branch. All of it costs <b>O(log n)</b>: one more step each time the number of savers doubles.</p>
       <p>One more problem: after a round closes, the random number takes a minute or so to arrive, and people keep saving in the meantime. Those changes must not alter the closed round's entries. The vault keeps <b>two</b> copies of the second term, one for each round parity. While the new round runs in one, changes are also recorded in the closed round's copy as if they happened at its close, which cancels out exactly, so its entries stay frozen until the winners are paid. Old rounds are cleared lazily: a branch stamped with an older round simply reads as zero, so starting a round costs nothing.</p>
