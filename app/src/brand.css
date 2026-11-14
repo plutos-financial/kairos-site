@@ -151,3 +151,7 @@ body.explain .toc a { color: var(--champagne); }
   body.landing .nav-cta .btn { padding: 0 14px; }
   body.landing .compare thead th { text-transform: none; letter-spacing: 0; font-size: 12px; }
 }
+
+/* ---------------------------------------------------------------- members' sign-in (app.winplutos.tech) */
+body.landing .nav-signin { color: var(--ink); font-size: 12.5px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; margin-right: 6px; align-self: center; }
+body.landing .nav-signin:hover { color: var(--champagne); text-decoration: underline; text-underline-offset: 6px; }
