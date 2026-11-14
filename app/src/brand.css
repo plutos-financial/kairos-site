@@ -155,3 +155,39 @@ body.explain .toc a { color: var(--champagne); }
 /* ---------------------------------------------------------------- members' sign-in (app.winplutos.tech) */
 body.landing .nav-signin { color: var(--ink); font-size: 12.5px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; margin-right: 6px; align-self: center; }
 body.landing .nav-signin:hover { color: var(--champagne); text-decoration: underline; text-underline-offset: 6px; }
+
+/* ---------------------------------------------------------------- one look with the savings app (app.winplutos.tech)
+   Blue night instead of black, starlight text instead of cream, Mona Sans set wide for headlines and figures,
+   sentence-case navigation and labels. Champagne stays the colour of money and the main action. */
+body.landing {
+  --page: #0A1022;
+  --fill: #17213F;
+  --band: #111A33;
+  --ink: #E9ECF4;
+  --champagne: #E3C98E;
+  --champagne-2: #EED9A8;
+  --prize: #E3C98E;
+  --line: rgba(233, 236, 244, 0.08);
+  --line-2: rgba(233, 236, 244, 0.16);
+  --muted: #97A0B8;
+  --dim: #8C95AE;
+  --wide: "Mona Sans Variable", "Mona Sans", var(--display);
+}
+body.landing .film-title,
+body.landing .hero .hero-title,
+body.landing .sec-head h2,
+body.landing .why-copy h2,
+body.landing .wl-copy h2,
+body.landing .ex-head h1,
+body.landing .ex-sec h2,
+body.landing .ex-end h2 { font-family: var(--wide); font-stretch: 118%; font-weight: 640; letter-spacing: -0.02em; }
+body.landing .why-num,
+body.landing .calc-amt,
+body.landing .step h3,
+body.landing .tile h3,
+body.landing .rails-grid b,
+body.landing .stat-strip b { font-family: var(--wide); font-stretch: 115%; letter-spacing: -0.01em; }
+body.landing .nav-links a,
+body.landing .nav-signin { font-size: 14px; letter-spacing: 0; text-transform: none; font-weight: 600; }
+body.landing .rails-grid span,
+body.landing .compare thead th { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 500; }
