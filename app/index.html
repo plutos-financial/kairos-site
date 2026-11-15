@@ -27,6 +27,7 @@
         <a href="#how">How it works</a>
         <a href="#odds">Your chances</a>
         <a href="#faq">Questions</a>
+        <span class="nav-mark" id="navMark" aria-hidden="true"></span>
       </nav>
       <div class="nav-cta">
         <a href="https://app.winplutos.tech/login" class="nav-signin">Sign in</a>
@@ -36,13 +37,11 @@
   </header>
 
   <main>
-    <!-- First screen: the film, full width, with the words at its foot. Muted and looping, it plays only
-         while it is on screen and can be paused (landing.js). -->
+    <!-- First screen: the film, full width, with the words at its foot. The film is a draw board drawn in
+         code (board.js); it runs only while it is on screen and can be paused (landing.js). -->
     <section class="hero" id="top" aria-labelledby="heroTitle">
-      <video class="hero-film" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
-        <source src="/src/media/plutos-film.mp4" type="video/mp4" />
-        <source src="/src/media/plutos-film.webm" type="video/webm" />
-      </video>
+      <canvas class="hero-film" id="film" width="1600" height="900" aria-hidden="true"></canvas>
+      <div class="hero-tint" aria-hidden="true"></div>
       <div class="hero-shade" aria-hidden="true"></div>
       <div class="wrap hero-in">
         <div class="hero-copy">

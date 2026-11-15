@@ -3,8 +3,8 @@
 // for less motion, and browsers without IntersectionObserver, see everything at once.
 const SELECTORS = [
   // homepage
-  ".hero-copy", ".hero-visual", ".rails-grid > div", ".sec-head", ".step", ".table-wrap", ".tile",
-  ".calc", ".why-num", ".why-cap", ".why-copy", ".faq details", ".wl-copy", ".wl-form",
+  ".rails-grid p", ".head", ".copy", ".screen", ".stage", ".trio article", ".flow", ".calc", ".table-wrap",
+  ".why-num", ".faq .t-acc", ".wl",
   // explainer pages
   ".ex-sec .sec-n", ".ex-sec h2", ".ex-sec > p", ".flow li", ".receipt", ".stat-strip > div", ".promise",
   ".finding", ".arch-row", ".gas", ".odds-mini", ".qa", ".ex-end > *",

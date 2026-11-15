@@ -2,6 +2,8 @@
 // the money diagram and the film on the first screen.
 import { $ } from "./core.js";
 import built from "./site-config.json";
+import { board } from "./board.js";
+import { reveal } from "./motion.js";
 
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => (calm ? Promise.resolve() : new Promise((r) => setTimeout(r, ms)));
@@ -347,18 +349,19 @@ function waitlist() {
 }
 
 // ------------------------------------------------------------------ the film behind the first screen
-// Muted and looping, it plays only while it's on screen (and never downloads before that), and it can
-// be paused. People who ask for less motion or to save data get the still picture instead.
+// A draw board drawn in code (board.js). It runs only while it's on screen, and it can be paused.
+// People who ask for less motion get one still frame instead.
 function film() {
   const v = $("film");
   const toggle = $("filmToggle");
-  if (!v || calm || navigator.connection?.saveData === true) return;
+  if (!v) return;
+  const b = board(v);
+  b.still(); // something to look at straight away
+  document.fonts?.ready.then(b.still); // and again once the typeface is in
+  if (calm) return;
   let stopped = false; // paused by the visitor
   let onScreen = false;
-  const sync = () => {
-    if (onScreen && !stopped) v.play().catch(() => {}); // blocked (e.g. Low Power Mode) = the picture stays
-    else if (!v.paused) v.pause();
-  };
+  const sync = () => (onScreen && !stopped ? b.play() : b.pause());
   new IntersectionObserver(
     ([e]) => {
       onScreen = e.isIntersecting;
@@ -376,11 +379,37 @@ function film() {
 }
 
 // The nav is clear over the top of the film and turns solid as soon as the page moves.
+// A thin marker slides under the link for whichever section is in the middle of the screen.
 function nav() {
   const bar = $("nav");
   const update = () => bar.classList.toggle("solid", scrollY > 24);
   addEventListener("scroll", update, { passive: true });
   update();
+
+  const mark = $("navMark");
+  const links = [...document.querySelectorAll(".nav-links a[href^='#']")];
+  let current = null;
+  const point = (link) => {
+    current = link;
+    links.forEach((a) => (a === link ? a.setAttribute("aria-current", "true") : a.removeAttribute("aria-current")));
+    mark.classList.toggle("on", !!link);
+    if (!link) return;
+    mark.style.transform = `translateX(${link.offsetLeft}px)`;
+    mark.style.width = `${link.offsetWidth}px`;
+  };
+  if (!("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        const link = links.find((a) => a.getAttribute("href") === `#${e.target.id}`);
+        if (e.isIntersecting) point(link);
+        else if (current === link) point(null);
+      }
+    },
+    { rootMargin: "-50% 0px -50% 0px" } // a line across the middle of the screen
+  );
+  links.forEach((a) => io.observe(document.querySelector(a.getAttribute("href"))));
+  addEventListener("resize", () => point(current));
 }
 
 calculator();
@@ -389,6 +418,7 @@ questions();
 waitlist();
 film();
 nav();
+reveal();
 
 // With motion turned down, the dots on the money diagram hold still.
 if (calm) $("flow")?.pauseAnimations?.();

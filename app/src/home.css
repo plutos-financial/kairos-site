@@ -46,14 +46,24 @@ html:has(body.home) { scroll-padding-top: 72px; }
 .nav-in { max-width: var(--wrap); margin: 0 auto; padding: 14px var(--gutter); display: flex; align-items: center; gap: var(--s-6); }
 .nav-in .brand { margin-right: auto; }
 .home .brand .logo { height: 26px; }
-.nav-links { display: flex; gap: var(--s-6); }
+.nav-links { position: relative; display: flex; gap: var(--s-6); }
+.nav-mark { position: absolute; left: 0; bottom: -15px; width: 0; height: 1px; background: var(--text); opacity: 0; transition: transform var(--duration-medium) var(--ease-smooth-out), width var(--duration-medium) var(--ease-smooth-out), opacity var(--duration-fast); }
+.nav-mark.on { opacity: 1; }
 .nav-links a, .nav-signin { font-size: var(--t-small); padding: 4px 0; color: var(--text); }
 .nav-cta { display: flex; align-items: center; gap: var(--s-5); }
 
 /* ---------------------------------------------------------------- hero: the film, with the words at its foot */
 .hero { position: relative; isolation: isolate; height: 100svh; min-height: 600px; max-height: 1080px; display: flex; align-items: flex-end; overflow: hidden; background: var(--bg); }
 .hero-film, .hero-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
-.hero-film { z-index: -2; object-fit: cover; filter: saturate(0.8) brightness(0.9); }
+/* the board is drawn flat (board.js); here it is tilted, softened and set drifting, as if filmed from one side */
+.hero-film { z-index: -2; object-fit: cover; filter: blur(0.8px); transform-origin: 60% 50%; transform: perspective(1500px) rotateY(-18deg) rotateX(6deg) scale(1.42); animation: drift 26s ease-in-out infinite alternate; }
+@keyframes drift { to { transform: perspective(1500px) rotateY(-12deg) rotateX(3deg) scale(1.5) translate(-2%, 1.5%); } }
+/* The film's treatment: one colour (white multiplied by champagne), thin scan lines, and grain that shifts a few times a second. */
+.hero-tint { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: #DCC38A; mix-blend-mode: multiply; }
+.hero-shade::before, .hero-shade::after { content: ""; position: absolute; inset: 0; }
+.hero-shade::before { background: repeating-linear-gradient(0deg, rgba(10, 10, 11, 0.34) 0 1px, transparent 1px 4px); }
+.hero-shade::after { inset: -110px; opacity: 0.2; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); animation: grain 0.7s steps(1) infinite; }
+@keyframes grain { 0% { transform: translate(0, 0); } 17% { transform: translate(-60px, 40px); } 33% { transform: translate(50px, -70px); } 50% { transform: translate(-30px, -50px); } 67% { transform: translate(70px, 30px); } 83% { transform: translate(-80px, -20px); } }
 /* dark only where the nav and the words sit */
 .hero-shade { z-index: -1; pointer-events: none; background: linear-gradient(180deg, rgba(10, 10, 11, 0.6) 0%, rgba(10, 10, 11, 0) 18%, rgba(10, 10, 11, 0) 38%, rgba(10, 10, 11, 0.78) 78%, var(--bg) 100%); }
 .hero-in { width: 100%; display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s-6); padding-bottom: var(--s-7); }
@@ -78,6 +88,20 @@ html:has(body.home) { scroll-padding-top: 72px; }
 .rails-grid span { display: block; margin-bottom: 2px; font-size: var(--t-fine); color: var(--dim); }
 
 /* ---------------------------------------------------------------- sections */
+/* a hairline down each side of the column, the whole length of the page */
+@media (min-width: 1281px) {
+  body.home main { background: linear-gradient(var(--line), var(--line)) calc(50% - var(--wrap) / 2) 0 / 1px 100% no-repeat, linear-gradient(var(--line), var(--line)) calc(50% + var(--wrap) / 2) 0 / 1px 100% no-repeat; }
+}
+/* things rise into focus as they come on screen (motion.js adds the classes; the timing is the transitions' "texts reveal") */
+.home .rv { opacity: 0; transform: translateY(12px); filter: blur(3px); transition: opacity 500ms ease-in-out var(--rv-d, 0s), transform 500ms ease-in-out var(--rv-d, 0s), filter 500ms ease-in-out var(--rv-d, 0s), border-color var(--duration-fast); }
+.home .rv.rv-in { opacity: 1; transform: none; filter: none; }
+/* the first screen's words let go as it scrolls away (browsers that can tie an animation to scrolling) */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-in { animation: hero-out linear both; animation-timeline: view(); animation-range: exit 10% exit 70%; }
+    @keyframes hero-out { to { opacity: 0; transform: translateY(-28px); } }
+  }
+}
 .section { border-top: 1px solid var(--line); padding: var(--s-9) 0; }
 .head { max-width: 44rem; margin-bottom: var(--s-8); }
 .head p, .copy > p { margin-top: var(--s-4); max-width: 34rem; font-size: var(--t-lead); line-height: 1.55; color: var(--muted); text-wrap: pretty; }
@@ -94,7 +118,8 @@ html:has(body.home) { scroll-padding-top: 72px; }
 
 /* ---------------------------------------------------------------- the app: two real screens */
 .screens { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-5); align-items: start; }
-.screen { display: block; width: 100%; height: auto; border: 1px solid var(--line-2); border-radius: var(--r-frame); }
+.screen { display: block; width: 100%; height: auto; border: 1px solid var(--line-2); border-radius: var(--r-frame); transition: transform var(--duration-slow) var(--ease-smooth-out), border-color var(--duration-fast); }
+.home .screens .screen:hover { transform: translateY(-6px); border-color: rgba(255, 255, 255, 0.45); }
 .screens .screen:last-child { margin-top: var(--s-8); }
 
 /* ---------------------------------------------------------------- the draw */
@@ -268,5 +293,5 @@ table.compare { width: 100%; min-width: 600px; border-collapse: collapse; table-
   .foot-links { justify-content: flex-start; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .hero-copy > * { animation: none !important; }
+  .hero-copy > *, .hero-shade::after, .hero-film { animation: none !important; }
 }

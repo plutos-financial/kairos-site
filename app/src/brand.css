@@ -160,18 +160,18 @@ body.landing .nav-signin:hover { color: var(--champagne); text-decoration: under
    Blue night instead of black, starlight text instead of cream, Mona Sans set wide for headlines and figures,
    sentence-case navigation and labels. Champagne stays the colour of money and the main action. */
 body.landing {
-  --page: #0A1022;
-  --fill: #17213F;
-  --band: #111A33;
-  --ink: #E9ECF4;
-  --champagne: #E3C98E;
-  --champagne-2: #EED9A8;
+  --page: #0A0A0B;
+  --fill: #121214;
+  --band: #0A0A0B;
+  --ink: #F4F4F2;
+  --champagne: #F4F4F2;   /* links and buttons are plain light now; champagne is kept for money */
+  --champagne-2: #FFFFFF;
   --prize: #E3C98E;
-  --line: rgba(233, 236, 244, 0.08);
-  --line-2: rgba(233, 236, 244, 0.16);
-  --muted: #97A0B8;
-  --dim: #8C95AE;
-  --wide: "Mona Sans Variable", "Mona Sans", var(--display);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-2: rgba(255, 255, 255, 0.22);
+  --muted: #A6A6AB;
+  --dim: #8B8B92;
+  --wide: var(--sans);
 }
 body.landing .film-title,
 body.landing .hero .hero-title,
@@ -180,14 +180,22 @@ body.landing .why-copy h2,
 body.landing .wl-copy h2,
 body.landing .ex-head h1,
 body.landing .ex-sec h2,
-body.landing .ex-end h2 { font-family: var(--wide); font-stretch: 118%; font-weight: 640; letter-spacing: -0.02em; }
+body.landing .ex-end h2 { font-family: var(--wide); font-stretch: normal; font-weight: 300; letter-spacing: -0.03em; }
 body.landing .why-num,
 body.landing .calc-amt,
 body.landing .step h3,
 body.landing .tile h3,
 body.landing .rails-grid b,
-body.landing .stat-strip b { font-family: var(--wide); font-stretch: 115%; letter-spacing: -0.01em; }
+body.landing .stat-strip b { font-family: var(--wide); font-stretch: normal; font-weight: 400; letter-spacing: -0.02em; }
 body.landing .nav-links a,
 body.landing .nav-signin { font-size: 14px; letter-spacing: 0; text-transform: none; font-weight: 600; }
 body.landing .rails-grid span,
 body.landing .compare thead th { font-size: 13px; letter-spacing: 0; text-transform: none; font-weight: 500; }
+
+/* ---------------------------------------------------------------- one look with the homepage (home.css)
+   Near-black, hairlines, small-cornered buttons in plain light. The footer is ruled off, not a band. */
+body.landing .btn { border-radius: 8px; }
+body.landing .btn-primary, body.landing .btn-light { background: var(--ink); border-color: var(--ink); color: var(--page); }
+body.landing .btn-primary:hover, body.landing .btn-light:hover { background: #fff; border-color: #fff; }
+body.landing .nav, body.landing .nav.nav-over.solid { background: rgba(10, 10, 11, 0.84); }
+body.landing .site-footer { border-top: 1px solid var(--line); }
