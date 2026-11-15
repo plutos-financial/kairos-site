@@ -28,7 +28,7 @@
       </nav>
       <div class="nav-cta">
         <a href="https://app.winplutos.tech/login" class="nav-signin">Sign in</a>
-        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Try the demo</a>
         <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
       </div>
     </div>
@@ -37,26 +37,45 @@
   <main class="ex">
     <header class="ex-head wrap-narrow">
       <h1>How Plutos keeps savings safe</h1>
-      <p class="ex-lede">Plutos makes four promises about your money. Each one is written down as a test that a computer tries to break, thousands of times, every time the code changes.</p>
+      <p class="ex-lede">Plutos comes in two editions, and this page covers both. The pilot holds real savings in Treasury bills. The demo is an earlier test edition built on smart contracts, with test money. Each is checked in its own way.</p>
       <div class="stat-strip">
-        <div><b>38</b><span>automated tests</span></div>
-        <div><b>38,400</b><span>random actions per safety check</span></div>
-        <div><b>2,000</b><span>randomized draw histories checked against a brute-force model</span></div>
-        <div><b>0</b><span>high-severity scanner findings</span></div>
+        <div><b>270+</b><span>automated tests on the pilot, run on every change</span></div>
+        <div><b>Daily</b><span>check of the pilot's books against the broker and Stripe</span></div>
+        <div><b>38</b><span>tests on the demo's contracts, 38,400 random actions per safety check</span></div>
+        <div><b>0</b><span>high-severity scanner findings on the contracts</span></div>
       </div>
       <nav class="toc" aria-label="On this page">
-        <a href="#promises">The promises</a>
+        <a href="#pilot">The pilot</a>
+        <a href="#promises">The demo's promises</a>
         <a href="#tests">How they're tested</a>
         <a href="#found">What the tests found</a>
         <a href="#scan">The scanner</a>
-        <a href="#before">Before real money</a>
+        <a href="#before">Before the contracts hold real money</a>
         <a href="#yourself">Check it yourself</a>
       </nav>
     </header>
 
+    <section class="ex-sec wrap-narrow" id="pilot">
+      <p class="sec-n">00</p>
+      <h2>The pilot: real savings</h2>
+      <p>The pilot is invite-only and limited to 100 savers. It doesn't use the smart contracts described further down. Money moves by bank transfer through Stripe, savings are held in U.S. Treasury bills at Interactive Brokers, and Plutos keeps the books. This is what protects it.</p>
+      <ul class="honest">
+        <li><b>Records that can't be rewritten.</b> Every deposit, withdrawal, prize and fee is a balanced entry in a ledger that can only be added to. The database itself refuses edits and deletions, so a mistake is fixed with a new, visible entry, never by changing an old one.</li>
+        <li><b>Checked against the outside world every day.</b> Each morning Plutos's books are compared with the statement from Interactive Brokers and the balance at Stripe. If they differ by more than a dollar, deposits, withdrawals and draws stop until a founder has found the cause and written down what it was.</li>
+        <li><b>Prizes only from interest.</b> Only the interest the Treasury bills earn can reach the prize pool. Deposits can't, and neither can a gain from selling a bill.</li>
+        <li><b>Nobody chooses the winners.</b> Entries are locked and a fingerprint of them is published before the random number exists. The number comes from drand, a public beacon, and Plutos checks its signature before using it. The software has no way to accept a number from a person.</li>
+        <li><b>Every draw is worked out twice.</b> After each draw the winners are recomputed from the stored entries and the published number, and members can run the same check in their browser.</li>
+        <li><b>Savers' money apart from ours.</b> Customer money and company money are tracked separately. The only money that crosses is Plutos's 15% share of the interest, once a month.</li>
+        <li><b>Locked down.</b> Bank references are encrypted, backups are encrypted and test-restored, the app can't alter its own history even if it were broken into, and every action a founder takes is logged.</li>
+        <li><b>Tested on every change.</b> More than 270 automated tests run against two different databases whenever the code changes, along with a simulated four months of deposits, withdrawals and draws that has to reconcile every day.</li>
+      </ul>
+      <p><b>What hasn't been done yet.</b> The pilot has not had an independent security audit, and there is no bug bounty. Its tests were written by the people who wrote the code. That is why it is small and invite-only, and why it will stay that way until an outside review has been done.</p>
+    </section>
+
     <section class="ex-sec wrap-narrow" id="promises">
       <p class="sec-n">01</p>
-      <h2>The promises</h2>
+      <h2>The demo's promises</h2>
+      <p>Everything from here down is about the demo's smart contracts, which run on a test network with test money. The contracts make four promises, and each is written as a test that a computer tries to break, thousands of times, every time the code changes.</p>
       <div class="promise-grid">
         <div class="promise"><span class="p-n">1</span><b>Your deposit is always yours</b><p>You can withdraw everything, at any time, even if deposits are paused. Nobody else can move your savings.</p></div>
         <div class="promise"><span class="p-n">2</span><b>Prizes only come from interest</b><p>Every prize dollar is interest the Treasury bills earned. Deposits are never used for prizes.</p></div>
@@ -114,8 +133,8 @@
 
     <section class="ex-sec wrap-narrow" id="before">
       <p class="sec-n">05</p>
-      <h2>Before real money</h2>
-      <p>Tests and scanners catch a lot, but they aren't an audit. Plutos runs on a test network with test money, and won't take real deposits until all of this is done:</p>
+      <h2>Before the contracts hold real money</h2>
+      <p>Tests and scanners catch a lot, but they aren't an audit. The contracts run on a test network with test money, and won't hold real deposits until all of this is done:</p>
       <ul class="honest">
         <li>Two independent security audits, and a bug bounty.</li>
         <li>Settings that need several people to sign off, with a delay before any change takes effect, plus monitoring and alerts.</li>
@@ -147,11 +166,11 @@ forge test --match-test test_DrawCostStaysFlat -vv   # the gas table</code></pre
   <footer class="site-footer">
     <div class="wrap foot">
       <div class="foot-brand">
-        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured. Stripe, Interactive Brokers and drand are independent of Plutos and do not endorse it. The demo runs on a test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./">Home</a>
-        <a href="./app.html">App</a>
+        <a href="./app.html">Demo</a>
         <a href="./draws.html">Draws</a>
         <a href="./case-study.html">How it's built</a>
         <a href="./privacy.html">Privacy</a>

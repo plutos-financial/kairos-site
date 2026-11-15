@@ -26,7 +26,7 @@
       </nav>
       <div class="nav-cta">
         <a href="https://app.winplutos.tech/login" class="nav-signin">Sign in</a>
-        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Try the demo</a>
         <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
       </div>
     </div>
@@ -35,8 +35,8 @@
   <main class="ex">
     <header class="ex-head wrap-narrow">
       <h1>Privacy</h1>
-      <p class="ex-lede">Plutos collects as little as it can, never sells it, and deletes it when you ask. Here's exactly what that means.</p>
-      <p class="tiny">Last updated October 20, 2026. Plutos is in development and runs on a test network with test money.</p>
+      <p class="ex-lede">Plutos collects as little as it can and never sells it. Here's exactly what we hold, who else handles it, and how long it's kept.</p>
+      <p class="tiny">Last updated November 14, 2026. Plutos is an invite-only pilot.</p>
     </header>
 
     <section class="ex-sec wrap-narrow" id="collect">
@@ -44,10 +44,12 @@
       <h2>What we collect</h2>
       <ul class="honest">
         <li><b>If you join the waitlist:</b> your name, email, phone number, roughly how much you'd start with, and whether you want a text at launch. It's kept in a private Google Sheet that only the founders can open.</li>
-        <li><b>If you sign in to the app:</b> you sign in with your email through Coinbase. Coinbase sends the code and keeps your account's keys, so Plutos never has a password to lose. Plutos sees your email and your account address.</li>
-        <li><b>If you use Add money:</b> the amount, your phone number and your agreement to Coinbase's terms go to Coinbase to start the payment, through the Plutos money server. The server doesn't keep them.</li>
-        <li><b>On the blockchain:</b> like every blockchain transaction, your account address, deposits, withdrawals and prizes are public on the Base Sepolia test network. Your name and email are never put on the blockchain.</li>
-        <li><b>In your browser:</b> a few small notes, like which wins it already celebrated. They stay on your device.</li>
+        <li><b>If you open a Plutos account:</b> your legal name, your email and a password. The password is stored only in scrambled form, so nobody at Plutos can read it.</li>
+        <li><b>When you confirm your identity:</b> you give a photo of your ID and a selfie to Stripe, which checks them. Plutos receives the result and a reference number. Plutos does not keep your ID photos, your Social Security number or your home address.</li>
+        <li><b>When you link a bank account:</b> you sign in to your bank in a window run by Stripe. Plutos keeps the bank's name, the last four digits of the account and Stripe's reference for it. Plutos never sees your bank password or your full account number.</li>
+        <li><b>As you save:</b> your deposits, withdrawals, balance, entries and prizes.</li>
+        <li><b>If you win $600 or more in a year:</b> prizes are taxable, and we'll ask for the details needed for a tax form.</li>
+        <li><b>In your browser:</b> a sign-in cookie that scripts on the page can't read, and nothing else.</li>
       </ul>
     </section>
 
@@ -55,16 +57,18 @@
       <p class="sec-n">02</p>
       <h2>What we don't do</h2>
       <p>No ads, no tracking pixels, no analytics scripts, and we never sell or rent your information. We only use it to run Plutos and to tell you about it.</p>
+      <p>Each draw's results are published so anyone can re-check them. What's published is a fingerprint of the entries, with savers identified only by scrambled codes. Your name, email and balance are never published.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="others">
       <p class="sec-n">03</p>
       <h2>Who else handles it</h2>
       <ul class="honest">
-        <li><b>Coinbase</b> runs sign-in and payments, and its sign-in tools send Coinbase error reports. Its <a href="https://www.coinbase.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> applies to what you give Coinbase.</li>
+        <li><b>Stripe</b> checks your identity, links your bank account and moves your money by bank transfer. Its <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> applies to what you give Stripe.</li>
+        <li><b>Interactive Brokers</b> holds the Treasury bills. The account is in Plutos's name for the benefit of savers as a group, so Interactive Brokers does not receive your personal details.</li>
+        <li><b>Render</b> hosts the Plutos app and its database. <b>GitHub</b> hosts this website. Like any web host, they see visitors' IP addresses.</li>
         <li><b>Google</b> stores the waitlist sheet.</li>
-        <li><b>GitHub</b> hosts this website, and <b>Netlify</b> runs the money server. Like any web host, they see visitors' IP addresses.</li>
-        <li><b>Base</b>, the blockchain network, records transactions publicly.</li>
+        <li><b>Our email provider</b> delivers the messages we send you, such as a password reset or a prize notice.</li>
       </ul>
     </section>
 
@@ -73,16 +77,29 @@
       <h2>How it's protected</h2>
       <ul class="honest">
         <li>Every page has a strict security policy: it can only run its own code and only talk to the services listed above, and it can't be shown inside another website.</li>
-        <li>The money server only starts a payment for someone signed in to Plutos, and only into their own account. It checks every request with Coinbase.</li>
-        <li>The Coinbase keys that run Plutos live only on the server, never in the website.</li>
-        <li>The savings contract has no way for anyone at Plutos to take your savings: withdrawals go only to your own account, and prizes come only from interest.</li>
+        <li>Sign-in locks for a while after repeated wrong passwords, and sessions end by themselves.</li>
+        <li>The references Plutos holds for your bank account are encrypted in the database, and backups are encrypted too.</li>
+        <li>The record of every deposit, withdrawal and prize can only be added to. It can't be edited or deleted, by us or by anyone who broke in.</li>
+        <li>Founders sign in to run Plutos with a password and a one-time code, and everything they do is logged.</li>
       </ul>
     </section>
 
     <section class="ex-sec wrap-narrow" id="delete">
       <p class="sec-n">05</p>
-      <h2>Getting your data deleted</h2>
-      <p>Ask us and we'll delete your waitlist entry and anything else we hold within 30 days. A contact address for requests will be posted here soon. Records on the blockchain can't be deleted by anyone, which is why your name and email are never put there.</p>
+      <h2>How long it's kept, and getting it deleted</h2>
+      <p>Ask us and we'll delete your waitlist entry within 30 days. A contact address for requests will be posted here soon.</p>
+      <p>If you have a Plutos account, we can close it and remove your sign-in. Records of your deposits, withdrawals and prizes are kept for at least seven years after that, because financial records have to be. They aren't used for anything else.</p>
+    </section>
+
+    <section class="ex-sec wrap-narrow" id="demo">
+      <p class="sec-n">06</p>
+      <h2>If you use the demo</h2>
+      <p>The <a href="./app.html">demo</a> is a separate test edition that uses test money and works differently:</p>
+      <ul class="honest">
+        <li>You sign in with your email through <b>Coinbase</b>, which sends the code and keeps the demo account's keys. Its <a href="https://www.coinbase.com/legal/privacy" target="_blank" rel="noopener noreferrer">privacy policy</a> applies to what you give Coinbase.</li>
+        <li>The demo runs on the Base Sepolia test network, where every account address, deposit, withdrawal and prize is public and can't be deleted by anyone. Your name and email are never put there.</li>
+        <li>Trying the demo's card checkout sends the amount and your phone number to Coinbase in its test mode, through a small server run on <b>Netlify</b>. No card is charged and the server keeps nothing.</li>
+      </ul>
     </section>
 
     <section class="ex-end wrap-narrow">
@@ -97,11 +114,11 @@
   <footer class="site-footer">
     <div class="wrap foot">
       <div class="foot-brand">
-        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits.</p>
+        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./">Home</a>
-        <a href="./app.html">App</a>
+        <a href="./app.html">Demo</a>
         <a href="./draws.html">Draws</a>
         <a href="./security.html">Security</a>
         <a href="./case-study.html">How it's built</a>

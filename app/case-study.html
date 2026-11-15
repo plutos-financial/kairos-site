@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Plutos · How it's built</title>
-  <meta name="description" content="A case study: the problem Plutos solves, how it's built, how the prize draw was redesigned to scale to millions of savers, and how it's kept safe." />
+  <meta name="description" content="A case study of the Plutos demo: the problem Plutos solves, how the demo is built, how the prize draw was redesigned to scale to millions of savers, and how it's kept safe." />
   <meta name="theme-color" content="#070A14" />
   <link rel="icon" type="image/png" href="/src/media/plutos-icon.png" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
@@ -28,7 +28,7 @@
       </nav>
       <div class="nav-cta">
         <a href="https://app.winplutos.tech/login" class="nav-signin">Sign in</a>
-        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Try the demo</a>
         <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
       </div>
     </div>
@@ -38,7 +38,8 @@
     <header class="ex-head wrap-narrow">
       <p class="ex-kicker">Case study</p>
       <h1>Building Plutos</h1>
-      <p class="ex-lede">A savings account where the interest becomes prizes. This is how it works under the hood, the hardest problem in building it, and how it's kept safe.</p>
+      <p class="ex-lede">A savings account where the interest becomes prizes. This is how the demo works under the hood, the hardest problem in building it, and how it's kept safe.</p>
+      <p class="tiny">This case study is about the demo: an earlier test edition built on smart contracts, with test money, Coinbase sign-in and Chainlink random numbers. The pilot that holds real savings works differently: bank transfers through Stripe, Treasury bills at Interactive Brokers and draws from drand. See <a href="./how-it-works.html">how Plutos works</a> and <a href="./security.html#pilot">how the pilot is protected</a>.</p>
       <div class="stat-strip">
         <div><b>440&times;</b><span>cheaper to close a draw with 2,000 savers</span></div>
         <div><b>O(log n)</b><span>cost per deposit, draw and winner</span></div>
@@ -169,11 +170,11 @@
   <footer class="site-footer">
     <div class="wrap foot">
       <div class="foot-brand">
-        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured. Stripe, Interactive Brokers and drand are independent of Plutos and do not endorse it. The demo runs on a test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./">Home</a>
-        <a href="./app.html">App</a>
+        <a href="./app.html">Demo</a>
         <a href="./draws.html">Draws</a>
         <a href="./security.html">Security</a>
         <a href="./privacy.html">Privacy</a>

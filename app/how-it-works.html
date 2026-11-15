@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>How Plutos works</title>
-  <meta name="description" content="How Plutos works: where your money goes, where the prizes come from, how Chainlink picks the winners, and what to know before you save." />
+  <meta name="description" content="How Plutos works: where your money goes, where the prizes come from, how a public random number picks the winners, and what to know before you save." />
   <meta name="theme-color" content="#070A14" />
   <link rel="icon" type="image/png" href="/src/media/plutos-icon.png" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
@@ -28,7 +28,7 @@
       </nav>
       <div class="nav-cta">
         <a href="https://app.winplutos.tech/login" class="nav-signin">Sign in</a>
-        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Try the demo</a>
         <a href="./#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
       </div>
     </div>
@@ -37,7 +37,7 @@
   <main class="ex">
     <header class="ex-head wrap-narrow">
       <h1>How Plutos works</h1>
-      <p class="ex-lede">Plutos is a savings account with a monthly prize draw. Your money earns interest, the interest from all savers is pooled, and once a month it's paid out as prizes. Your deposit is never used for prizes.</p>
+      <p class="ex-lede">Plutos is prize-linked savings. You deposit from your bank, your money is held in U.S. Treasury bills, the interest from all savers is pooled, and once a month it's paid out as prizes. Your deposit is never used for prizes.</p>
       <nav class="toc" aria-label="On this page">
         <a href="#idea">The idea</a>
         <a href="#money">Where your money goes</a>
@@ -53,7 +53,7 @@
       <p class="sec-n">01</p>
       <h2>The idea</h2>
       <p>A regular savings account pays everyone a small amount of interest. Plutos pools that interest and pays it out as prizes instead. Each month some savers win, and everyone keeps their full deposit.</p>
-      <p>The idea has a long track record. The UK government has offered <b>Premium Bonds</b> since 1956, and more than 22 million people hold them today. In the U.S., a 2014 federal law allows banks and credit unions to offer prize-linked savings in states that permit it, and more than 30 states do. Plutos is building a version anyone can open from their phone.</p>
+      <p>The idea has a long track record. The UK government has offered <b>Premium Bonds</b> since 1956, and more than 22 million people hold them today. In the U.S., a 2014 federal law allows banks and credit unions to offer prize-linked savings in states that permit it, and more than 30 states do. Plutos is building a version anyone can open from their phone, and is running it now as a small, invite-only pilot.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="money">
@@ -61,11 +61,11 @@
       <h2>Where your money goes</h2>
       <p>What happens to a $100 deposit, from start to finish:</p>
       <ol class="flow">
-        <li><b>You add $100.</b><span>With Apple Pay or a debit card through Coinbase, or by sending USDC. That's 100 entries in every draw while it stays saved.</span></li>
-        <li><b>It's held in U.S. Treasury bills.</b><span>Short-term loans to the U.S. government. A portion stays in cash so withdrawals are instant.</span></li>
+        <li><b>You deposit $100 from your bank.</b><span>By bank transfer through Stripe, from an account in your name. It counts once the transfer settles, usually in a few business days. From then on it's 100 entries in every draw while it stays saved.</span></li>
+        <li><b>It's held in U.S. Treasury bills.</b><span>Short-term loans to the U.S. government, held in a brokerage account at Interactive Brokers, apart from Plutos's own money. A portion stays in cash so withdrawals can be paid without selling anything.</span></li>
         <li><b>The Treasury bills earn interest.</b><span>The interest from all savers goes into one shared pool.</span></li>
         <li><b>The pool becomes the prizes.</b><span>85% of the interest is paid out as prizes and Plutos keeps 15% to run the service. There are no fees to deposit or withdraw.</span></li>
-        <li><b>Draw day.</b><span>Chainlink picks the winners at random, and their prizes are added to their savings.</span></li>
+        <li><b>Draw day.</b><span>A public random number from drand picks the winners, and their prizes are added to their savings.</span></li>
         <li class="end"><b>Your $100 is still $100.</b><span>Win or not, your deposit stays the same, and you're entered in next month's draw automatically.</span></li>
       </ol>
     </section>
@@ -82,7 +82,7 @@
         <p class="r-foot">For example, an $8,500 top prize plus several smaller prizes. 4% is an example rate; Treasury rates change over time.</p>
       </div>
       <p>More savers means more entries in each draw, but also a bigger prize pool. Your expected share stays about the same, and there's room for more and bigger prizes.</p>
-      <p>On the test network, $100,000 of house money stays in the vault so the prize pool always grows, even before anyone saves. It earns interest for the prizes like everyone's savings, but it has no entries, so it can never win. Interest is also sped up there: a month's worth arrives every day.</p>
+      <p>Only interest funds prizes. If a Treasury bill is ever sold for less than it cost, that loss is taken first from a buffer and then from Plutos's own capital. It is never taken from the prize pool.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="draw">
@@ -94,11 +94,15 @@
       </div>
       <div class="qa">
         <h3>Money that stays in counts for more</h3>
-        <p>Each dollar's entries grow the longer it stays saved: <b>1x</b> for new money, <b>1.5x</b> after 3 months, <b>2x</b> after 6 months and <b>3x</b> after a year. Adding more never resets the boost on money that's already in. Taking money out takes your newest dollars first, so your oldest dollars keep their boost. On the test network a month is one draw, so you can watch your boost step up over a few days.</p>
+        <p>Each dollar's entries grow the longer it stays saved: <b>1x</b> for new money, <b>1.5x</b> after 3 months, <b>2x</b> after 6 months and <b>3x</b> after a year. Adding more never resets the boost on money that's already in. Taking money out takes your newest dollars first, so your oldest dollars keep their boost.</p>
       </div>
       <div class="qa">
-        <h3>Chainlink picks the winners</h3>
-        <p>When the month ends, every saver gets a stretch of one long line: their savings times how long they were saved. Plutos then requests a random number from Chainlink VRF. It arrives with a cryptographic proof that the blockchain checks, so nobody, including Plutos, can influence who wins. The number picks one spot on the line for each prize, and whoever's stretch holds that spot wins it. The same person can win more than once.</p>
+        <h3>A public random number picks the winners</h3>
+        <p>When the month ends, Plutos locks everyone's entries and publishes a fingerprint of them: a short code that would change if a single entry changed. Only then is the random number taken, from <b>drand</b>, a public randomness beacon run by a group of independent organizations that releases a new signed number every few seconds. Plutos uses the first one released after the fingerprint was published and checks its signature. Because the entries were fixed before the number existed, nobody, including Plutos, can influence who wins. Each prize goes to a saver in proportion to their entries.</p>
+      </div>
+      <div class="qa">
+        <h3>Anyone can re-check a draw</h3>
+        <p>The fingerprint and the drand number are published for every draw, so the winners can be worked out again by anyone who has them. Members can re-run their own draw in the app and see that it matches.</p>
       </div>
       <div class="qa">
         <h3>Prizes go straight into your savings</h3>
@@ -112,15 +116,16 @@
         <div class="om-row"><span>$1,000 saved for 6 months</span><b>20×</b></div>
         <div class="om-row"><span>$1,000 saved for a year</span><b>30×</b></div>
       </div>
-      <p class="try">See it for yourself: <a class="text-link" href="./draws.html">watch a draw step by step &rarr;</a> The Draws page replays every real draw from the blockchain, and runs pretend ones with the real savers and prize pool.</p>
+      <p class="try">See the idea in motion: <a class="text-link" href="./draws.html">watch a demo draw step by step &rarr;</a> The Draws page belongs to the demo, an earlier test edition with test money. It picks winners the same way, in proportion to entries, but takes its random number from a different source.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="in-out">
       <p class="sec-n">05</p>
       <h2>Adding and withdrawing</h2>
-      <p>You add money with Apple Pay or a debit card through Coinbase, or by sending USDC to your Plutos wallet. When you save it, it turns into Plutos savings tokens, one for each dollar. Only saved money is in the draw: cash waiting in your Plutos wallet isn't, and the app shows the two separately.</p>
-      <p>You can withdraw your savings at any time, and cash out to the bank account linked in your Coinbase account. Most withdrawals are instant because part of everyone's savings is kept in cash. If many people withdraw at once, a large withdrawal can take about a business day while Treasury bills are sold.</p>
-      <p>In the test app, <b>Add money</b> gives you free test dollars and saves them straight away, as much as you like. You can also try the real Apple Pay checkout, which runs in Coinbase's test mode, so no card is ever charged.</p>
+      <p>Before your first deposit you confirm your identity once, with a photo of your ID and a selfie, checked by Stripe. Then you link a checking or savings account in your name by signing in to your bank. Plutos never sees your bank password.</p>
+      <p>Deposits are bank transfers through Stripe. A transfer usually takes a few business days to settle, and your balance and your entries go up when it does, not before.</p>
+      <p>You can withdraw at any time, back to the same bank account, with no fee. The app shows you exactly what a withdrawal changes before you confirm it. Bank transfers out also take a few business days to arrive. If many people withdraw at once, a large withdrawal can take longer while Treasury bills are sold.</p>
+      <p>One thing to know: interest earned on money you take out before the month's draw doesn't go into that month's prize pool. Plutos keeps it.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="know">
@@ -128,8 +133,9 @@
       <h2>Good to know</h2>
       <ul class="honest">
         <li><b>Most months, most people don't win.</b> On average, savers receive 85% of the interest their savings earn, paid as prizes. In some months you may win nothing. If you want a steady, predictable return, a high-yield savings account is the better choice.</li>
-        <li><b>Plutos isn't open yet.</b> Before taking real deposits, we need the right legal setup, independent security audits and identity checks for new customers, like any financial company.</li>
-        <li><b>Plutos isn't a bank.</b> Deposits won't be FDIC insured. The current app runs on the Base Sepolia test network with test money that has no value.</li>
+        <li><b>Plutos is an invite-only pilot.</b> It is open to a small group of savers while we test every part of it with real money. Join the waitlist to hear when it opens in your state.</li>
+        <li><b>Plutos isn't a bank.</b> Your savings are in U.S. Treasury bills, not a bank account, and they are not FDIC insured.</li>
+        <li><b>Bank transfers can be reversed.</b> A bank can take a deposit back for some days after it arrives. If that happens, the deposit comes off your balance.</li>
       </ul>
     </section>
 
@@ -149,16 +155,16 @@
         <p>$1. Every dollar you save is an entry.</p>
       </details>
       <details>
-        <summary>Why does Plutos run on a blockchain?</summary>
-        <p>So anyone can check the rules and the results. Every deposit, prize and random number is public, and nobody can quietly change who won. You don't need to know anything about crypto to use it: you sign in with your email and see dollars.</p>
+        <summary>Is my money in crypto?</summary>
+        <p>No. Your savings are U.S. dollars held in Treasury bills at a brokerage, and money moves in and out by ordinary bank transfer. The <a href="./app.html">demo</a> is a separate, earlier test edition built on a blockchain test network with test money.</p>
       </details>
       <details>
         <summary>Who's behind Plutos?</summary>
-        <p>Plutos Savings, Inc., a small team building Plutos while it's tested on the Base test network. Join the <a href="./#waitlist">waitlist</a> and we'll keep you posted.</p>
+        <p>Plutos Savings, Inc., a small team running Plutos as an invite-only pilot. Join the <a href="./#waitlist">waitlist</a> and we'll keep you posted.</p>
       </details>
       <details>
-        <summary>How do I try the app?</summary>
-        <p>Open the <a href="./app.html">app</a>, sign in with your email, and press <b>Add money</b>. It adds free test dollars straight into your savings, so you're in the next draw. Then open the Draws page to see how a draw picks its winners.</p>
+        <summary>Can I try it without an invite?</summary>
+        <p>You can try the <a href="./app.html">demo</a>. It uses free test dollars, not real money, and runs on a test network, so it works differently from the pilot in how money moves and where the random number comes from. The savings, entries and prizes behave the same way.</p>
       </details>
     </section>
 
@@ -166,7 +172,7 @@
       <h2>Ready when you are</h2>
       <div class="cta-row">
         <a href="./#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
-        <a href="./app.html" class="btn btn-ghost btn-lg">Try the app</a>
+        <a href="./app.html" class="btn btn-ghost btn-lg">Try the demo</a>
       </div>
     </section>
   </main>
@@ -174,11 +180,11 @@
   <footer class="site-footer">
     <div class="wrap foot">
       <div class="foot-brand">
-        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured. Stripe, Interactive Brokers and drand are independent of Plutos and do not endorse it. The demo runs on a test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./">Home</a>
-        <a href="./app.html">App</a>
+        <a href="./app.html">Demo</a>
         <a href="./draws.html">Draws</a>
         <a href="./security.html">Security</a>
         <a href="./case-study.html">How it's built</a>
