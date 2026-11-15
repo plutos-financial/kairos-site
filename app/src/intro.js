@@ -1,11 +1,13 @@
-// The opening on the homepage: the phoenix and the name stand on black, then burn away to ash while the
-// page appears behind them. public/intro-gate.js decides before the first paint whether it plays, by
-// putting "intro-on" on <html>. It waits until the page is actually on screen, so a page the browser
-// loaded in the background still shows it. People who ask for less motion get the logo and a plain fade.
+// The opening on the homepage: the phoenix and the name stand on black and burn away to ash on the black,
+// then the black lifts off the page in one fade. public/intro-gate.js decides before the first paint whether
+// it plays, by putting "intro-on" on <html>. It waits until the page is actually on screen, so a page the
+// browser loaded in the background still shows it. People who ask for less motion get the same dissolve
+// with the ash standing still: it fades where it is and nothing travels.
 const root = document.documentElement;
 const intro = document.getElementById("intro");
 const HOLD = 2700; // ms the logo stands before it burns
-const SWEEP = 520; // ms for the burn to cross the logo, left to right
+const SWEEP = 700; // ms for the burn to cross the logo, left to right
+const LIFT = SWEEP + 550; // ms into the burn when the black starts to lift: most of the ash has gone by then (home.css times the headline to it)
 
 if (intro && root.classList.contains("intro-on")) {
   root.classList.add("intro-js"); // this script is running, so the CSS safety net stands down
@@ -16,12 +18,14 @@ if (intro && root.classList.contains("intro-on")) {
     root.classList.remove("intro-on", "intro-js", "intro-go");
   };
   const fade = () => {
+    const film = document.getElementById("film");
+    if (film) film.currentTime = 0; // the page appears on the film's first frame
     intro.classList.add("fade");
     setTimeout(done, 600);
   };
   const go = () => {
     root.classList.add("intro-go"); // lets the logo's entrance run
-    timer = setTimeout(() => (calm ? fade() : burn(done).catch(done)), HOLD);
+    timer = setTimeout(() => burn(fade, calm ? 0 : 1).catch(fade), HOLD);
   };
   if (document.visibilityState === "visible") go();
   else {
@@ -41,8 +45,9 @@ if (intro && root.classList.contains("intro-on")) {
   addEventListener("keydown", skip, { once: true });
 }
 
-// Redraws the logo on a canvas exactly where it stands, cuts it into specks, and lets them rise and fade.
-async function burn(done) {
+// Redraws the logo on a canvas exactly where it stands, cuts it into specks, and lets them rise and fade
+// (drift 1) or fade where they are (drift 0). Calls lift once the burn has crossed the logo.
+async function burn(lift, drift) {
   if (!intro.isConnected) return;
   const bird = intro.querySelector(".intro-bird");
   const word = intro.querySelector(".intro-word");
@@ -81,22 +86,26 @@ async function burn(done) {
         x: left + x / dpr,
         y: top + y / dpr,
         at: (x / px.width) * SWEEP + Math.random() * 160, // when the burn reaches it
-        life: 600 + Math.random() * 380,
-        vx: 14 + Math.random() * 36,
-        vy: -(26 + Math.random() * 64),
+        life: 500 + Math.random() * 400,
+        vx: (14 + Math.random() * 36) * drift,
+        vy: -(26 + Math.random() * 64) * drift,
         sway: Math.random() * 6.28,
       });
     }
   }
   const colour = getComputedStyle(intro).color;
   const size = step / dpr;
-  const end = SWEEP + 160 + 980;
-  intro.classList.add("ash"); // hides the real logo and lets the black fade
+  intro.classList.add("ash"); // hides the real logo; the specks now stand in for it
 
   const t0 = performance.now();
+  let lifted = false;
   const frame = (now) => {
-    if (!intro.isConnected) return;
+    if (!intro.isConnected) return; // lift() removes the opening when its fade ends, which stops this
     const t = now - t0;
+    if (!lifted && t >= LIFT) {
+      lifted = true;
+      lift();
+    }
     c.clearRect(0, 0, innerWidth, innerHeight);
     c.fillStyle = colour;
     for (const s of specks) {
@@ -110,11 +119,10 @@ async function burn(done) {
       const k = age / s.life;
       const sec = age / 1000;
       c.globalAlpha = (1 - k) * (1 - k);
-      c.fillRect(s.x + s.vx * sec + Math.sin(s.sway + sec * 5) * 5 * k, s.y + s.vy * sec - 46 * sec * sec, size, size);
+      c.fillRect(s.x + (s.vx * sec + Math.sin(s.sway + sec * 5) * 5 * k) * drift, s.y + (s.vy * sec - 46 * sec * sec) * drift, size, size);
     }
     c.globalAlpha = 1;
-    if (t < end) requestAnimationFrame(frame);
-    else done();
+    requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
 }

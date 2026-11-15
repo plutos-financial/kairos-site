@@ -75,25 +75,24 @@ html:has(body.home) { scroll-padding-top: 72px; }
 /* intro-gate.js puts "intro-on" on <html> when it should play; intro.js adds "intro-js" as soon as it runs and
    "intro-go" once the page is on screen, then burns the logo away and removes it */
 .intro { display: none; }
-.intro-on .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background-color: #000; color: var(--text); transition: background-color 900ms ease-out 200ms, opacity 500ms ease-out; }
+.intro-on .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background-color: #000; color: var(--text); transition: opacity 450ms ease-out; }
 .intro-on:not(.intro-js) .intro { animation: intro-safety 500ms 5s forwards; } /* if the script never runs, the page still appears */
-.intro-on .intro.fade { opacity: 0; }
+.intro-on .intro.fade { opacity: 0; pointer-events: none; } /* the black and the last of the ash leave as one layer */
 /* a page loaded in the background waits, so the opening starts when someone is looking */
 .intro-js:not(.intro-go) .intro-bird, .intro-js:not(.intro-go) .intro-word, .intro-js:not(.intro-go) .hero-copy > * { animation-play-state: paused; }
 .intro-lockup { display: flex; align-items: center; gap: 0.2em; font-size: clamp(2.5rem, 7vw, 7rem); }
 .intro-bird { width: 1.3em; height: 1.58em; background: currentColor; -webkit-mask: url(./media/plutos-phoenix-bold.svg) center / contain no-repeat; mask: url(./media/plutos-phoenix-bold.svg) center / contain no-repeat; animation: intro-in 800ms 150ms var(--ease-smooth-out) both; }
 .intro-word { font-weight: 600; letter-spacing: -0.03em; line-height: 1; clip-path: inset(-0.2em 100% -0.3em 0); animation: intro-word 700ms 800ms var(--ease-smooth-out) forwards; }
 .intro-ash { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.intro-on .intro.ash { background-color: transparent; pointer-events: none; }
 .intro.ash .intro-lockup { visibility: hidden; }
-/* the words on the film wait for the black to lift */
-.intro-on .hero-copy > * { animation-delay: 3300ms; }
-.intro-on .hero-copy > :nth-child(2) { animation-delay: 3380ms; }
-.intro-on .hero-copy > :nth-child(3) { animation-delay: 3460ms; }
+/* the words on the film wait for the black to lift (intro.js: HOLD + LIFT = 3950ms) */
+.intro-on .hero-copy > * { animation-delay: 4150ms; }
+.intro-on .hero-copy > :nth-child(2) { animation-delay: 4230ms; }
+.intro-on .hero-copy > :nth-child(3) { animation-delay: 4310ms; }
 @keyframes intro-in { from { opacity: 0; transform: translateY(6px); } }
 @keyframes intro-word { to { clip-path: inset(-0.2em 0 -0.3em 0); } }
 @keyframes intro-safety { to { opacity: 0; visibility: hidden; } }
-/* less motion: the logo simply stands on black, then the black fades (intro.js) */
+/* less motion: the logo simply stands on black, then dissolves where it is, with no ash travelling (intro.js) */
 @media (prefers-reduced-motion: reduce) {
   .intro-bird, .intro-word { animation: none; clip-path: none; }
 }
