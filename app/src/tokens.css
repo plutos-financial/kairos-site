@@ -1,0 +1,71 @@
+/* Plutos design tokens: one place for colour, type, spacing, corners and motion.
+   Loaded after style.css (which names the colours the app pages use) and transitions.css.
+   The homepage uses nothing but these; the other pages move over to them next. */
+:root {
+  /* ------------------------------------------------------------ colour: blue night, starlight text */
+  --bg: #0A1022;        /* the page */
+  --bg-1: #0E1630;      /* a band: the draw, the why, the footer */
+  --bg-2: #141E3D;      /* a card on the page */
+  --bg-3: #1C2850;      /* a control or a card on a band */
+  --line: rgba(233, 236, 244, 0.1);
+  --line-2: rgba(233, 236, 244, 0.18);
+  --text: #EEF1F8;
+  --muted: #B1B9CD;     /* supporting text: 9:1 on the page */
+  --dim: #98A1BA;       /* labels and fine print: 7:1 on the page */
+  /* champagne: the main action and money you can win. Nothing else gets it. */
+  --accent: #E3C98E;
+  --accent-hi: #F0DCAF;
+  --accent-ink: #17130B;
+  --gold: var(--accent);
+  /* mint: something went through. Settled, verified, on the list. */
+  --good: #7FE0B4;
+  --good-soft: rgba(127, 224, 180, 0.14);
+  --red: #FF7A6E;
+
+  /* ------------------------------------------------------------ type */
+  --sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --wide: "Mona Sans Variable", "Mona Sans", var(--sans);
+  --display: var(--sans);
+  /* only for things a person might compare character by character: a fingerprint, a random number */
+  --code: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --t-hero: clamp(3.1rem, 6.6vw, 6.25rem);
+  --t-h2: clamp(2.1rem, 3.7vw, 3.4rem);
+  --t-h3: 1.375rem;
+  --t-lead: clamp(1.0625rem, 1.3vw, 1.25rem);
+  --t-body: 1.0625rem;
+  --t-small: 0.9375rem;
+  --t-fine: 0.8125rem;
+
+  /* ------------------------------------------------------------ spacing: one scale, used for every gap */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+  --s-9: 112px;
+  --gutter: 32px;
+  --wrap: 1240px;
+
+  /* ------------------------------------------------------------ corners: an inner corner is the outer one minus the padding between them */
+  --r-card: 28px;
+  --pad-card: 10px;
+  --r-inset: calc(var(--r-card) - var(--pad-card));
+  --r-control: 14px;
+  --r-pill: 999px;
+
+  /* ------------------------------------------------------------ the transitions' own colours, set for a dark page */
+  --tabs-text-muted: var(--muted);
+  --tabs-text-active: var(--text);
+  --tabs-bar-bg: var(--bg);
+  --tabs-pill-bg: var(--bg-3);
+  --shimmer-base: var(--dim);
+  --shimmer-highlight: var(--text);
+  --check-y-amount: 16px;
+}
+
+@media (max-width: 640px) {
+  :root { --gutter: 20px; --s-9: 80px; --s-8: 56px; --r-card: 22px; --pad-card: 8px; }
+}

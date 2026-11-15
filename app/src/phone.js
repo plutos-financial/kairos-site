@@ -174,7 +174,7 @@ function pretendDraw() {
   if (drawing) return;
   drawing = true;
   $("pDrawGo").disabled = true;
-  $("pResult").textContent = "Chainlink is picking a spot…";
+  $("pResult").textContent = "Waiting for the public number…";
   document.querySelectorAll("#pLineTrack i").forEach((i) => i.classList.remove("hit"));
   const total = SEG.reduce((a, b) => a + b, 0);
   const youWin = Math.random() < 0.35;
