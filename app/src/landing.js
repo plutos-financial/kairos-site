@@ -1,8 +1,7 @@
-// Homepage: the phone preview, the sample draw, the chances calculator, the questions, the waitlist
-// (Google Sheet) and the film behind the first screen.
+// Homepage: the sample draw, the chances calculator, the questions, the waitlist (Google Sheet),
+// the money diagram and the film on the first screen.
 import { $ } from "./core.js";
 import built from "./site-config.json";
-import { phone } from "./phone.js";
 
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => (calm ? Promise.resolve() : new Promise((r) => setTimeout(r, ms)));
@@ -121,49 +120,6 @@ function calculator() {
   requestAnimationFrame(() => movePill(chosen(), false));
   addEventListener("resize", () => movePill(chosen(), false));
   document.fonts?.ready.then(() => movePill(chosen(), false));
-}
-
-// ------------------------------------------------------------------ the small pictures in "how it works"
-// Each plays once when it comes on screen, and again when you point at its card.
-
-function pictures() {
-  const cards = [...document.querySelectorAll("[data-play]")];
-  const interest = $("billsInterest");
-  const target = 36.4;
-  const countUp = () => {
-    if (calm) return;
-    const t0 = performance.now();
-    const step = (t) => {
-      const p = Math.min(1, (t - t0) / 1800);
-      interest.textContent = dollars(target * (1 - Math.pow(1 - p, 3)));
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  };
-  const play = (card) => {
-    if (card.dataset.busy) return;
-    card.dataset.busy = "1";
-    card.classList.remove("play");
-    void card.offsetWidth;
-    card.classList.add("play");
-    if (card.contains(interest)) countUp();
-    setTimeout(() => delete card.dataset.busy, 2600);
-  };
-  if (!("IntersectionObserver" in window)) return;
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        play(e.target);
-        io.unobserve(e.target);
-      }
-    },
-    { threshold: 0.45 }
-  );
-  cards.forEach((c) => {
-    io.observe(c);
-    c.addEventListener("pointerenter", () => play(c));
-  });
 }
 
 // ------------------------------------------------------------------ a sample draw
@@ -414,7 +370,7 @@ function film() {
   toggle.addEventListener("click", () => {
     stopped = !stopped;
     toggle.setAttribute("aria-pressed", String(stopped));
-    $("filmToggleText").textContent = stopped ? "Play film" : "Pause film";
+    toggle.setAttribute("aria-label", stopped ? "Play the film" : "Pause the film");
     sync();
   });
 }
@@ -427,11 +383,12 @@ function nav() {
   update();
 }
 
-phone();
 calculator();
-pictures();
 draw();
 questions();
 waitlist();
 film();
 nav();
+
+// With motion turned down, the dots on the money diagram hold still.
+if (calm) $("flow")?.pauseAnimations?.();
