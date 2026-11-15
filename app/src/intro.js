@@ -1,22 +1,37 @@
 // The opening on the homepage: the phoenix and the name stand on black, then burn away to ash while the
-// page appears behind them. It plays once per visit and never for people who ask for less motion;
-// index.html decides that before the first paint by putting "intro-on" on <html>.
+// page appears behind them. public/intro-gate.js decides before the first paint whether it plays, by
+// putting "intro-on" on <html>. It waits until the page is actually on screen, so a page the browser
+// loaded in the background still shows it. People who ask for less motion get the logo and a plain fade.
 const root = document.documentElement;
 const intro = document.getElementById("intro");
 const HOLD = 1900; // ms the logo stands before it burns
 const SWEEP = 520; // ms for the burn to cross the logo, left to right
 
 if (intro && root.classList.contains("intro-on")) {
-  try {
-    sessionStorage.setItem("plutos.intro", "1");
-  } catch {
-    /* private mode: it just plays again next time */
-  }
+  root.classList.add("intro-js"); // this script is running, so the CSS safety net stands down
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let timer;
   const done = () => {
     intro.remove();
-    root.classList.remove("intro-on");
+    root.classList.remove("intro-on", "intro-js", "intro-go");
   };
-  const timer = setTimeout(() => burn(done).catch(done), Math.max(0, HOLD - performance.now()));
+  const fade = () => {
+    intro.classList.add("fade");
+    setTimeout(done, 600);
+  };
+  const go = () => {
+    root.classList.add("intro-go"); // lets the logo's entrance run
+    timer = setTimeout(() => (calm ? fade() : burn(done).catch(done)), HOLD);
+  };
+  if (document.visibilityState === "visible") go();
+  else {
+    const seen = () => {
+      if (document.visibilityState !== "visible") return;
+      document.removeEventListener("visibilitychange", seen);
+      go();
+    };
+    document.addEventListener("visibilitychange", seen);
+  }
   // a tap or a key skips it
   const skip = () => {
     clearTimeout(timer);
