@@ -173,14 +173,24 @@
             <li><h3>Prizes come back to savers</h3><p>Every prize is paid straight into the winner's savings, theirs to keep or withdraw.</p></li>
           </ul>
         </div>
-        <!-- Where the money goes: your savings in the middle, your bank on one side, the draw on the other. -->
-        <div class="flow" role="img" aria-label="Your savings sit in the middle and are always yours. You deposit from your bank and can withdraw at any time. The interest goes to the monthly draw, and prizes come back into savings.">
-          <p class="f-node">Your bank</p>
-          <p class="f-lane"><span class="f-go">Deposit</span><span class="f-back">Withdraw<i> anytime</i></span></p>
-          <p class="f-node f-main"><b>Your savings</b><small>Always yours</small></p>
-          <p class="f-lane f-gold"><span class="f-go">Interest</span><span class="f-back">Prizes</span></p>
-          <p class="f-node">Monthly draw</p>
-        </div>
+        <svg class="flow" id="flow" viewBox="0 0 560 250" role="img" aria-labelledby="flowTitle flowDesc">
+          <title id="flowTitle">Where the money goes</title>
+          <desc id="flowDesc">Your deposit goes from your bank into your savings. The interest goes to the monthly draw, and prizes come back into savings. Your deposit can go back to your bank at any time.</desc>
+          <path id="fDeposit" class="f-line" d="M130 64 H215" />
+          <path id="fInterest" class="f-line f-gold" d="M345 64 H430" />
+          <path id="fPrizes" class="f-line f-gold" d="M495 88 V150 H305 V88" />
+          <path id="fBack" class="f-line f-dash" d="M255 88 V206 H65 V88" />
+          <g class="f-node"><rect x="0.5" y="40.5" width="129" height="47" rx="6" /><text x="65" y="69">Your bank</text></g>
+          <g class="f-node"><rect x="215.5" y="40.5" width="129" height="47" rx="6" /><text x="280" y="69">Your savings</text></g>
+          <g class="f-node"><rect x="430.5" y="40.5" width="129" height="47" rx="6" /><text x="495" y="69">Monthly draw</text></g>
+          <text class="f-label" x="172" y="54">Deposit</text>
+          <text class="f-label" x="387" y="54">Interest</text>
+          <text class="f-label" x="400" y="142">Prizes</text>
+          <text class="f-label" x="160" y="228">Your deposit, whenever you want it</text>
+          <circle class="f-dot" r="3.5"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#fDeposit" /></animateMotion></circle>
+          <circle class="f-dot f-gold" r="3.5"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#fInterest" /></animateMotion></circle>
+          <circle class="f-dot f-gold" r="3.5"><animateMotion dur="4.8s" begin="1.6s" repeatCount="indefinite"><mpath href="#fPrizes" /></animateMotion></circle>
+        </svg>
       </div>
     </section>
 

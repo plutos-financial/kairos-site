@@ -154,26 +154,16 @@ html:has(body.home) { scroll-padding-top: 72px; }
 .trio article + article { padding-left: var(--s-6); border-left: 1px solid var(--line); }
 .trio p { margin-top: var(--s-2); font-size: var(--t-body); line-height: 1.55; color: var(--muted); }
 
-/* ---------------------------------------------------------------- where the money goes
-   Three boxes in a row. Your savings are the big one in the middle; each side has a lane out and a lane back. */
-.flow { display: grid; grid-template-columns: auto minmax(108px, 1fr) auto minmax(108px, 1fr) auto; align-items: center; font-size: var(--t-small); }
-.f-node { padding: 14px 12px; border: 1px solid var(--line-2); border-radius: var(--r-control); text-align: center; }
-.f-main { padding: 26px 16px; border-color: var(--text); }
-.f-main b { display: block; font-size: var(--t-lead); font-weight: 500; }
-.f-main small { display: block; margin-top: 2px; font-size: var(--t-fine); color: var(--muted); }
-.f-lane { display: grid; gap: 22px; font-size: var(--t-fine); text-align: center; white-space: nowrap; color: var(--muted); }
-.f-lane i { font-style: normal; }
-/* a lane: a label, a line and an arrowhead. Out is on top with its label above; back is below with its label under. */
-.f-lane span { position: relative; display: block; padding-bottom: 9px; }
-.f-lane .f-back { padding: 9px 0 0; }
-.f-lane span::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: rgba(255, 255, 255, 0.4); }
-.f-lane .f-back::after { top: 0; bottom: auto; }
-.f-lane span::before { content: ""; position: absolute; right: 1px; bottom: -3px; width: 6px; height: 6px; border: solid rgba(255, 255, 255, 0.7); border-width: 1px 1px 0 0; transform: rotate(45deg); }
-.f-lane .f-back::before { left: 1px; right: auto; top: -3px; bottom: auto; transform: rotate(-135deg); }
-/* the interest and the prizes are the money you can win, so that side is champagne */
-.f-gold { color: var(--accent); }
-.f-gold span::after { background: var(--accent); }
-.f-gold span::before { border-color: var(--accent); }
+/* ---------------------------------------------------------------- where the money goes */
+.flow { display: block; width: 100%; height: auto; overflow: visible; }
+.f-line { fill: none; stroke: rgba(255, 255, 255, 0.3); stroke-width: 1; }
+.f-line.f-gold { stroke: var(--accent); }
+.f-line.f-dash { stroke-dasharray: 3 5; }
+.f-node rect { fill: var(--bg); stroke: rgba(255, 255, 255, 0.3); }
+.f-node text { fill: var(--text); font: 400 14px var(--sans); text-anchor: middle; }
+.f-label { fill: var(--muted); font: 400 12px var(--sans); text-anchor: middle; }
+.f-dot { fill: var(--text); }
+.f-dot.f-gold { fill: var(--accent); }
 
 /* ---------------------------------------------------------------- your chances */
 .calc-amt { margin-bottom: var(--s-5); font-size: var(--t-figure); font-weight: var(--w-display); line-height: 1; letter-spacing: -0.04em; }
@@ -283,13 +273,9 @@ table.compare { width: 100%; min-width: 600px; border-collapse: collapse; table-
   .compare tbody th { font-size: var(--t-small); line-height: 1.35; }
   .compare thead th { font-size: 0.75rem; line-height: 1.25; }
   .kept .t-tab { font-size: 0.75rem; padding: 0 2px; }
-  /* on a phone the diagram runs top to bottom: a box, the two ways across, the next box */
-  .flow { grid-template-columns: 1fr; }
-  .f-lane { grid-template-columns: 1fr 1fr; gap: 0; padding: var(--s-3) 0; font-size: var(--t-small); }
-  .f-lane span, .f-lane .f-back { padding: 0; }
-  .f-lane span::after { display: none; }
-  .f-lane span::before, .f-lane .f-back::before { content: "↓  "; position: static; width: auto; height: auto; border: 0; transform: none; }
-  .f-lane .f-back::before { content: "↑  "; }
+  /* the diagram is drawn 560 wide and scales down on a phone, so its text is set larger to stay readable */
+  .f-node text { font-size: 18px; }
+  .f-label { font-size: 16px; }
   .calc-out b { font-size: 1.75rem; }
   .t-acc-panel-inner p { padding-right: var(--s-5); }
   .foot { flex-direction: column; gap: var(--s-5); }

@@ -403,3 +403,6 @@ waitlist();
 film();
 nav();
 reveal();
+
+// With motion turned down, the dots on the money diagram hold still.
+if (calm) $("flow")?.pauseAnimations?.();
