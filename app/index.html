@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Plutos · The savings account with a prize draw</title>
-  <meta name="description" content="Plutos is a savings account where the interest goes into a monthly prize draw. Keep your full deposit, withdraw anytime, and start with $1." />
+  <meta name="description" content="Plutos is prize-linked savings. Your money is held in U.S. Treasury bills, and the interest is paid out as prizes in a monthly draw. Your deposit stays yours." />
   <meta name="theme-color" content="#070A14" />
   <link rel="icon" type="image/png" href="/src/media/plutos-icon.png" />
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
@@ -28,7 +28,7 @@
       </nav>
       <div class="nav-cta">
         <a href="https://app.winplutos.tech/login" class="nav-signin">Sign in</a>
-        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Open app</a>
+        <a href="./app.html" class="btn btn-ghost btn-sm nav-app">Try the demo</a>
         <a href="#waitlist" class="btn btn-light btn-sm">Join waitlist</a>
       </div>
     </div>
@@ -44,7 +44,7 @@
       <div class="film-shade" aria-hidden="true"></div>
       <div class="wrap film-copy">
         <h1 class="film-title" id="filmTitle">A savings account with a monthly prize draw.</h1>
-        <p class="film-text">Plutos keeps your savings in U.S. Treasury bills and turns the interest into prizes, drawn at random every month. Your deposit stays yours, and you can withdraw it anytime.</p>
+        <p class="film-text">You deposit from your bank. Plutos holds your savings in U.S. Treasury bills and pays the interest out as prizes, drawn at random every month. Your deposit stays yours, and you can withdraw it anytime.</p>
         <div class="cta-row">
           <a href="#waitlist" class="btn btn-primary btn-lg">Join the waitlist</a>
           <a href="#save" class="btn btn-outline btn-lg">See how it works</a>
@@ -59,13 +59,13 @@
           <h2 class="hero-title">Save money.<br />Win prizes.</h2>
           <p class="lede">Every dollar you save is an entry in every draw. Winners are picked at random each month, and prizes go straight into their savings. Nobody loses a cent of their deposit.</p>
           <div class="cta-row">
-            <a href="./app.html" class="btn btn-primary btn-lg">Try the app</a>
+            <a href="#how" class="btn btn-primary btn-lg">How it works</a>
             <a href="./how-it-works.html" class="btn btn-ghost btn-lg">Read the details</a>
           </div>
           <ul class="proof">
             <li>Start with $1</li>
             <li>No fees to deposit or withdraw</li>
-            <li>Draws verified by Chainlink</li>
+            <li>Draws anyone can re-check</li>
           </ul>
         </div>
         <div class="hero-visual" role="group" aria-label="Try the Plutos app, with sample numbers">
@@ -197,9 +197,9 @@
     <section class="rails" aria-label="What Plutos runs on">
       <div class="wrap rails-grid">
         <div><span>Interest from</span><b>U.S. Treasury bills</b></div>
-        <div><span>Random draws by</span><b>Chainlink VRF</b></div>
-        <div><span>Payments through</span><b>Coinbase</b></div>
-        <div><span>Runs on</span><b>Base</b></div>
+        <div><span>Held at</span><b>Interactive Brokers</b></div>
+        <div><span>Bank transfers by</span><b>Stripe</b></div>
+        <div><span>Random draws by</span><b>drand</b></div>
       </div>
     </section>
 
@@ -212,18 +212,18 @@
         <div class="steps">
           <article class="step">
             <span class="step-n">01</span>
-            <h3>Add money</h3>
-            <p>Start with as little as $1. Pay with Apple Pay or a debit card through Coinbase.</p>
+            <h3>Deposit from your bank</h3>
+            <p>Link your bank account and deposit by bank transfer through Stripe. Your money counts once the transfer settles, usually in a few business days.</p>
           </article>
           <article class="step">
             <span class="step-n">02</span>
-            <h3>Get entries</h3>
-            <p>Every dollar you save is an entry in every draw. Dollars that stay in count for more, up to 3x after a year.</p>
+            <h3>Held in Treasury bills</h3>
+            <p>Savers' money is held in short-term U.S. Treasury bills at Interactive Brokers, apart from Plutos's own money. Every dollar is an entry, and dollars that stay in count for more, up to 3x after a year.</p>
           </article>
           <article class="step">
             <span class="step-n">03</span>
-            <h3>Win prizes</h3>
-            <p>The interest everyone's savings earn becomes the prizes. Winnings go straight into your savings.</p>
+            <h3>Interest becomes prizes</h3>
+            <p>Each month, 85% of the interest is paid out as prizes and Plutos keeps 15%. Winners are drawn with a public random number from drand, and prizes go straight into their savings.</p>
           </article>
         </div>
       </div>
@@ -255,31 +255,31 @@
       <div class="wrap">
         <div class="sec-head">
           <h2>Fair, and you can check it</h2>
-          <p>Every part of Plutos can be checked by anyone. <a class="text-link" href="./security.html">How it’s tested</a></p>
+          <p>Nobody at Plutos can pick a winner, and you don't have to take our word for it.</p>
         </div>
         <div class="bento">
           <article class="tile wide">
             <div class="tile-copy">
-              <h3>Winners picked by Chainlink</h3>
-              <p>Each draw uses a random number from Chainlink VRF, with a proof that anyone can check. Nobody at Plutos can choose who wins.</p>
+              <h3>Winners picked by a public random number</h3>
+              <p>Each draw uses drand, a public randomness beacon run by a group of independent organizations. Before the number exists, Plutos locks everyone's entries and publishes a fingerprint of them, then uses the first drand number released after that. Nobody at Plutos can choose it or change the entries once it is known.</p>
             </div>
           </article>
           <article class="tile">
             <div class="tile-copy">
               <h3>Prizes paid from Treasury interest</h3>
-              <p>Savings are held in short-term U.S. Treasury bills. The interest pays for the prizes, so deposits are never used.</p>
+              <p>Savings are held in short-term U.S. Treasury bills at Interactive Brokers. Only the interest they earn pays for prizes, so deposits are never used.</p>
             </div>
           </article>
           <article class="tile">
             <div class="tile-copy">
-              <h3>Money in and out with Coinbase</h3>
-              <p>Add money with Apple Pay or a debit card, and cash out to your bank account, through Coinbase.</p>
+              <h3>Money in and out by bank transfer</h3>
+              <p>Deposits come from, and withdrawals go back to, a bank account in your name. Transfers run through Stripe, and Plutos never sees your bank password.</p>
             </div>
           </article>
           <article class="tile wide">
             <div class="tile-copy">
-              <h3>Every transaction is public</h3>
-              <p>Plutos runs on Base. Deposits, draws and prize payments are recorded publicly, so the numbers can always be checked.</p>
+              <h3>Every draw can be re-checked</h3>
+              <p>After a draw, anyone can take the published fingerprint and the drand number and work out the winners again. Members can re-run their own draw in the app. Plutos's records are also checked every day against the statements from Interactive Brokers and Stripe, and everything pauses if they don't match.</p>
             </div>
           </article>
         </div>
@@ -336,23 +336,23 @@
         <div class="faq">
           <details>
             <summary>Can I lose the money I put in?</summary>
-            <p>Prizes are paid only from interest, never from deposits, so the amount you save stays the same whether you win or not. Plutos is not a bank and won't be FDIC insured, and we'll set out every risk clearly before launch.</p>
+            <p>Prizes are paid only from interest, never from deposits, so the amount you save stays the same whether you win or not. Your savings are in U.S. Treasury bills, not a bank account: Plutos is not a bank and is not FDIC insured. We set out every risk in writing before you deposit.</p>
           </details>
           <details>
             <summary>How are winners picked?</summary>
-            <p>Each draw uses a random number from Chainlink VRF, which comes with a proof anyone can verify. Your chances depend on how much you've saved, how long it was saved that month, and how long it has stayed in: dollars kept in for 3 months or more count up to three times.</p>
+            <p>Each draw uses a public random number from drand. Entries are locked and their fingerprint is published before that number exists, so the result can't be steered and anyone can re-check it. Your chances depend on how much you've saved, how long it was saved that month, and how long it has stayed in: dollars kept in for 3 months or more count up to three times.</p>
           </details>
           <details>
             <summary>How big are the prizes?</summary>
-            <p>The prize pool is the interest that everyone's savings earn in a month. Plutos keeps 15% of the interest and the rest is paid out as prizes. The more people save, the bigger the prizes.</p>
+            <p>The prize pool is the interest that everyone's Treasury bills earn in a month. Plutos keeps 15% of the interest and the rest is paid out as prizes. The more people save, the bigger the prizes.</p>
           </details>
           <details>
             <summary>How do I add and withdraw money?</summary>
-            <p>You add money with Apple Pay or a debit card through Coinbase, and you can withdraw your savings at any time. Cash-outs go to the bank account linked in your Coinbase account.</p>
+            <p>By bank transfer. You link a bank account in your name, confirm your identity once, and deposit from that account through Stripe; a transfer usually takes a few business days to settle. You can withdraw at any time, back to the same account. Interest on money you take out before the month's draw isn't entered in it.</p>
           </details>
           <details>
             <summary>When can I sign up?</summary>
-            <p>Plutos isn't open yet. Join the waitlist and we'll let you know when it launches in your state. You can try the full app today on the Base test network, using test money.</p>
+            <p>Plutos is running a small, invite-only pilot. Join the waitlist and we'll let you know when it opens in your state. The <a href="./app.html">demo</a> is a separate test edition that uses test money and works differently from the pilot described here.</p>
           </details>
         </div>
       </div>
@@ -362,7 +362,7 @@
       <div class="wrap wl-grid">
         <div class="wl-copy">
           <h2>Join the waitlist</h2>
-          <p>We'll email you when Plutos launches in your state. We're not taking deposits yet.</p>
+          <p>We'll email you when Plutos opens in your state. For now it is an invite-only pilot.</p>
         </div>
 
         <form name="waitlist" id="waitlistForm" class="wl-form" method="POST" data-netlify="true" netlify-honeypot="bot-field" novalidate>
@@ -390,8 +390,8 @@
 
         <div class="wl-done" id="wlDone" hidden>
           <h3>You're on the list, <span id="wlFirst"></span>.</h3>
-          <p>We'll be in touch before launch. In the meantime, you can try the app on the test network.</p>
-          <a href="./app.html" class="btn btn-light">Try the app</a>
+          <p>We'll be in touch before launch. In the meantime, you can try the demo, which uses test money.</p>
+          <a href="./app.html" class="btn btn-light">Try the demo</a>
         </div>
       </div>
     </section>
@@ -402,11 +402,11 @@
       <div class="foot-brand">
         <a class="brand" href="./" aria-label="Plutos home">
         <img class="logo logo-white" src="/src/media/plutos-logo.png" alt="" width="532" height="140" /><img class="logo logo-navy" src="/src/media/plutos-logo-navy.png" alt="" width="532" height="140" /></a>
-        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is in development. It is not a bank, is not FDIC insured, and is not accepting deposits. The app runs on the Base Sepolia test network with test money.</p>
+        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured. Stripe, Interactive Brokers and drand are independent of Plutos and do not endorse it. The demo runs on a test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./how-it-works.html">How it works</a>
-        <a href="./app.html">App</a>
+        <a href="./app.html">Demo</a>
         <a href="./draws.html">Draws</a>
         <a href="#waitlist">Waitlist</a>
         <a href="./security.html">Security</a>
