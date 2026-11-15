@@ -38,7 +38,7 @@
 
   <main>
     <!-- First screen: the film, full width, with the words at its foot. Muted and looping, it plays only
-         while it is on screen and can be paused (landing.js). -->
+         while it is on screen (landing.js). -->
     <section class="hero" id="top" aria-labelledby="heroTitle">
       <video class="hero-film" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
         <source src="/src/media/plutos-film.mp4" type="video/mp4" />
@@ -54,9 +54,6 @@
             <a href="#draw" class="btn btn-quiet">Run a sample draw</a>
           </div>
         </div>
-        <button type="button" class="film-toggle" id="filmToggle" aria-pressed="false" aria-label="Pause the film" hidden>
-          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" d="M9 6v12M15 6v12"/><path class="i-play" d="M8.5 5.5v13l10-6.5z"/></svg>
-        </button>
       </div>
     </section>
 

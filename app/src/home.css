@@ -66,11 +66,6 @@ html:has(body.home) { scroll-padding-top: 72px; }
 .hero-copy > :nth-child(2) { animation-delay: 80ms; }
 .hero-copy > :nth-child(3) { animation-delay: 160ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
-.film-toggle { width: 44px; height: 44px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid var(--line-2); border-radius: 50%; background: rgba(10, 10, 11, 0.4); color: var(--text); cursor: pointer; transition: background var(--duration-quick), border-color var(--duration-quick); }
-.film-toggle:hover { background: rgba(10, 10, 11, 0.7); border-color: var(--text); }
-.film-toggle .i-play { display: none; fill: currentColor; stroke: none; }
-.film-toggle[aria-pressed="true"] .i-play { display: block; }
-.film-toggle[aria-pressed="true"] .i-pause { display: none; }
 
 /* what it runs on: four facts in a row, divided by hairlines */
 .rails { border-top: 1px solid var(--line); }
@@ -279,7 +274,6 @@ table.compare { width: 100%; min-width: 600px; border-collapse: collapse; table-
   .nav-cta { gap: var(--s-4); }
   .hero-in { padding-bottom: var(--s-6); }
   .hero-actions .btn { flex: 1 1 auto; }
-  .film-toggle { position: absolute; right: var(--gutter); top: 76px; }
   .head { margin-bottom: var(--s-7); }
   .screens { gap: var(--s-3); }
   .board .btn { align-self: stretch; }

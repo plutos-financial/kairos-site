@@ -348,32 +348,18 @@ function waitlist() {
 }
 
 // ------------------------------------------------------------------ the film behind the first screen
-// Muted and looping, it plays only while it's on screen (and never downloads before that), and it can
-// be paused. People who ask for less motion or to save data get the still picture instead.
+// Muted and looping, it plays only while it's on screen (and never downloads before that). People who
+// ask for less motion or to save data get the still picture instead.
 function film() {
   const v = $("film");
-  const toggle = $("filmToggle");
   if (!v || calm || navigator.connection?.saveData === true) return;
-  let stopped = false; // paused by the visitor
-  let onScreen = false;
-  const sync = () => {
-    if (onScreen && !stopped) v.play().catch(() => {}); // blocked (e.g. Low Power Mode) = the picture stays
-    else if (!v.paused) v.pause();
-  };
   new IntersectionObserver(
     ([e]) => {
-      onScreen = e.isIntersecting;
-      sync();
+      if (e.isIntersecting) v.play().catch(() => {}); // blocked (e.g. Low Power Mode) = the picture stays
+      else if (!v.paused) v.pause();
     },
     { threshold: 0.15 }
   ).observe(v.closest(".hero"));
-  toggle.hidden = false;
-  toggle.addEventListener("click", () => {
-    stopped = !stopped;
-    toggle.setAttribute("aria-pressed", String(stopped));
-    toggle.setAttribute("aria-label", stopped ? "Play the film" : "Pause the film");
-    sync();
-  });
 }
 
 // The nav is clear over the top of the film and turns solid as soon as the page moves.
