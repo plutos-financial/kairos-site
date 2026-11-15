@@ -164,9 +164,9 @@ body.landing {
   --fill: #121214;
   --band: #0A0A0B;
   --ink: #F4F4F2;
-  --champagne: #F4F4F2;   /* links and buttons are plain light now; champagne is kept for money */
+  --champagne: #F4F4F2;   /* links, buttons and money are all plain light now; there is no gold */
   --champagne-2: #FFFFFF;
-  --prize: #E3C98E;
+  --prize: #F4F4F2;
   --line: rgba(255, 255, 255, 0.1);
   --line-2: rgba(255, 255, 255, 0.22);
   --muted: #A6A6AB;

@@ -11,8 +11,8 @@
   --text: #F4F4F2;
   --muted: #A6A6AB;     /* supporting text: 8:1 on the page */
   --dim: #8B8B92;       /* fine print: 5.8:1 on the page */
-  /* champagne: money you can win, and nothing else */
-  --accent: #E3C98E;
+  /* no accent colour: money is set in the text colour, and the film carries the colour */
+  --accent: var(--text);
   --accent-ink: #0A0A0B;
   --gold: var(--accent);
   /* mint: something went through. Settled, verified, on the list. */
