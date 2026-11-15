@@ -63,7 +63,7 @@
 /* honest part */
 .honest { list-style: none; margin: 0; padding: 0; }
 .honest li { padding-left: 22px; position: relative; }
-.honest li::before { content: ""; position: absolute; left: 0; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: var(--amber); }
+.honest li::before { content: ""; position: absolute; left: 0; top: 11px; width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
 
 /* questions */
 details { border-bottom: 1px solid var(--line); }
@@ -108,7 +108,7 @@ details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted
 .finding > b { display: block; font-size: 18px; }
 .finding > p:last-child { margin: 8px 0 0; color: var(--muted); font-size: 16px; line-height: 1.6; }
 
-.code { margin: 18px 0; background: #070A13; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; overflow-x: auto; font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #E8E3D8; }
+.code { margin: 18px 0; background: #0A0A0B; border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; overflow-x: auto; font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; color: #E8E3D8; }
 .code.formula { font-size: 15px; color: var(--accent); }
 
 .arch { margin: 24px 0 26px; display: flex; flex-direction: column; gap: 10px; }
@@ -120,7 +120,7 @@ details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted
 .arch-box b { display: block; font-size: 15.5px; }
 .arch-box span { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; line-height: 1.4; }
 .arch-box.you { border-color: var(--line-2); }
-.arch-box.core { background: rgba(227, 203, 148, 0.08); border-color: rgba(227, 203, 148, 0.45); }
+.arch-box.core { background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.45); }
 .arch-box.core b { color: var(--accent); }
 
 .gas { margin: 26px 0; border-top: 1px solid var(--line-2); border-bottom: 1px solid var(--line); padding: 18px 0 14px; font-variant-numeric: tabular-nums; }
@@ -129,7 +129,7 @@ details p { margin-top: -4px !important; padding-bottom: 6px; color: var(--muted
 .g-n { color: var(--muted); font-size: 14px; }
 .g-bars { display: flex; flex-direction: column; gap: 3px; }
 .g-bars i, .g-key i { display: block; height: 8px; border-radius: 4px; min-width: 4px; }
-.g-bars i.old, .g-key i.old { background: #5B6178; }
+.g-bars i.old, .g-key i.old { background: #55555C; }
 .g-bars i.new, .g-key i.new { background: var(--accent); }
 .g-v { font-size: 13.5px; color: var(--muted); text-align: right; white-space: nowrap; }
 .g-v b { color: var(--accent); }

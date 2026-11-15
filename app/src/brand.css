@@ -59,9 +59,9 @@ body.landing .nav.nav-over:not(.solid) .nav-links a { color: #fff; }
 
 /* ---------------------------------------------------------------- the film: centred words, a point into the page */
 body.landing .film { align-items: center; justify-content: center; text-align: center; }
-body.landing .film-shade { background: linear-gradient(180deg, rgba(7, 10, 20, 0.55) 0%, rgba(7, 10, 20, 0.38) 40%, rgba(7, 10, 20, 0.7) 88%, var(--page) 100%); }
+body.landing .film-shade { background: linear-gradient(180deg, rgba(10, 10, 11, 0.55) 0%, rgba(10, 10, 11, 0.38) 40%, rgba(10, 10, 11, 0.7) 88%, var(--page) 100%); }
 body.landing .film .film-copy { padding-bottom: 0; display: flex; flex-direction: column; align-items: center; }
-body.landing .film-title { font-size: clamp(2.8rem, 6.6vw, 6.4rem); line-height: 1.02; max-width: 12em; margin: 0 auto 26px; color: #fff; text-shadow: 0 2px 40px rgba(7, 10, 20, 0.45); }
+body.landing .film-title { font-size: clamp(2.8rem, 6.6vw, 6.4rem); line-height: 1.02; max-width: 12em; margin: 0 auto 26px; color: #fff; text-shadow: 0 2px 40px rgba(10, 10, 11, 0.45); }
 body.landing .film-text { margin: 0 auto 34px; color: rgba(255, 255, 255, 0.88); max-width: 36rem; }
 body.landing .film .cta-row { justify-content: center; }
 body.landing .film-down { bottom: 34px; color: rgba(255, 255, 255, 0.75); }
@@ -94,7 +94,7 @@ body.landing .step > p:last-child { margin: 0 auto; font-size: 16.5px; }
 /* comparison */
 body.landing .table-wrap { border-top: 1.5px solid rgba(244, 241, 234, 0.6); max-width: 980px; margin: 0 auto; }
 body.landing .compare thead th { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; }
-body.landing .compare .k { background: rgba(230, 206, 151, 0.06); }
+body.landing .compare .k { background: rgba(255, 255, 255, 0.06); }
 
 /* fairness */
 body.landing .bento { max-width: 1080px; margin: 0 auto; }
@@ -141,7 +141,7 @@ body.explain .toc a { color: var(--champagne); }
 }
 @media (max-width: 640px) {
   body.landing .film-title { font-size: clamp(2.5rem, 11vw, 3.4rem); }
-  body.landing .film-shade { background: linear-gradient(180deg, rgba(7, 10, 20, 0.6) 0%, rgba(7, 10, 20, 0.45) 45%, rgba(7, 10, 20, 0.8) 90%, var(--page) 100%); }
+  body.landing .film-shade { background: linear-gradient(180deg, rgba(10, 10, 11, 0.6) 0%, rgba(10, 10, 11, 0.45) 45%, rgba(10, 10, 11, 0.8) 90%, var(--page) 100%); }
   body.landing .hero { padding: 72px 0 48px; }
   body.landing .section { padding-top: 88px; }
   body.landing .sec-head:not(.left) { margin-bottom: 32px; }
@@ -199,3 +199,24 @@ body.landing .btn-primary, body.landing .btn-light { background: var(--ink); bor
 body.landing .btn-primary:hover, body.landing .btn-light:hover { background: #fff; border-color: #fff; }
 body.landing .nav, body.landing .nav.nav-over.solid { background: rgba(10, 10, 11, 0.84); }
 body.landing .site-footer { border-top: 1px solid var(--line); }
+
+/* ---------------------------------------------------------------- the same menu bar and footer as the homepage (home.css):
+   same links, same edges, same sizes and weights */
+body.landing .wrap { max-width: 1200px; padding: 0 40px; }
+body.landing .nav-in { max-width: 1200px; padding: 14px 40px; gap: 32px; }
+body.landing .nav-links { gap: 32px; }
+body.landing .nav-links a, body.landing .nav-signin { font-size: 14px; font-weight: 400; padding: 4px 0; margin: 0; color: var(--ink); text-decoration: none; }
+body.landing .nav-cta { align-items: center; gap: 24px; }
+body.landing .nav-cta .btn { min-height: 36px; padding: 0 14px; font-weight: 500; }
+body.landing .site-footer { padding: 48px 0 80px; font-size: 13px; }
+body.landing .foot { gap: 48px; }
+body.landing .foot-brand .brand { margin-bottom: 0; }
+body.landing .foot-brand .brand .logo { height: 26px; }
+body.landing .foot-brand p { margin-top: 16px; max-width: 60ch; line-height: 1.6; }
+body.landing .foot-links { gap: 0 24px; max-width: 26rem; font-size: 14px; }
+body.landing .foot-links a { padding: 6px 0; }
+@media (max-width: 720px) {
+  body.landing .wrap { padding: 0 20px; }
+  body.landing .nav-in { padding: 10px 20px; gap: 12px; }
+  body.landing .nav-cta { gap: 16px; }
+}

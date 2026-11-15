@@ -7,34 +7,34 @@
 [data-edition="beta"] .demo-only { display: none !important; }
 
 :root {
-  --bg: #070A14;
-  --bg-1: #0C1120;
-  --bg-2: #121829;
-  --bg-3: #1A2136;
-  --line: rgba(255, 255, 255, 0.075);
-  --line-2: rgba(255, 255, 255, 0.13);
+  --bg: #0A0A0B;
+  --bg-1: #121214;
+  --bg-2: #17171A;
+  --bg-3: #222226;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-2: rgba(255, 255, 255, 0.22);
   /* the light that catches the top edge of a raised surface */
   --edge: inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  --text: #F4F1EA;
-  --muted: #A4A7B1;
-  --dim: #8A90A5;
-  /* champagne: actions, odds, brand UI */
-  --accent: #E6CE97;
-  --accent-2: #D4B67A;
-  --accent-ink: #17130B;
-  --accent-soft: rgba(230, 206, 151, 0.11);
-  /* gold: anything you can win */
-  --gold: #D9BA78;
-  --gold-2: #E6CE97;
-  --gold-ink: #1f1500;
-  --gold-soft: rgba(217, 186, 120, 0.12);
+  --text: #F4F4F2;
+  --muted: #A6A6AB;
+  --dim: #8B8B92;
+  /* no accent colour: actions and money are set in the text colour (tokens.css) */
+  --accent: #F4F4F2;
+  --accent-2: #FFFFFF;
+  --accent-ink: #0A0A0B;
+  --accent-soft: rgba(255, 255, 255, 0.08);
+  /* kept as names the app pages use; all plain light now */
+  --gold: #F4F4F2;
+  --gold-2: #FFFFFF;
+  --gold-ink: #0A0A0B;
+  --gold-soft: rgba(255, 255, 255, 0.06);
   --red: #ff5b4f;
   --amber: #ffb648;
-  --blue: #9aa6c8;
+  --blue: #6F6F78;
   /* names the control room's scripts use */
   --green: var(--accent);
   --cyan: var(--blue);
-  --radius: 22px;
+  --radius: 14px;
   /* headlines and big numbers: Geist, set tight, the same family as the body text */
   --display: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
   --sans: "Geist Variable", "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -83,7 +83,7 @@ img, svg { max-width: 100%; }
 }
 .brand { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--text); }
 .brand .mark { width: 24px; height: 24px; flex: 0 0 auto; display: block; }
-.brand .logo { height: 30px; width: auto; display: block; flex: 0 0 auto; }
+.brand .logo { height: 26px; width: auto; display: block; flex: 0 0 auto; }
 .brand .name { font-family: var(--display); font-weight: 700; font-stretch: 125%; font-size: 17px; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1; }
 .brand .by { color: var(--muted); font-size: 14px; font-weight: 500; padding-left: 10px; margin-left: 2px; border-left: 1px solid var(--line-2); }
 .top-right { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
@@ -139,10 +139,10 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
   cursor: pointer; white-space: nowrap; text-decoration: none;
   transition: transform 0.12s ease, background 0.15s, border-color 0.15s, opacity 0.15s;
 }
-.btn:hover { background: #222A42; border-color: rgba(255, 255, 255, 0.2); }
+.btn:hover { background: #222226; border-color: rgba(255, 255, 255, 0.2); }
 .btn:active { transform: scale(0.98); }
 .btn-primary, .btn-accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
-.btn-primary:hover, .btn-accent:hover { background: #F0DCAF; border-color: #F0DCAF; }
+.btn-primary:hover, .btn-accent:hover { background: #fff; border-color: #fff; }
 .btn-light { background: var(--text); color: var(--bg); border-color: var(--text); }
 .btn-dark { background: #000; color: #fff; border-color: #000; }
 .btn-dark:hover { background: #222; border-color: #222; }
@@ -185,7 +185,7 @@ select { appearance: none; background-image: linear-gradient(45deg, transparent 
 
 .toast {
   position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(16px);
-  background: #F2EDE4; color: #0b0b0b;
+  background: #F4F4F2; color: #0b0b0b;
   padding: 13px 18px; border-radius: 16px; font-size: 15px; font-weight: 500; max-width: min(92vw, 560px);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   opacity: 0; pointer-events: none; transition: opacity 0.22s ease, transform 0.22s ease; z-index: 60;
