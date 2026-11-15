@@ -80,16 +80,16 @@ html:has(body.home) { scroll-padding-top: 72px; }
 .intro-on .intro.fade { opacity: 0; }
 /* a page loaded in the background waits, so the opening starts when someone is looking */
 .intro-js:not(.intro-go) .intro-bird, .intro-js:not(.intro-go) .intro-word, .intro-js:not(.intro-go) .hero-copy > * { animation-play-state: paused; }
-.intro-lockup { display: flex; align-items: center; gap: 0.2em; font-size: clamp(2.5rem, 7vw, 4.25rem); }
+.intro-lockup { display: flex; align-items: center; gap: 0.2em; font-size: clamp(2.5rem, 7vw, 7rem); }
 .intro-bird { width: 1.3em; height: 1.58em; background: currentColor; -webkit-mask: url(./media/plutos-phoenix-bold.svg) center / contain no-repeat; mask: url(./media/plutos-phoenix-bold.svg) center / contain no-repeat; animation: intro-in 800ms 150ms var(--ease-smooth-out) both; }
 .intro-word { font-weight: 600; letter-spacing: -0.03em; line-height: 1; clip-path: inset(-0.2em 100% -0.3em 0); animation: intro-word 700ms 800ms var(--ease-smooth-out) forwards; }
 .intro-ash { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .intro-on .intro.ash { background-color: transparent; pointer-events: none; }
 .intro.ash .intro-lockup { visibility: hidden; }
 /* the words on the film wait for the black to lift */
-.intro-on .hero-copy > * { animation-delay: 2500ms; }
-.intro-on .hero-copy > :nth-child(2) { animation-delay: 2580ms; }
-.intro-on .hero-copy > :nth-child(3) { animation-delay: 2660ms; }
+.intro-on .hero-copy > * { animation-delay: 3300ms; }
+.intro-on .hero-copy > :nth-child(2) { animation-delay: 3380ms; }
+.intro-on .hero-copy > :nth-child(3) { animation-delay: 3460ms; }
 @keyframes intro-in { from { opacity: 0; transform: translateY(6px); } }
 @keyframes intro-word { to { clip-path: inset(-0.2em 0 -0.3em 0); } }
 @keyframes intro-safety { to { opacity: 0; visibility: hidden; } }

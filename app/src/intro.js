@@ -4,7 +4,7 @@
 // loaded in the background still shows it. People who ask for less motion get the logo and a plain fade.
 const root = document.documentElement;
 const intro = document.getElementById("intro");
-const HOLD = 1900; // ms the logo stands before it burns
+const HOLD = 2700; // ms the logo stands before it burns
 const SWEEP = 520; // ms for the burn to cross the logo, left to right
 
 if (intro && root.classList.contains("intro-on")) {
