@@ -10,12 +10,20 @@
   <link rel="apple-touch-icon" href="/src/media/plutos-touch-icon.png" />
   <meta property="og:title" content="Plutos · Save money. Win prizes." />
   <meta property="og:description" content="Prize-linked savings: the interest goes into a monthly prize draw, and your deposit stays yours." />
+  <!-- Decides before the first paint whether the opening plays. A file of its own because the page's
+       security policy allows no inline scripts. -->
+  <script src="./intro-gate.js"></script>
   <link rel="stylesheet" href="/src/style.css" />
   <link rel="stylesheet" href="/src/transitions.css" />
   <link rel="stylesheet" href="/src/tokens.css" />
   <link rel="stylesheet" href="/src/home.css" />
 </head>
 <body class="landing home">
+  <!-- The opening: shown only while <html> has "intro-on"; intro.js burns it away and removes it. -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="intro-lockup"><span class="intro-bird"></span><span class="intro-word">plutos</span></div>
+    <canvas class="intro-ash"></canvas>
+  </div>
   <a class="skip" href="#app">Skip to the app</a>
   <header class="nav" id="nav">
     <div class="nav-in">
@@ -353,6 +361,7 @@
     </div>
   </footer>
 
+  <script type="module" src="/src/intro.js"></script>
   <script type="module" src="/src/landing.js"></script>
 </body>
 </html>

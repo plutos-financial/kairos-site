@@ -71,6 +71,24 @@ html:has(body.home) { scroll-padding-top: 72px; }
 .hero-copy > :nth-child(3) { animation-delay: 160ms; }
 @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
 
+/* ---------------------------------------------------------------- the opening: the phoenix and the name on black, then ash */
+/* index.html puts "intro-on" on <html> when it should play; intro.js burns it away and removes it */
+.intro { display: none; }
+.intro-on .intro { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; background-color: #000; color: var(--text); transition: background-color 900ms ease-out 200ms; animation: intro-safety 500ms 5s forwards; }
+.intro-lockup { display: flex; align-items: center; gap: 0.2em; font-size: clamp(2.5rem, 7vw, 4.25rem); }
+.intro-bird { width: 1.3em; height: 1.58em; background: currentColor; -webkit-mask: url(./media/plutos-phoenix-bold.svg) center / contain no-repeat; mask: url(./media/plutos-phoenix-bold.svg) center / contain no-repeat; animation: intro-in 800ms 150ms var(--ease-smooth-out) both; }
+.intro-word { font-weight: 600; letter-spacing: -0.03em; line-height: 1; clip-path: inset(-0.2em 100% -0.3em 0); animation: intro-word 700ms 800ms var(--ease-smooth-out) forwards; }
+.intro-ash { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.intro-on .intro.ash { background-color: transparent; pointer-events: none; }
+.intro.ash .intro-lockup { visibility: hidden; }
+/* the words on the film wait for the black to lift */
+.intro-on .hero-copy > * { animation-delay: 2500ms; }
+.intro-on .hero-copy > :nth-child(2) { animation-delay: 2580ms; }
+.intro-on .hero-copy > :nth-child(3) { animation-delay: 2660ms; }
+@keyframes intro-in { from { opacity: 0; transform: translateY(6px); } }
+@keyframes intro-word { to { clip-path: inset(-0.2em 0 -0.3em 0); } }
+@keyframes intro-safety { to { opacity: 0; visibility: hidden; } } /* if the script never runs, the page still appears */
+
 /* what it runs on: four facts in a row, divided by hairlines */
 .rails { border-top: 1px solid var(--line); }
 .rails-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
