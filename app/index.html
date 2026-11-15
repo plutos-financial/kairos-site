@@ -37,11 +37,13 @@
   </header>
 
   <main>
-    <!-- First screen: the film, full width, with the words at its foot. The film is a draw board drawn in
-         code (board.js); it runs only while it is on screen and can be paused (landing.js). -->
+    <!-- First screen: the film, full width, with the words at its foot. Muted and looping, it plays only
+         while it is on screen and can be paused (landing.js). -->
     <section class="hero" id="top" aria-labelledby="heroTitle">
-      <canvas class="hero-film" id="film" width="1600" height="900" aria-hidden="true"></canvas>
-      <div class="hero-tint" aria-hidden="true"></div>
+      <video class="hero-film" id="film" muted loop playsinline preload="none" poster="/src/media/plutos-film-poster.jpg" aria-hidden="true" tabindex="-1">
+        <source src="/src/media/plutos-film.mp4" type="video/mp4" />
+        <source src="/src/media/plutos-film.webm" type="video/webm" />
+      </video>
       <div class="hero-shade" aria-hidden="true"></div>
       <div class="wrap hero-in">
         <div class="hero-copy">
@@ -167,31 +169,21 @@
     <section class="section" id="how" aria-labelledby="howTitle">
       <div class="wrap split">
         <div class="copy">
-          <h2 id="howTitle">Your deposit stays put. Only the interest is in play.</h2>
+          <h2 id="howTitle">Your money stays yours. Prizes are added on top.</h2>
           <ul class="points">
-            <li><h3>Deposit from your bank</h3><p>Link your bank account and deposit by bank transfer through Stripe. Your money counts once the transfer settles, usually in a few business days.</p></li>
-            <li><h3>Your savings sit in Treasury bills</h3><p>Savers' money is held in short-term U.S. Treasury bills at Interactive Brokers, apart from Plutos's own money.</p></li>
-            <li><h3>The interest becomes prizes</h3><p>Each month the interest is paid out as prizes, after Plutos keeps 15% of it. Prizes go straight into the winners' savings.</p></li>
+            <li><h3>Your savings are always yours</h3><p>They sit in short-term U.S. Treasury bills at Interactive Brokers, apart from Plutos's own money. Withdraw to your bank whenever you like.</p></li>
+            <li><h3>Only the interest goes into the draw</h3><p>Each month the interest your savings earn goes into the prize pool, after Plutos keeps 15% of it. Your deposit is never used for prizes.</p></li>
+            <li><h3>Prizes come back to savers</h3><p>Every prize is paid straight into the winner's savings, theirs to keep or withdraw.</p></li>
           </ul>
         </div>
-        <svg class="flow" id="flow" viewBox="0 0 560 250" role="img" aria-labelledby="flowTitle flowDesc">
-          <title id="flowTitle">Where the money goes</title>
-          <desc id="flowDesc">Your deposit goes from your bank into Treasury bills. The interest goes to the monthly draw, and prizes come back into savings. Your deposit can go back to your bank at any time.</desc>
-          <path id="fDeposit" class="f-line" d="M130 64 H215" />
-          <path id="fInterest" class="f-line f-gold" d="M345 64 H430" />
-          <path id="fPrizes" class="f-line f-gold" d="M495 88 V150 H305 V88" />
-          <path id="fBack" class="f-line f-dash" d="M255 88 V206 H65 V88" />
-          <g class="f-node"><rect x="0.5" y="40.5" width="129" height="47" rx="6" /><text x="65" y="69">Your bank</text></g>
-          <g class="f-node"><rect x="215.5" y="40.5" width="129" height="47" rx="6" /><text x="280" y="69">Treasury bills</text></g>
-          <g class="f-node"><rect x="430.5" y="40.5" width="129" height="47" rx="6" /><text x="495" y="69">Monthly draw</text></g>
-          <text class="f-label" x="172" y="54">Deposit</text>
-          <text class="f-label" x="387" y="54">Interest</text>
-          <text class="f-label" x="400" y="142">Prizes</text>
-          <text class="f-label" x="160" y="228">Your deposit, whenever you want it</text>
-          <circle class="f-dot" r="3.5"><animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#fDeposit" /></animateMotion></circle>
-          <circle class="f-dot f-gold" r="3.5"><animateMotion dur="2.4s" begin="0.8s" repeatCount="indefinite"><mpath href="#fInterest" /></animateMotion></circle>
-          <circle class="f-dot f-gold" r="3.5"><animateMotion dur="4.8s" begin="1.6s" repeatCount="indefinite"><mpath href="#fPrizes" /></animateMotion></circle>
-        </svg>
+        <!-- Where the money goes: your savings in the middle, your bank on one side, the draw on the other. -->
+        <div class="flow" role="img" aria-label="Your savings sit in the middle and are always yours. You deposit from your bank and can withdraw at any time. The interest goes to the monthly draw, and prizes come back into savings.">
+          <p class="f-node">Your bank</p>
+          <p class="f-lane"><span class="f-go">Deposit</span><span class="f-back">Withdraw<i> anytime</i></span></p>
+          <p class="f-node f-main"><b>Your savings</b><small>Always yours</small></p>
+          <p class="f-lane f-gold"><span class="f-go">Interest</span><span class="f-back">Prizes</span></p>
+          <p class="f-node">Monthly draw</p>
+        </div>
       </div>
     </section>
 

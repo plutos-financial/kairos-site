@@ -1,8 +1,7 @@
-// Homepage: the sample draw, the chances calculator, the questions, the waitlist (Google Sheet),
-// the money diagram and the film on the first screen.
+// Homepage: the sample draw, the chances calculator, the questions, the waitlist (Google Sheet)
+// and the film on the first screen.
 import { $ } from "./core.js";
 import built from "./site-config.json";
-import { board } from "./board.js";
 import { reveal } from "./motion.js";
 
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -349,19 +348,18 @@ function waitlist() {
 }
 
 // ------------------------------------------------------------------ the film behind the first screen
-// A draw board drawn in code (board.js). It runs only while it's on screen, and it can be paused.
-// People who ask for less motion get one still frame instead.
+// Muted and looping, it plays only while it's on screen (and never downloads before that), and it can
+// be paused. People who ask for less motion or to save data get the still picture instead.
 function film() {
   const v = $("film");
   const toggle = $("filmToggle");
-  if (!v) return;
-  const b = board(v);
-  b.still(); // something to look at straight away
-  document.fonts?.ready.then(b.still); // and again once the typeface is in
-  if (calm) return;
+  if (!v || calm || navigator.connection?.saveData === true) return;
   let stopped = false; // paused by the visitor
   let onScreen = false;
-  const sync = () => (onScreen && !stopped ? b.play() : b.pause());
+  const sync = () => {
+    if (onScreen && !stopped) v.play().catch(() => {}); // blocked (e.g. Low Power Mode) = the picture stays
+    else if (!v.paused) v.pause();
+  };
   new IntersectionObserver(
     ([e]) => {
       onScreen = e.isIntersecting;
@@ -419,6 +417,3 @@ waitlist();
 film();
 nav();
 reveal();
-
-// With motion turned down, the dots on the money diagram hold still.
-if (calm) $("flow")?.pauseAnimations?.();
