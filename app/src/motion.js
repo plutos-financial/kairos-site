@@ -3,7 +3,7 @@
 // for less motion, and browsers without IntersectionObserver, see everything at once.
 const SELECTORS = [
   // homepage
-  ".rails-grid p", ".head", ".copy", ".screen", ".stage", ".trio article", ".flow", ".calc", ".table-wrap",
+  ".head", ".copy", ".screen", ".stage", ".trio article", ".flow", ".calc", ".table-wrap",
   ".why-num", ".faq .t-acc", ".wl", ".engraving",
   // explainer pages
   ".ex-sec .sec-n", ".ex-sec h2", ".ex-sec > p", ".flow li", ".receipt", ".stat-strip > div", ".promise",
