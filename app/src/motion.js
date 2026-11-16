@@ -4,7 +4,7 @@
 const SELECTORS = [
   // homepage
   ".rails-grid p", ".head", ".copy", ".screen", ".stage", ".trio article", ".flow", ".calc", ".table-wrap",
-  ".why-num", ".faq .t-acc", ".wl",
+  ".why-num", ".faq .t-acc", ".wl", ".engraving",
   // explainer pages
   ".ex-sec .sec-n", ".ex-sec h2", ".ex-sec > p", ".flow li", ".receipt", ".stat-strip > div", ".promise",
   ".finding", ".arch-row", ".gas", ".odds-mini", ".qa", ".ex-end > *",

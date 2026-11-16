@@ -242,6 +242,12 @@ table.compare { width: 100%; min-width: 600px; border-collapse: collapse; table-
 .t-acc-panel-inner a { color: var(--text); text-underline-offset: 3px; }
 
 /* ---------------------------------------------------------------- waitlist */
+/* the engraving: the fine phoenix drawing in the open space beside the waitlist form. It rises into view once
+   (motion.js); with less motion asked for, or on a narrow screen where the form comes first, it does not move or show. */
+.engraving { display: block; width: min(100%, 19rem); aspect-ratio: 2444 / 2977; margin-top: var(--s-7); background: var(--muted); -webkit-mask: url(./media/plutos-phoenix.svg) center / contain no-repeat; mask: url(./media/plutos-phoenix.svg) center / contain no-repeat; }
+.home .engraving.rv { opacity: 1; filter: none; transform: translateY(20px); clip-path: inset(100% 0 0 0); transition: clip-path 1800ms var(--ease-smooth-out) 300ms, transform 1800ms var(--ease-smooth-out) 300ms; }
+.home .engraving.rv.rv-in { transform: none; clip-path: inset(0 0 0 0); }
+@media (max-width: 960px) { .engraving { display: none; } }
 .wl-form { display: flex; flex-direction: column; }
 .field { display: flex; flex-direction: column; }
 .field label { margin-bottom: 6px; font-size: var(--t-small); color: var(--muted); }
