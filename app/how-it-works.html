@@ -39,7 +39,7 @@
   <main class="ex">
     <header class="ex-head wrap-narrow">
       <h1>How Plutos works</h1>
-      <p class="ex-lede">Plutos is prize-linked savings. You deposit from your bank, your money is held in U.S. Treasury bills, the interest from all savers is pooled, and once a month it's paid out as prizes. Your deposit is never used for prizes.</p>
+      <p class="ex-lede">Plutos is prize-linked savings. You deposit from your bank, your money is kept apart from Plutos's own, the interest from all savers is pooled, and once a month it's paid out as prizes. Your deposit is never used for prizes.</p>
       <nav class="toc" aria-label="On this page">
         <a href="#idea">The idea</a>
         <a href="#money">Where your money goes</a>
@@ -64,8 +64,8 @@
       <p>What happens to a $100 deposit, from start to finish:</p>
       <ol class="flow">
         <li><b>You deposit $100 from your bank.</b><span>By bank transfer through Stripe, from an account in your name. It counts once the transfer settles, usually in a few business days. From then on it's 100 entries in every draw while it stays saved.</span></li>
-        <li><b>It's held in U.S. Treasury bills.</b><span>Short-term loans to the U.S. government, held in a brokerage account at Interactive Brokers, apart from Plutos's own money. A portion stays in cash so withdrawals can be paid without selling anything.</span></li>
-        <li><b>The Treasury bills earn interest.</b><span>The interest from all savers goes into one shared pool.</span></li>
+        <li><b>It's kept apart from Plutos's money.</b><span>During the pilot it sits in an account at Stripe used only for savers' money.</span></li>
+        <li><b>It earns interest.</b><span>The interest from all savers goes into one shared pool.</span></li>
         <li><b>The pool becomes the prizes.</b><span>85% of the interest is paid out as prizes and Plutos keeps 15% to run the service. There are no fees to deposit or withdraw.</span></li>
         <li><b>Draw day.</b><span>A public random number from drand picks the winners, and their prizes are added to their savings.</span></li>
         <li class="end"><b>Your $100 is still $100.</b><span>Win or not, your deposit stays the same, and you're entered in next month's draw automatically.</span></li>
@@ -79,12 +79,12 @@
       <div class="receipt">
         <p class="r-title">Example month</p>
         <div class="r-row"><span>10,000 people save $500 each</span><b>$5,000,000</b></div>
-        <div class="r-row"><span>Treasury bills paying 4% a year earn, per month</span><b>$16,667</b></div>
+        <div class="r-row"><span>Savings earning 4% a year earn, per month</span><b>$16,667</b></div>
         <div class="r-row total"><span>Prize pool this month<small>85% of the interest</small></span><b>$14,167</b></div>
-        <p class="r-foot">For example, an $8,500 top prize plus several smaller prizes. 4% is an example rate; Treasury rates change over time.</p>
+        <p class="r-foot">For example, an $8,500 top prize plus several smaller prizes. 4% is an example rate; what savings earn changes over time.</p>
       </div>
       <p>More savers means more entries in each draw, but also a bigger prize pool. Your expected share stays about the same, and there's room for more and bigger prizes.</p>
-      <p>Only interest funds prizes. If a Treasury bill is ever sold for less than it cost, that loss is taken first from a buffer and then from Plutos's own capital. It is never taken from the prize pool.</p>
+      <p>Only interest funds prizes. Deposits are never used to pay them.</p>
     </section>
 
     <section class="ex-sec wrap-narrow" id="draw">
@@ -126,7 +126,7 @@
       <h2>Adding and withdrawing</h2>
       <p>Before your first deposit you confirm your identity once, with a photo of your ID and a selfie, checked by Stripe. Then you link a checking or savings account in your name by signing in to your bank. Plutos never sees your bank password.</p>
       <p>Deposits are bank transfers through Stripe. A transfer usually takes a few business days to settle, and your balance and your entries go up when it does, not before.</p>
-      <p>You can withdraw at any time, back to the same bank account, with no fee. The app shows you exactly what a withdrawal changes before you confirm it. Bank transfers out also take a few business days to arrive. If many people withdraw at once, a large withdrawal can take longer while Treasury bills are sold.</p>
+      <p>You can withdraw at any time, back to the same bank account, with no fee. The app shows you exactly what a withdrawal changes before you confirm it. Bank transfers out also take a few business days to arrive.</p>
       <p>One thing to know: interest earned on money you take out before the month's draw doesn't go into that month's prize pool. Plutos keeps it.</p>
     </section>
 
@@ -136,7 +136,7 @@
       <ul class="honest">
         <li><b>Most months, most people don't win.</b> On average, savers receive 85% of the interest their savings earn, paid as prizes. In some months you may win nothing. If you want a steady, predictable return, a high-yield savings account is the better choice.</li>
         <li><b>Plutos is an invite-only pilot.</b> It is open to a small group of savers while we test every part of it with real money. Join the waitlist to hear when it opens in your state.</li>
-        <li><b>Plutos isn't a bank.</b> Your savings are in U.S. Treasury bills, not a bank account, and they are not FDIC insured.</li>
+        <li><b>Plutos isn't a bank.</b> Your savings are not FDIC insured.</li>
         <li><b>Bank transfers can be reversed.</b> A bank can take a deposit back for some days after it arrives. If that happens, the deposit comes off your balance.</li>
       </ul>
     </section>
@@ -158,7 +158,7 @@
       </details>
       <details>
         <summary>Is my money in crypto?</summary>
-        <p>No. Your savings are U.S. dollars held in Treasury bills at a brokerage, and money moves in and out by ordinary bank transfer. The <a href="./app.html">demo</a> is a separate, earlier test edition built on a blockchain test network with test money.</p>
+        <p>No. Your savings are U.S. dollars, and money moves in and out by ordinary bank transfer. The <a href="./app.html">demo</a> is a separate, earlier test edition built on a blockchain test network with test money.</p>
       </details>
       <details>
         <summary>Who's behind Plutos?</summary>
@@ -183,7 +183,7 @@
     <div class="wrap foot">
       <div class="foot-brand">
         <a class="brand" href="./" aria-label="Plutos home"><img class="logo" src="/src/media/plutos-logo.png" alt="" width="532" height="140" /></a>
-        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured. Stripe, Interactive Brokers and drand are independent of Plutos and do not endorse it. The demo runs on a test network with test money.</p>
+        <p>© 2026 Plutos Savings, Inc. Patent pending. Plutos is an invite-only pilot. It is not a bank and is not FDIC insured. Stripe and drand are independent of Plutos and do not endorse it. The demo runs on a test network with test money.</p>
       </div>
       <nav class="foot-links" aria-label="Footer">
         <a href="./">Home</a>
