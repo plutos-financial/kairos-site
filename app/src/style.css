@@ -235,3 +235,9 @@ html:has(body.landing) { scroll-behavior: smooth; }
 
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 pre.code:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Fingers need about 44px. On touch screens the menu, footer and "on this page" links get a taller tap
+   area; with a mouse nothing changes. */
+@media (pointer: coarse) {
+  .nav-links a, .nav-signin, .foot-links a, .toc a { display: inline-flex; align-items: center; min-height: 44px; }
+}
