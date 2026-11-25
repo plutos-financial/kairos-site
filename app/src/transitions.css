@@ -141,8 +141,10 @@
   z-index: 1;
   transition: color var(--tabs-dur) var(--tabs-ease);
 }
-.t-tab:not([aria-selected="true"]):hover,
-.t-tab[aria-selected="true"] {
+/* Lit when chosen: aria-selected on a tab, aria-checked where the same control is a radio group. */
+.t-tab:hover,
+.t-tab[aria-selected="true"],
+.t-tab[aria-checked="true"] {
   color: var(--tabs-text-active);
 }
 

@@ -1,9 +1,11 @@
 // Homepage: the sample draw, the chances calculator, the questions, the waitlist (Google Sheet)
 // and the film on the first screen.
-import { $ } from "./core.js";
+// Nothing from core.js: that module carries the demo's blockchain library, which the homepage never uses.
+import "./fresh.js"; // reloads a stale cached page after a site update, and refuses to run inside another site's frame
 import built from "./site-config.json";
 import { reveal } from "./motion.js";
 
+const $ = (id) => document.getElementById(id);
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const wait = (ms) => (calm ? Promise.resolve() : new Promise((r) => setTimeout(r, ms)));
 const money = (n) => "$" + n.toLocaleString("en-US");
@@ -95,8 +97,7 @@ function calculator() {
     range.setAttribute("aria-valuetext", money(amt));
     choices.forEach((b) => {
       const on = Number(b.dataset.x) === kept;
-      b.setAttribute("aria-checked", String(on));
-      b.setAttribute("aria-selected", String(on));
+      b.setAttribute("aria-checked", String(on));   // a radio is checked, never "selected" (that is for tabs)
       b.tabIndex = on ? 0 : -1;
     });
   };

@@ -41,8 +41,8 @@
       <h1>How Plutos keeps savings safe</h1>
       <p class="ex-lede">Plutos comes in two editions, and this page covers both. The pilot holds real savings. The demo is an earlier test edition built on smart contracts, with test money. Each is checked in its own way.</p>
       <div class="stat-strip">
-        <div><b>270+</b><span>automated tests on the pilot, run on every change</span></div>
-        <div><b>Daily</b><span>check of the pilot's books against the broker and Stripe</span></div>
+        <div><b>430+</b><span>automated tests on the pilot, run on every change</span></div>
+        <div><b>$1</b><span>is the most the pilot's books may differ from the balance at Stripe before everything pauses</span></div>
         <div><b>38</b><span>tests on the demo's contracts, 38,400 random actions per safety check</span></div>
         <div><b>0</b><span>high-severity scanner findings on the contracts</span></div>
       </div>
@@ -63,13 +63,13 @@
       <p>The pilot is invite-only and limited to 100 savers. It doesn't use the smart contracts described further down. Money moves by bank transfer through Stripe, savings are held in a Stripe account kept only for savers' money, and Plutos keeps the books. This is what protects it.</p>
       <ul class="honest">
         <li><b>Records that can't be rewritten.</b> Every deposit, withdrawal, prize and fee is a balanced entry in a ledger that can only be added to. The database itself refuses edits and deletions, so a mistake is fixed with a new, visible entry, never by changing an old one.</li>
-        <li><b>Checked against the outside world every day.</b> Each morning Plutos's books are compared with the balance at Stripe. If they differ by more than a dollar, deposits, withdrawals and draws stop until a founder has found the cause and written down what it was.</li>
+        <li><b>Checked against the outside world.</b> Plutos's books are compared with the balance at Stripe. If they differ by more than a dollar, deposits, withdrawals and draws stop until a founder has found the cause and written down what it was.</li>
         <li><b>Prizes only from interest.</b> Only interest earned on savings can reach the prize pool. Deposits can't.</li>
         <li><b>Nobody chooses the winners.</b> Entries are locked and a fingerprint of them is published before the random number exists. The number comes from drand, a public beacon, and Plutos checks its signature before using it. The software has no way to accept a number from a person.</li>
         <li><b>Every draw is worked out twice.</b> After each draw the winners are recomputed from the stored entries and the published number, and members can run the same check in their browser.</li>
         <li><b>Savers' money apart from ours.</b> Customer money and company money are tracked separately. The only money that crosses is Plutos's 15% share of the interest, once a month.</li>
-        <li><b>Locked down.</b> Bank references are encrypted, backups are encrypted and test-restored, the app can't alter its own history even if it were broken into, and every action a founder takes is logged.</li>
-        <li><b>Tested on every change.</b> More than 270 automated tests run against two different databases whenever the code changes, along with a simulated four months of deposits, withdrawals and draws that has to reconcile every day.</li>
+        <li><b>Locked down.</b> Bank references are encrypted, the app can't alter its own history even if it were broken into, and every action a founder takes is logged.</li>
+        <li><b>Tested on every change.</b> More than 430 automated tests run against two different databases whenever the code changes, along with a simulated four months of deposits, withdrawals and draws that has to reconcile every day.</li>
       </ul>
       <p><b>What hasn't been done yet.</b> The pilot has not had an independent security audit, and there is no bug bounty. Its tests were written by the people who wrote the code. That is why it is small and invite-only, and why it will stay that way until an outside review has been done.</p>
     </section>
