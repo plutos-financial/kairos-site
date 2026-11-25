@@ -10,6 +10,7 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read   # the deploy step looks up the uploaded site among this run's artifacts
 concurrency:
   group: pages
   cancel-in-progress: false
